@@ -1,0 +1,35 @@
+{
+  "name": "stemngine",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.umd.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "./sandbox"
+  ],
+  "scripts": {
+    "dev:sandbox": "tsc -b packages/engine sandbox --watch",
+    "test:sandbox:dist": "pnpm --filter @stemngine/engine build:dev && pnpm --filter sandbox dev"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.17.1",
+  "devDependencies": {
+    "@rollup/plugin-node-resolve": "^16.0.1",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@testing-library/jest-dom": "^6.8.0",
+    "@vitest/ui": "^3.2.4",
+    "fast-glob": "^3.3.3",
+    "javascript-obfuscator": "^4.1.1",
+    "rollup": "^4.52.3",
+    "rollup-plugin-dts": "^6.2.3",
+    "rollup-plugin-obfuscator": "^1.1.0",
+    "rollup-plugin-typescript2": "^0.36.0",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  }
+}

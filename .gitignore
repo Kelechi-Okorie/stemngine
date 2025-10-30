@@ -1,0 +1,18 @@
+# Node modules
+node_modules/
+packages/*/node_modules
+sandbox/node_modules
+
+# Build outputs
+dist/
+packages/*/dist
+sandbox/dist
+
+# Coverage and misc
+coverage/
+packages/*/coverage
+sandbox/coverage
+.DS_Store
+
+# TypeScript cache
+*.tsbuildinfo

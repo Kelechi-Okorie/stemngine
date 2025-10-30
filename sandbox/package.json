@@ -1,0 +1,20 @@
+{
+  "name": "sandbox",
+  "version": "1.0.0",
+  "description": "Sandbox for Stemngine",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "build:dev": "rollup -c",
+    "build:dev:watch": "rollup -c -w",
+    "start": "vite"
+  },
+  "dependencies": {
+    "@stemngine/engine": "workspace:*"
+  },
+  "devDependencies": {
+    "vite": "^7.1.7"
+  }
+}
