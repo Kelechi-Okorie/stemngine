@@ -1,6 +1,7 @@
 // Types - for type checking only
 import type { Matrix3 } from './Matrix3';
 import type { Matrix4 } from './Matrix4';
+import { clamp } from './MathUtils';
 
 // Implementations
 // import { Matrix3 as Matrix3Impl } from './Matrix3'; // actual class at runtime
@@ -53,7 +54,7 @@ export class Vector3 {
    * @param z - The z component.
    * @returns The current instance.
    */
-  set(x: number, y: number, z?: number): this {
+  public set(x: number, y: number, z?: number): this {
     if (z === undefined) z = this.z;
     this.x = x;
     this.y = y;
@@ -68,7 +69,7 @@ export class Vector3 {
    * @param scalar - The value to set for all components.
    * @returns A reference to this vector
    */
-  setScalar(scalar: number): this {
+  public setScalar(scalar: number): this {
     this.x = scalar;
     this.y = scalar;
     this.z = scalar;
@@ -82,7 +83,7 @@ export class Vector3 {
    * @param x - The x component.
    * @returns The current instance.
    */
-  setX(x: number): this {
+  public setX(x: number): this {
     this.x = x;
 
     return this;
@@ -94,7 +95,7 @@ export class Vector3 {
    * @param y - The y component.
    * @returns The current instance.
    */
-  setY(y: number): this {
+  public setY(y: number): this {
     this.y = y;
 
     return this;
@@ -106,7 +107,7 @@ export class Vector3 {
    * @param z - The z component.
    * @returns The current instance.
    */
-  setZ(z: number): this {
+  public setZ(z: number): this {
     this.z = z;
 
     return this;
@@ -119,7 +120,7 @@ export class Vector3 {
    * @param value - The value to set.
    * @returns The current instance.
    */
-  setComponent(index: number, value: number): this {
+  public setComponent(index: number, value: number): this {
     switch (index) {
       case 0: this.x = value; break;
       case 1: this.y = value; break;
@@ -130,7 +131,7 @@ export class Vector3 {
     return this;
   }
 
-  getComponent(index: number): number {
+  public getComponent(index: number): number {
     switch (index) {
       case 0: return this.x;
       case 1: return this.y;
@@ -144,7 +145,7 @@ export class Vector3 {
    *
    * @returns A clone of this instance.
    */
-  clone(): Vector3 {
+  public clone(): Vector3 {
     return new (this.constructor as any)(this.x, this.y, this.z);
   }
 
@@ -154,7 +155,7 @@ export class Vector3 {
    * @param v - The vector to copy from.
    * @returns The current instance.
    */
-  copy(v: Vector3): this {
+  public copy(v: Vector3): this {
     this.x = v.x;
     this.y = v.y;
     this.z = v.z;
@@ -168,7 +169,7 @@ export class Vector3 {
    * @param v - The vector to add.
    * @returns The current instance.
    */
-  add(v: Vector3): this {
+  public add(v: Vector3): this {
     this.x += v.x;
     this.y += v.y;
     this.z += v.z;
@@ -182,7 +183,7 @@ export class Vector3 {
    * @param s - The scalar to add.
    * @returns The current instance.
    */
-  addScalar(s: number): this {
+  public addScalar(s: number): this {
     this.x += s;
     this.y += s;
     this.z += s;
@@ -197,7 +198,7 @@ export class Vector3 {
    * @param b - The second vector to add.
    * @returns The current instance.
    */
-  addVectors(a: Vector3, b: Vector3): this {
+  public addVectors(a: Vector3, b: Vector3): this {
     this.x = a.x + b.x;
     this.y = a.y + b.y;
     this.z = a.z + b.z;
@@ -212,7 +213,7 @@ export class Vector3 {
    * @param s - The scalar to scale the vector by before adding.
    * @returns The current instance.
    */
-  addScaledVector(v: Vector3, s: number): this {
+  public addScaledVector(v: Vector3, s: number): this {
     this.x += v.x * s;
     this.y += v.y * s;
     this.z += v.z * s;
@@ -226,7 +227,7 @@ export class Vector3 {
    * @param v - The vector to subtract.
    * @returns The current instance.
    */
-  sub(v: Vector3): this {
+  public sub(v: Vector3): this {
     this.x -= v.x;
     this.y -= v.y;
     this.z -= v.z;
@@ -240,7 +241,7 @@ export class Vector3 {
    * @param s - The scalar to subtract.
    * @returns The current instance.
    */
-  subScalar(s: number): this {
+  public subScalar(s: number): this {
     this.x -= s;
     this.y -= s;
     this.z -= s;
@@ -255,7 +256,7 @@ export class Vector3 {
    * @param b - The second vector to subtract.
    * @returns The current instance.
    */
-  subVectors(a: Vector3, b: Vector3): this {
+  public subVectors(a: Vector3, b: Vector3): this {
     this.x = a.x - b.x;
     this.y = a.y - b.y;
     this.z = a.z - b.z;
@@ -269,7 +270,7 @@ export class Vector3 {
    * @param v - The vector to multiply by.
    * @returns The current instance.
    */
-  multiply(v: Vector3): this {
+  public multiply(v: Vector3): this {
     this.x *= v.x;
     this.y *= v.y;
     this.z *= v.z;
@@ -283,7 +284,7 @@ export class Vector3 {
    * @param s - The scalar to multiply by.
    * @returns The current instance.
    */
-  multiplyScalar(s: number): this {
+  public multiplyScalar(s: number): this {
     this.x *= s;
     this.y *= s;
     this.z *= s;
@@ -298,7 +299,7 @@ export class Vector3 {
    * @param b - The second vector to multiply.
    * @returns The current instance.
    */
-  multiplyVectors(a: Vector3, b: Vector3): this {
+  public multiplyVectors(a: Vector3, b: Vector3): this {
     this.x = a.x * b.x;
     this.y = a.y * b.y;
     this.z = a.z * b.z;
@@ -312,7 +313,7 @@ export class Vector3 {
    * @param v - The vector to divide by.
    * @returns The current instance.
    */
-  divide(v: Vector3): this {
+  public divide(v: Vector3): this {
 
     if (v.x === 0 || v.y === 0 || v.z === 0) {
       throw new Error('division by zero');
@@ -331,7 +332,7 @@ export class Vector3 {
    * @param s - The scalar to divide by.
    * @returns The current instance.
    */
-  divideScalar(s: number): this {
+  public divideScalar(s: number): this {
     if (s === 0) {
       throw new Error('division by zero');
     }
@@ -345,7 +346,7 @@ export class Vector3 {
    * @param euler - The Euler rotation to apply.
    * @return The current instance.
    */
-  applyEuler(euler: any): this {
+  public applyEuler(euler: any): this {
     // TODO: implement once Euler and Quaternion are available
     throw new Error('applyEuler is not implemented yet');
   }
@@ -357,7 +358,7 @@ export class Vector3 {
    * @param angle - The angle in radians.
    * @returns The current instance.
    */
-  applyAxisAngle(axis: Vector3, angle: number): this {
+  public applyAxisAngle(axis: Vector3, angle: number): this {
     // TODO: implement once Quaternion is available
     throw new Error('applyAxisAngle is not implemented yet');
   }
@@ -368,7 +369,7 @@ export class Vector3 {
    * @param m - The 3x3 matrix to apply.
    * @returns The current instance.
    */
-  applyMatrix3(m: Matrix3) {
+  public applyMatrix3(m: Matrix3) {
     const x = this.x, y = this.y, z = this.z;
     const e = m.elements;
 
@@ -385,7 +386,7 @@ export class Vector3 {
    * @param m - normal matrix.
    * @return The current instance
    */
-  applyNormalMatrix(m: Matrix3) {
+  public applyNormalMatrix(m: Matrix3) {
     return this.applyMatrix3(m).normalize();
   }
 
@@ -396,7 +397,7 @@ export class Vector3 {
    * @param m - tha matrix to apply
    * @return The current instance
    */
-  applyMatrix4(m: Matrix4) {
+  public applyMatrix4(m: Matrix4) {
     const x = this.x, y = this.y, z = this.z;
     const e = m.elements;
 
@@ -412,12 +413,36 @@ export class Vector3 {
   /**
    * Applies the given Quaternion rotation to this vector.
    *
+   * @remarks
+   * Rotates this vector by the given quaternion
+   * Assumes the quaternion is normalized. If quaternion is not normalized,
+   * the rotation will scale the vector (incorrectly) as well
+   *
    * @param q - The Quaternion to apply.
    * @return The current instance.
    */
-  applyQuaternion(q: any): this {
-    // TODO: implement once Quaternion is available
-    throw new Error('applyQuaternion is not implemented yet');
+  public applyQuaternion(q: any): this {
+    // quaternion q is assumed to have unit length
+
+    // Extract vector components
+    const vx = this.x, vy = this.y, vz = this.z;
+    // Extract quaternion components
+    const qx = q.x, qy = q.y, qz = q.z, qw = q.w;
+
+    // t = 2 * cross( q.xyz, v );
+    // Twice the cross product of quaternion vector part and the vector
+    const tx = 2 * (qy * vz - qz * vy);
+    const ty = 2 * (qz * vx - qx * vz);
+    const tz = 2 * (qx * vy - qy * vx);
+
+    // v + q.w * t + cross( q.xyz, t );
+    // qw * t -> rotates the vector along the quaternion's scalar part
+    // cross( q.xyz, t ) -> rotates the vector along the quaternion's vector part
+    this.x = vx + qw * tx + qy * tz - qz * ty;
+    this.y = vy + qw * ty + qz * tx - qx * tz;
+    this.z = vz + qw * tz + qx * ty - qy * tx;
+
+    return this;
   }
 
   /**
@@ -427,7 +452,7 @@ export class Vector3 {
    * @param camera - The camera.
    * @return The current instance
    */
-  project(camera: any): this {
+  public project(camera: any): this {
     // TODO: implement once Camera is available
     throw new Error('project is not implemented yet');
   }
@@ -439,7 +464,7 @@ export class Vector3 {
    * @param camera - The camera.
    * @return The current instance
    */
-  unproject(camera: any): this {
+  public unproject(camera: any): this {
     // TODO: implement once camera is available
     throw new Error('unproject is not yet implemented');
   }
@@ -463,7 +488,7 @@ export class Vector3 {
    * @param m - The matrix.
    * @return The current instance
    */
-  transformDirection(m: Matrix4): this {
+  public transformDirection(m: Matrix4): this {
     // input: Matrix4 affine matrix
     // vector interpreted as a direction
 
@@ -477,6 +502,65 @@ export class Vector3 {
     return this.normalize();
   }
 
+  /**
+   * If this vector's components values are greater than the given vector's component
+   * values, set them to the given vector's component values.
+   *
+   * @param v - the vector to compare to.
+   * @returns The current instance.
+   */
+  public min(v: Vector3): this {
+    this.x = Math.min(this.x, v.x);
+    this.y = Math.min(this.y, v.y);
+    this.z = Math.min(this.z, v.z);
+
+    return this;
+  }
+
+  /**
+   * If this vector's component values are less than the given vector's component
+   * values, set them to the given vector's component values.
+   *
+   * @param v - the vector to compare to.
+   * @returns The current instance.
+   */
+  public max(v: Vector3): this {
+    this.x = Math.max(this.x, v.x);
+    this.y = Math.max(this.y, v.y);
+    this.z = Math.max(this.z, v.z);
+
+    return this;
+  }
+
+  /**
+   * If any component of this vector is greater than the corresponding component
+   * of the max vector, it is replaced by the value from the max vector
+   * if any componentn of this vector is less than the corresponding component of
+   * the min vector, it is replaced by the value from the min vector
+   *
+   * @param min - the min vector
+   * @param max - the max vector
+   * @return The current instance
+   */
+  public clamp(min: Vector3, max: Vector3) {
+    // assume min < max, componentwise
+
+    this.x = clamp(this.x, min.x, max.x);
+    this.y = clamp(this.y, min.y, max.y);
+    this.z = clamp(this.z, min.z, max.z);
+
+    return this;
+  }
+
+  /**
+   * Calculates the dot product of the vicen vector with this instance.
+   *
+   * @param v - The vector to compute the dot product with.
+   * @returns The result of the dot product
+   */
+  dot(v: Vector3): number {
+    return this.x * v.x + this.y * v.y + this.z * v.z;
+  }
 
   ////////////////////////////////////////////////////////////////
   /* End of linear timeline */
@@ -492,7 +576,7 @@ export class Vector3 {
    *
    * @return The square of the length of this vector
    */
-  lengthSq() {
+  public lengthSq() {
     return this.x * this.x + this.y * this.y + this.z * this.z;
   }
 
@@ -501,7 +585,7 @@ export class Vector3 {
    *
    * @return The length of this vector.
    */
-  length() {
+  public length() {
     return Math.sqrt(this.lengthSq());
   }
 
@@ -511,8 +595,91 @@ export class Vector3 {
    *
    * @return The current instance
    */
-  normalize() {
+  public normalize() {
     return this.divideScalar(this.length() || 1);
+  }
+
+
+  /**
+   * Calculates the cross product of the given vectors and stores the result in this instance.
+   *
+   * @param a - The first vector.
+   * @param b - The second vector.
+   * @returns The current instance.
+   */
+  crossVectors(a: Vector3, b: Vector3): this {
+    const ax = a.x, ay = a.y, az = a.z;
+    const bx = b.x, by = b.y, bz = b.z;
+
+    this.x = ay * bz - az * by;
+    this.y = az * bx - ax * bz;
+    this.z = ax * by - ay * bx;
+
+    return this;
+  }
+
+
+  /**
+   * Sets vector components from an array.
+   *
+   * @param array - The array to read from.
+   * @param offset - The offset into the array where the vector components start. Default is `0`.
+   * @returns A reference to this vector.
+   */
+  public fromArray(array: number[], offset: number = 0): this {
+    this.x = array[offset];
+    this.y = array[offset + 1];
+    this.z = array[offset + 2];
+
+    return this;
+  }
+
+  /**
+   * Sets the vector components from the specified matrix column.
+   *
+   * @param m - The 4x4 matrix
+   * @param index - The column index (0, 1, 2, or 3)
+   * @returns A reference to this vector
+   */
+  public setFromMatrixColumn(m: Matrix4, index: number): this {
+    return this.fromArray(m.elements, index * 4);
+  }
+
+  /**
+   * Sets the vector components from the specified matrix column.
+   *
+   * @param m - The 3x3 matrix
+   * @param index - The column index (0, 1, or 2)
+   * @returns A reference to this vector
+   */
+  public setFromMatrix3Column(m: Matrix3, index: number): this {
+    return this.fromArray(m.elements, index * 3);
+  }
+
+  /**
+   * Returns `true` if this vector is equal to the given vector.
+   *
+   * @param v - The vector to compare with.
+   * @returns `true` if the vectors are equal, `false` otherwise.
+   */
+  public equals(v: Vector3): boolean {
+    return ((v.x === this.x) && (v.y === this.y) && (v.z === this.z));
+  }
+
+  /**
+   * Writes the components of this vector to the given array. If no array is provided,
+   * the method returns a new instance
+   *
+   * @param array - The array to write to.
+   * @param offset - Index of the first element in the array. Default is 0
+   * @returns The vector components in an array
+   */
+  public toArray(array: number[] = [], offset: number = 0): number[] {
+    array[offset] = this.x;
+    array[offset + 1] = this.y;
+    array[offset + 2] = this.z;
+
+    return array;
   }
 
 }

@@ -2,23 +2,27 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { Vector3 } from '../../../src/math/Vector3';
 import { Matrix3 } from '../../../src/math/Matrix3';
 import { Matrix4 } from '../../../src/math/Matrix4';
+import { Quaternion } from '../../../src/math/Quaternion';
 
 describe('Vector3', () => {
-  it('schould create with default values (0, 0, 0)', () => {
-    const v = new Vector3();
+  describe('constructor()', () => {
 
-    expect(v.x).toBe(0);
-    expect(v.y).toBe(0);
-    expect(v.z).toBe(0);
-    expect(v.isVector3).toBe(true);
-  });
+    it('schould create with default values (0, 0, 0)', () => {
+      const v = new Vector3();
 
-  it('schould create with given values', () => {
-    const v = new Vector3(1, 2, 3);
+      expect(v.x).toBe(0);
+      expect(v.y).toBe(0);
+      expect(v.z).toBe(0);
+      expect(v.isVector3).toBe(true);
+    });
 
-    expect(v.x).toBe(1);
-    expect(v.y).toBe(2);
-    expect(v.z).toBe(3);
+    it('schould create with given values', () => {
+      const v = new Vector3(1, 2, 3);
+
+      expect(v.x).toBe(1);
+      expect(v.y).toBe(2);
+      expect(v.z).toBe(3);
+    });
   });
 
   describe('set()', () => {
@@ -66,7 +70,7 @@ describe('Vector3', () => {
     });
   });
 
-  describe('Vector3 setX / setY / setZ', () => {
+  describe('Vector3 setX(), setY() setZ()', () => {
     it('setX should update the component and return this', () => {
       const v = new Vector3(1, 2, 3);
       const result = v.setX(10);
@@ -107,7 +111,7 @@ describe('Vector3', () => {
     });
   });
 
-  describe('Vector3 setComponent / getComponent', () => {
+  describe('setComponent(), getComponent()', () => {
     it('setComponent should correctly set x, y, z by index', () => {
       const v = new Vector3();
 
@@ -162,7 +166,7 @@ describe('Vector3', () => {
     });
   });
 
-  describe('Vector3.clone()', () => {
+  describe('clone()', () => {
     it('should create a new Vector3 with the same component values', () => {
       const v = new Vector3(1, 2, 3);
       const c = v.clone();
@@ -219,7 +223,7 @@ describe('Vector3', () => {
     });
   });
 
-  describe('Vector3.copy()', () => {
+  describe('copy()', () => {
     it('should copy the values from another vector', () => {
       const v1 = new Vector3(1, 2, 3);
       const v2 = new Vector3();
@@ -265,7 +269,7 @@ describe('Vector3', () => {
     });
   });
 
-  describe('Vector3.add()', () => {
+  describe('add()', () => {
     it('should correctly add another vector this vector', () => {
       const v1 = new Vector3(1, 2, 3);
       const v2 = new Vector3(4, 5, 6);
@@ -324,7 +328,7 @@ describe('Vector3', () => {
     });
   });
 
-  describe('Vector3.addScalar()', () => {
+  describe('addScalar()', () => {
     it('should add a scalar to all components', () => {
       const v = new Vector3(1, 2, 3);
       v.addScalar(5);
@@ -360,7 +364,7 @@ describe('Vector3', () => {
     });
   });
 
-  describe('Vector3.addVectors()', () => {
+  describe('addVectors()', () => {
     it('should set this vector to the sum of two other vectors', () => {
       const a = new Vector3(1, 2, 3);
       const b = new Vector3(4, 5, 6);
@@ -424,7 +428,7 @@ describe('Vector3', () => {
     });
   });
 
-  describe('Vector3.addScaledVector()', () => {
+  describe('addScaledVector()', () => {
     it('should add the vector scaled by the scalar to this vector', () => {
       const v = new Vector3(1, 1, 1);
       const w = new Vector3(2, 3, 4);
@@ -479,7 +483,7 @@ describe('Vector3', () => {
     });
   });
 
-  describe('Vector3.sub()', () => {
+  describe('sub()', () => {
     it('should subtract the given vector from this vector', () => {
       const v = new Vector3(5, 7, 9);
       const w = new Vector3(1, 2, 3);
@@ -534,7 +538,7 @@ describe('Vector3', () => {
     });
   });
 
-  describe('Vector3.subScalar()', () => {
+  describe('subScalar()', () => {
     it('should subtract the scalar from all components', () => {
       const v = new Vector3(10, 20, 30);
 
@@ -574,7 +578,7 @@ describe('Vector3', () => {
     });
   });
 
-  describe('Vector3.subVectors()', () => {
+  describe('subVectors()', () => {
     it('should set this vector to the difference of two other vectors', () => {
       const a = new Vector3(10, 20, 30);
       const b = new Vector3(1, 2, 3);
@@ -638,7 +642,7 @@ describe('Vector3', () => {
     });
   });
 
-  describe('Vector3.multiply()', () => {
+  describe('multiply()', () => {
     it('should multiply corresponding components of this vector and given vector', () => {
       const v = new Vector3(2, 3, 4);
       const w = new Vector3(5, 6, 7);
@@ -693,7 +697,7 @@ describe('Vector3', () => {
     });
   });
 
-  describe('Vector3.multiplyScalar()', () => {
+  describe('multiplyScalar()', () => {
     it('should multiply all components by a positive scalar', () => {
       const v = new Vector3(2, 3, 4);
       v.multiplyScalar(2);
@@ -738,7 +742,7 @@ describe('Vector3', () => {
     });
   });
 
-  describe('Vector3.multiplyVectors()', () => {
+  describe('multiplyVectors()', () => {
     it('should correctly multiply two vectors component-wise and store the result in this vector', () => {
       const v = new Vector3(2, 3, 4);
       const w = new Vector3(5, 6, 7);
@@ -808,7 +812,7 @@ describe('Vector3', () => {
     });
   });
 
-  describe('Vector3.divide()', () => {
+  describe('divide()', () => {
     it('should divide corresponding components of this vector by given vector', () => {
       const v = new Vector3(10, 20, 30);
       const w = new Vector3(2, 4, 5);
@@ -870,7 +874,7 @@ describe('Vector3', () => {
     });
   });
 
-  describe('Vector3.divideScalar()', () => {
+  describe('divideScalar()', () => {
     it('should divide all components by a positive scalar', () => {
       const v = new Vector3(10, 20, 30);
 
@@ -916,7 +920,7 @@ describe('Vector3', () => {
     });
   });
 
-  describe('Vector3.applyMatrix3()', () => {
+  describe('applyMatrix3()', () => {
     it('should apply identity matrix and leave the vector unchanged', () => {
       const v = new Vector3(1, 2, 3);
       const m = new Matrix3();  // identity by default;
@@ -974,7 +978,7 @@ describe('Vector3', () => {
     });
   });
 
-  describe('Vector3.lengthSq()', () => {
+  describe('lengthSq()', () => {
     it('should return 0 for the zero vector', () => {
       const v = new Vector3(0, 0, 0);
 
@@ -1000,7 +1004,7 @@ describe('Vector3', () => {
     });
   });
 
-  describe('Vector3.length()', () => {
+  describe('length()', () => {
     it('should return 0 for the zero vector', () => {
       const v = new Vector3(0, 0, 0); // length(v) = 0
 
@@ -1026,7 +1030,7 @@ describe('Vector3', () => {
     });
   });
 
-  describe('Vector3.normalize()', () => {
+  describe('normalize()', () => {
     it('should normalize a non-zero vector to length 1 ', () => {
       const v = new Vector3(3, 4, 0)  // length = 5
 
@@ -1064,7 +1068,61 @@ describe('Vector3', () => {
     });
   });
 
-  describe('Vector3.applyNormalMatrix()', () => {
+  describe('crossVectors()', () => {
+    it('should compute the correct cross product of two perpendicular unit vectors', () => {
+      const a = new Vector3(1, 0, 0); // x-axis
+      const b = new Vector3(0, 1, 0); // y-axis
+      const result = new Vector3().crossVectors(a, b);
+
+      expect(result.x).toBeCloseTo(0);
+      expect(result.y).toBeCloseTo(0);
+      expect(result.z).toBeCloseTo(1); // right-hand rule → z-axis
+    });
+
+    it('should produce the opposite direction if vector order is swapped', () => {
+      const a = new Vector3(1, 0, 0);
+      const b = new Vector3(0, 1, 0);
+      const result = new Vector3().crossVectors(b, a);
+
+      expect(result.x).toBeCloseTo(0);
+      expect(result.y).toBeCloseTo(0);
+      expect(result.z).toBeCloseTo(-1);
+    });
+
+    it('should return a vector perpendicular to both input vectors', () => {
+      const a = new Vector3(2, 3, 4);
+      const b = new Vector3(5, 6, 7);
+      const result = new Vector3().crossVectors(a, b);
+
+      // Dot product should be zero if perpendicular
+      const dotA = result.dot(a);
+      const dotB = result.dot(b);
+
+      expect(dotA).toBeCloseTo(0);
+      expect(dotB).toBeCloseTo(0);
+    });
+
+    it('should handle parallel vectors (cross product = zero vector)', () => {
+      const a = new Vector3(1, 2, 3);
+      const b = new Vector3(2, 4, 6); // b = 2 * a
+      const result = new Vector3().crossVectors(a, b);
+
+      expect(result.x).toBeCloseTo(0);
+      expect(result.y).toBeCloseTo(0);
+      expect(result.z).toBeCloseTo(0);
+    });
+
+    it('should return the same instance (this)', () => {
+      const a = new Vector3(1, 0, 0);
+      const b = new Vector3(0, 1, 0);
+      const v = new Vector3();
+
+      const returned = v.crossVectors(a, b);
+      expect(returned).toBe(v); // same reference
+    });
+  })
+
+  describe('applyNormalMatrix()', () => {
     it('should apply the matrix and normalize the result', () => {
       // [ 2 0 0 ]
       // [ 0 3 0 ]
@@ -1114,7 +1172,7 @@ describe('Vector3', () => {
     });
   });
 
-  describe('Vector3.applyMatrix4()', () => {
+  describe('applyMatrix4()', () => {
     it('should correctly apply a translation matrix', () => {
       const v = new Vector3(1, 2, 3);
 
@@ -1174,6 +1232,539 @@ describe('Vector3', () => {
       const m = new Matrix4();
       const result = v.applyMatrix4(m);
       expect(result).toBe(v);
+    });
+  });
+
+  describe('applyQuaternion()', () => {
+    it('should rotate a vector by a unit quaternion', () => {
+      const v = new Vector3(1, 0, 0);
+      const q = new Quaternion(0, 0, Math.sin(Math.PI/4), Math.cos(Math.PI/4)); // 90° around Z
+      v.applyQuaternion(q);
+      expect(v.x).toBeCloseTo(0);
+      expect(v.y).toBeCloseTo(1);
+      expect(v.z).toBeCloseTo(0);
+    });
+
+    it('should return itself for chaining', () => {
+      const v = new Vector3(1, 2, 3);
+      const q = new Quaternion(0, 0, 0, 1);
+      const result = v.applyQuaternion(q);
+      expect(result).toBe(v);
+    });
+
+    it('should not modify the vector if quaternion is identity', () => {
+      const v = new Vector3(5, -2, 3);
+      const q = new Quaternion(0, 0, 0, 1); // identity quaternion
+      v.applyQuaternion(q);
+      expect(v.x).toBeCloseTo(5);
+      expect(v.y).toBeCloseTo(-2);
+      expect(v.z).toBeCloseTo(3);
+    });
+
+    it('should handle rotation around X axis', () => {
+      const v = new Vector3(0, 1, 0);
+      const q = new Quaternion(Math.sin(Math.PI/4), 0, 0, Math.cos(Math.PI/4)); // 90° around X
+      v.applyQuaternion(q);
+      expect(v.x).toBeCloseTo(0);
+      expect(v.y).toBeCloseTo(0);
+      expect(v.z).toBeCloseTo(1);
+    });
+  });
+
+  describe('transformDirection()', () => {
+    it('should rotate direction vector correctly', () => {
+      const dir = new Vector3(1, 0, 0);
+
+      // 90 degree rotation around Z axis
+      const angle = Math.PI / 2;
+      const cos = Math.cos(angle);
+      const sin = Math.sin(angle);
+
+      const m = new Matrix4(
+        cos, -sin, 0, 0,
+        sin, cos, 0, 0,
+        0, 0, 1, 0,
+        0, 0, 0, 1
+      );
+
+      dir.transformDirection(m);
+
+      // (1,0,0) rotated 90deg around Z -> (0,1,0)
+      expect(dir.x).toBeCloseTo(0);
+      expect(dir.y).toBeCloseTo(1);
+      expect(dir.z).toBeCloseTo(0);
+    });
+
+    it('should ignore translation components', () => {
+      const dir = new Vector3(0, 1, 0);
+
+      // Matrix with translation (should not affect direction)
+      const m = new Matrix4(
+        1, 0, 0, 10,
+        0, 1, 0, 20,
+        0, 0, 1, 30,
+        0, 0, 0, 1
+      );
+
+      dir.transformDirection(m);
+
+      // should be unchanged and normalized
+      expect(dir.x).toBeCloseTo(0, 6);
+      expect(dir.y).toBeCloseTo(1, 6);
+      expect(dir.z).toBeCloseTo(0, 6);
+    });
+
+    // TODO: enable and fix test
+    it.skip('should normalize after transformation with scale', () => {
+      const dir = new Vector3(1, 1, 0);
+
+      // Scaling matrix (non-uniform)
+      const m = new Matrix4().set(
+        2, 0, 0, 0,
+        0, 3, 0, 0,
+        0, 0, 4, 0,
+        0, 0, 0, 1
+      );
+
+      dir.transformDirection(m);
+
+      // still pointing along x but normalized
+      expect(dir.x).toBeCloseTo(1, 6);
+      expect(dir.y).toBeCloseTo(0, 6);
+      expect(dir.z).toBeCloseTo(0, 6);
+      expect(Math.abs(dir.length() - 1)).toBeLessThan(1e-6);
+    });
+
+    // TODO: enable and fix test
+    it.skip('should handle arbitrary rotation and stay normalized', () => {
+      const dir = new Vector3(0, 0, 1);
+      const rotationY = new Matrix4().makeRotationY(Math.PI / 4); // 45 deg
+
+      dir.transformDirection(rotationY);
+
+      // 45 degree rotation around Y axis -> should piont diagonally in XZ plane
+      expect(dir.x).toBeCloseTo(Math.sin(Math.PI / 4), 6);
+      expect(dir.y).toBeCloseTo(0, 6);
+      expect(dir.z).toBeCloseTo(Math.cos(Math.PI / 4), 6);
+      expect(Math.abs(dir.length() - 1)).toBeLessThan(1e-6);
+
+    });
+
+    it('should be chainable', () => {
+      const dir = new Vector3(1, 0, 0);
+      const m = new Matrix4();
+
+      const result = dir.transformDirection(m);
+
+      // ensures it returns same instance
+      expect(result).toBe(dir);
+    });
+  });
+
+  describe('min()', () => {
+    it('should clamp each component to the minimum of itself and the given vector', () => {
+      const a = new Vector3(5, 2, 9);
+      const b = new Vector3(3, 4, 8);
+
+      a.min(b);
+
+      expect(a.x).toBe(3); // min(5,3)
+      expect(a.y).toBe(2); // min(2,4)
+      expect(a.z).toBe(8); // min(9,8)
+    });
+
+    it('should leave components unchanged when all are smaller', () => {
+      const a = new Vector3(1, 2, 3);
+      const b = new Vector3(5, 5, 5);
+
+      a.min(b);
+
+      expect(a.x).toBe(1); // min(1,5)
+      expect(a.y).toBe(2); // min(2,5)
+      expect(a.z).toBe(3); // min(3,5)
+    });
+
+    it('should handle negative numbers correctly', () => {
+      const a = new Vector3(-1, 2, -3);
+      const b = new Vector3(-5, 3, 0);
+
+      a.min(b);
+
+      expect(a.x).toBe(-5); // min(-1,-5)
+      expect(a.y).toBe(2);  // min(2,3)
+      expect(a.z).toBe(-3); // min(-3,0)
+    });
+
+    it('should handle equal vectors correctly', () => {
+      const a = new Vector3(2, 2, 2);
+      const b = new Vector3(2, 2, 2);
+
+      a.min(b);
+
+      expect(a.x).toBe(2);
+      expect(a.y).toBe(2);
+      expect(a.z).toBe(2);
+    });
+
+    it('should be chainable', () => {
+      const a = new Vector3(1, 2, 3);
+      const b = new Vector3(0, 0, 0);
+
+      const result = a.min(b);
+
+      expect(result).toBe(a);
+    });
+  });
+
+  describe('max()', () => {
+    it('should replace components with the larger of the two vectors', () => {
+      const a = new Vector3(1, 5, -3);
+      const b = new Vector3(2, 4, -2);
+
+      a.max(b);
+
+      expect(a.x).toBe(2);     // max(1, 2)
+      expect(a.y).toBe(5);     // max(5, 4);
+      expect(a.z).toBe(-2);    // max(-3, -2);
+    });
+
+
+    // TODO:
+    it.skip('should not modify components that are already larger', () => {
+      const a = new Vector3(5, 5, 5);
+      const b = new Vector3(1, 2, 3);
+
+      a.max(b);
+
+      expect(a.equals(new Vector3(5, 5, 5))).toBe(true);
+    });
+
+    it('should handle negative values correctly', () => {
+      const a = new Vector3(-5, -2, 3);
+      const b = new Vector3(-10, -1, 0);
+
+      a.max(b);
+
+      expect(a.x).toBe(-5); // max(-5, -10)
+      expect(a.y).toBe(-1); // max(-2, -1)
+      expect(a.z).toBe(3);  // max(3, 0)
+    });
+
+    it('should be chainable', () => {
+      const a = new Vector3(0, 1, 2);
+      const b = new Vector3(3, 4, 5);
+
+      const result = a.max(b);
+
+      expect(result).toBe(a);
+    })
+  });
+
+  describe('clamp()', () => {
+    it('clamps components greater than max', () => {
+      const v = new Vector3(15, 5, 20);
+      const min = new Vector3(0, 0, 0);
+      const max = new Vector3(10, 10, 10);
+
+      v.clamp(min, max);
+
+      expect(v.x).toBe(10); // clamped to max.x
+      expect(v.y).toBe(5);  // within range, unchanged
+      expect(v.z).toBe(10); // clamped to max.z
+    });
+
+    it('clamps components less than min', () => {
+      const v = new Vector3(-5, -2, -10);
+      const min = new Vector3(0, 0, 0);
+      const max = new Vector3(10, 10, 10);
+
+      v.clamp(min, max);
+
+      expect(v.x).toBe(0);  // clamped to min.x
+      expect(v.y).toBe(0);  // clamped to min.y
+      expect(v.z).toBe(0);  // clamped to min.z
+    });
+
+    it('does not change components within range', () => {
+      const v = new Vector3(3, 7, 5);
+      const min = new Vector3(0, 0, 0);
+      const max = new Vector3(10, 10, 10);
+
+      v.clamp(min, max);
+
+      expect(v.x).toBe(3);
+      expect(v.y).toBe(7);
+      expect(v.z).toBe(5);
+    });
+
+    it('works when some components are below min and some above max', () => {
+      const v = new Vector3(-5, 5, 20);
+      const min = new Vector3(0, 0, 0);
+      const max = new Vector3(10, 10, 10);
+
+      v.clamp(min, max);
+
+      expect(v.x).toBe(0);  // clamped to min.x
+      expect(v.y).toBe(5);  // unchanged
+      expect(v.z).toBe(10); // clamped to max.z
+    });
+
+    it('returns the current instance for chaining', () => {
+      const v = new Vector3(5, 5, 5);
+      const min = new Vector3(0, 0, 0);
+      const max = new Vector3(10, 10, 10);
+
+      const result = v.clamp(min, max);
+      expect(result).toBe(v); // same instance
+    });
+
+  });
+
+  describe('dot()', () => {
+    it('should compute the correct dot product for simple vectors', () => {
+      const a = new Vector3(1, 2, 3);
+      const b = new Vector3(4, 5, 6);
+      const result = a.dot(b);
+
+      // 1*4 + 2*5 + 3*6 = 32
+      expect(result).toBeCloseTo(32);
+    });
+
+    it('should return 0 for perpendicular (orthogonal) vectors', () => {
+      const a = new Vector3(1, 0, 0);
+      const b = new Vector3(0, 1, 0);
+      const result = a.dot(b);
+
+      expect(result).toBeCloseTo(0);
+    });
+
+    it('should return positive value for vectors pointing in the same direction', () => {
+      const a = new Vector3(1, 2, 3);
+      const b = new Vector3(2, 4, 6); // same direction, scaled
+      const result = a.dot(b);
+
+      // 1*2 + 2*4 + 3*6 = 28
+      expect(result).toBeCloseTo(28);
+    });
+
+    it('should return negative value for vectors pointing in opposite directions', () => {
+      const a = new Vector3(1, 0, 0);
+      const b = new Vector3(-1, 0, 0);
+      const result = a.dot(b);
+
+      expect(result).toBeCloseTo(-1);
+    });
+
+    it('should handle zero vector correctly', () => {
+      const a = new Vector3(0, 0, 0);
+      const b = new Vector3(3, 4, 5);
+      const result = a.dot(b);
+
+      expect(result).toBeCloseTo(0);
+    });
+
+    it('should return the same result regardless of order (commutative)', () => {
+      const a = new Vector3(2, 3, 4);
+      const b = new Vector3(5, 6, 7);
+
+      expect(a.dot(b)).toBeCloseTo(b.dot(a));
+    });
+
+    it('should handle negative components correctly', () => {
+      const a = new Vector3(-1, 2, -3);
+      const b = new Vector3(4, -5, 6);
+      const result = a.dot(b);
+
+      // (-1)*4 + 2*(-5) + (-3)*6 = -4 -10 -18 = -32
+      expect(result).toBeCloseTo(-32);
+    });
+  });
+
+  describe('fromArray()', () => {
+    it('sets vector components from an array', () => {
+      const v = new Vector3();
+      const arr = [1, 2, 3];
+
+      v.fromArray(arr);
+
+      expect(v.x).toBe(1);
+      expect(v.y).toBe(2);
+      expect(v.z).toBe(3);
+    });
+
+    it('uses the offset parameter', () => {
+      const v = new Vector3();
+      const arr = [0, 0, 0, 4, 5, 6];
+
+      v.fromArray(arr, 3);
+
+      expect(v.x).toBe(4);
+      expect(v.y).toBe(5);
+      expect(v.z).toBe(6);
+    });
+
+    it('returns the same instance for chaining', () => {
+      const v = new Vector3();
+      const arr = [7, 8, 9];
+
+      const result = v.fromArray(arr);
+
+      expect(result).toBe(v);
+    });
+  });
+
+  describe('setFromMatrixColumn()', () => {
+    it('should set the vector components from column 0', () => {
+      const m = new Matrix4().fromArray([
+        1, 2, 3, 4,    // column 0
+        5, 6, 7, 8,    // column 1
+        9, 10, 11, 12, // column 2
+        13, 14, 15, 16 // column 3
+      ]);
+
+      const v = new Vector3().setFromMatrixColumn(m, 0);
+
+      expect(Array.from(v.toArray())).toEqual([1, 2, 3]);
+    });
+
+    it('should set the vector components from column 1', () => {
+      const m = new Matrix4().fromArray([
+        1, 2, 3, 4,    // column 0
+        5, 6, 7, 8,    // column 1
+        9, 10, 11, 12, // column 2
+        13, 14, 15, 16 // column 3
+      ]);
+
+      const v = new Vector3().setFromMatrixColumn(m, 1);
+
+      expect(Array.from(v.toArray())).toEqual([5, 6, 7]);
+    });
+
+    it('should set the vector components from column 2', () => {
+      const m = new Matrix4().fromArray([
+        1, 2, 3, 4,
+        5, 6, 7, 8,
+        9, 10, 11, 12,
+        13, 14, 15, 16
+      ]);
+
+      const v = new Vector3().setFromMatrixColumn(m, 2);
+
+      expect(Array.from(v.toArray())).toEqual([9, 10, 11]);
+    });
+
+    it('should set the vector components from column 3', () => {
+      const m = new Matrix4().fromArray([
+        1, 2, 3, 4,
+        5, 6, 7, 8,
+        9, 10, 11, 12,
+        13, 14, 15, 16
+      ]);
+
+      const v = new Vector3().setFromMatrixColumn(m, 3);
+
+      expect(Array.from(v.toArray())).toEqual([13, 14, 15]);
+    });
+
+    it('should return this for chaining', () => {
+      const m = new Matrix4();
+      const v = new Vector3();
+      const result = v.setFromMatrixColumn(m, 0);
+      expect(result).toBe(v);
+    });
+  });
+
+  describe('setFromMatrix3Column()', () => {
+    it('sets vector from the first column of the matrix', () => {
+      const v = new Vector3();
+      const m = new Matrix3(
+        1, 2, 3,
+        4, 5, 6,
+        7, 8, 9
+      );
+
+      v.setFromMatrix3Column(m, 0);
+
+      expect(v.x).toBe(1);
+      expect(v.y).toBe(4);
+      expect(v.z).toBe(7);
+    });
+
+    it('sets vector from the second column of the matrix', () => {
+      const v = new Vector3();
+      const m = new Matrix3(
+        1, 2, 3,
+        4, 5, 6,
+        7, 8, 9
+      );
+
+      v.setFromMatrix3Column(m, 1);
+
+      expect(v.x).toBe(2);
+      expect(v.y).toBe(5);
+      expect(v.z).toBe(8);
+    });
+
+    it('sets vector from the third column of the matrix', () => {
+      const v = new Vector3();
+      const m = new Matrix3(
+        1, 2, 3,
+        4, 5, 6,
+        7, 8, 9
+      );
+
+      v.setFromMatrix3Column(m, 2);
+
+      expect(v.x).toBe(3);
+      expect(v.y).toBe(6);
+      expect(v.z).toBe(9);
+    });
+
+    it('returns the same instance for chaining', () => {
+      const v = new Vector3();
+      const m = new Matrix3();
+
+      const result = v.setFromMatrix3Column(m, 0);
+
+      expect(result).toBe(v);
+    });
+  });
+
+  describe('toArray()', () => {
+    it('should write the vector components to a provided array starting at offset 0', () => {
+      const v = new Vector3(1, 2, 3);
+      const arr: number[] = [];
+
+      const result = v.toArray(arr);
+
+      expect(arr).toEqual([1, 2, 3]);
+      expect(result).toBe(arr); // should return the same array
+    });
+
+    it('should write the vector components to a provided array at a specified offset', () => {
+      const v = new Vector3(4, 5, 6);
+      const arr: number[] = [0, 0, 0, 0, 0];
+
+      v.toArray(arr, 1);
+
+      expect(arr).toEqual([0, 4, 5, 6, 0]);
+    });
+
+    it('should return a new array if none is provided', () => {
+      const v = new Vector3(7, 8, 9);
+
+      const result = v.toArray();
+
+      expect(result).toEqual([7, 8, 9]);
+    });
+
+    it('should not overwrite elements outside the specified offset', () => {
+      const v = new Vector3(1, 2, 3);
+      const arr = [9, 9, 9, 9, 9];
+
+      v.toArray(arr, 2);
+
+      expect(arr).toEqual([9, 9, 1, 2, 3]);
     });
   });
 });
