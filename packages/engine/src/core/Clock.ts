@@ -67,6 +67,15 @@ export class Clock {
   public maxAccumulatedTime: number = 0.25;
 
   /**
+   * Whether to ignore tab inactivity when calculating deltaTime.
+   *
+   * @remarks
+   * `true` - pauses simulation when when browser tab is hidden
+   * `false` - keeps simulation running when browser tab is hidden
+   */
+  public pauseOnTabInactivity: boolean = false;
+
+  /**
    * Constructs a new clock instance initializes
    * the starting reference time
    *
@@ -120,7 +129,10 @@ export class Clock {
    */
   public tick(timestamp?: number): void {
     const now = timestamp || performance.now();
-    const rawDelta = (now - this.lastTime) / 1000; // convert ms to s
+    let rawDelta = (now - this.lastTime) / 1000; // convert ms to s
+
+    // avoid huge deltas when tab is inactive
+    if (this.pauseOnTabInactivity && document?.hidden) rawDelta = 0;
 
     this._deltaTime = rawDelta * this.timeScale;
     this._time += this.deltaTime;
