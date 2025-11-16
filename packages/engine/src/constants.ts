@@ -60,6 +60,14 @@ export type GpuType = typeof FloatType | typeof IntType;
 
 export type AnyTypedArray = Float32Array | Uint32Array | Uint16Array | Uint8Array | Int32Array | Int16Array | Int8Array;
 
+/**
+ * Euler orders
+ */
+export type EulerOrder = 'XYZ' | 'YXZ' | 'ZXY' | 'ZYX' | 'YZX' | 'XZY';
+
+/**
+ * The default order of Euler angles.
+ */
 export const EulerDefaultOrder = 'XYZ';
 
 export const REVISION = '180dev';

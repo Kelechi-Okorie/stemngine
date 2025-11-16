@@ -319,21 +319,21 @@ describe('Quaternion', () => {
   });
 
   describe('setW()', () => {
-     it("sets the w component of the quaternion", () => {
-    const q = new Quaternion(1, 2, 3, 4);
-    q.setW(99);
-    expect(q.w).toBe(99);
-  });
+    it("sets the w component of the quaternion", () => {
+      const q = new Quaternion(1, 2, 3, 4);
+      q.setW(99);
+      expect(q.w).toBe(99);
+    });
 
-  it("calls _onChangeCallback when setting w", () => {
-    const q = new Quaternion(0, 0, 0, 0);
-    const spy = vi.spyOn(q as any, "_onChangeCallback");
+    it("calls _onChangeCallback when setting w", () => {
+      const q = new Quaternion(0, 0, 0, 0);
+      const spy = vi.spyOn(q as any, "_onChangeCallback");
 
-    q.setW(42);
+      q.setW(42);
 
-    expect(spy).toHaveBeenCalled();
-    expect(q.w).toBe(42);
-  });
+      expect(spy).toHaveBeenCalled();
+      expect(q.w).toBe(42);
+    });
   });
 
   describe('clone()', () => {
@@ -1739,6 +1739,69 @@ describe('Quaternion', () => {
       expect(json).toEqual([0, 0, 0, 0]);
     });
 
+  });
+
+  describe('_onChange()', () => {
+    it("should not throw if quaternion is modified before registering a callback", () => {
+      const q = new Quaternion();
+      expect(() => q.set(1, 2, 3, 4)).not.toThrow();
+    });
+
+    it("should register the onChange callback and call it when quaternion changes", () => {
+      const q = new Quaternion();
+      const cb = vi.fn();
+
+      q._onChange(cb);
+      q.set(1, 2, 3, 4);
+
+      expect(cb).toHaveBeenCalledTimes(1);
+    });
+
+    it("should override previously-set callbacks", () => {
+      const q = new Quaternion();
+      const cb1 = vi.fn();
+      const cb2 = vi.fn();
+
+      q._onChange(cb1);
+      q._onChange(cb2); // replace old callback
+
+      q.set(0, 0, 0, 1);
+
+      expect(cb1).toHaveBeenCalledTimes(0);
+      expect(cb2).toHaveBeenCalledTimes(1);
+    });
+
+    it("should trigger the callback for other mutating methods (multiply etc.)", () => {
+      const q = new Quaternion();
+      const cb = vi.fn();
+
+      q._onChange(cb);
+      q.multiply(new Quaternion(0, 1, 0, 0));
+
+      expect(cb).toHaveBeenCalledTimes(1);
+    });
+
+    it("should trigger exactly once per change", () => {
+      const q = new Quaternion();
+      const cb = vi.fn();
+
+      q._onChange(cb);
+
+      q.set(1, 0, 0, 1);
+      q.set(0, 1, 0, 1);
+      q.set(0, 0, 1, 1);
+
+      expect(cb).toHaveBeenCalledTimes(3);
+    });
+
+    it("should return this for chaining", () => {
+      const q = new Quaternion();
+      const cb = () => { };
+
+      const result = q._onChange(cb);
+
+      expect(result).toBe(q);
+    });
   });
 
   describe('[Symbol.iterator]()', () => {
