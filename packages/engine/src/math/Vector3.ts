@@ -1,11 +1,12 @@
 // Types - for type checking only
 import type { Matrix3 } from './Matrix3';
+import type { Euler } from './Euler';
 import type { Matrix4 } from './Matrix4';
+
 import { clamp } from './MathUtils';
+import { Quaternion as QuaternionImpl } from './Quaternion';
 
-// Implementations
-// import { Matrix3 as Matrix3Impl } from './Matrix3'; // actual class at runtime
-
+const _quaternion = /*@__PURE__*/ new QuaternionImpl();
 
 /**
  * Class representing a 3D vector.
@@ -55,7 +56,7 @@ export class Vector3 {
    * @returns The current instance.
    */
   public set(x: number, y: number, z?: number): this {
-    if (z === undefined) z = this.z;
+    if (z === undefined) z = this.z;  // sprite.scale.set(x,y)
     this.x = x;
     this.y = y;
     this.z = z;
@@ -346,9 +347,8 @@ export class Vector3 {
    * @param euler - The Euler rotation to apply.
    * @return The current instance.
    */
-  public applyEuler(euler: any): this {
-    // TODO: implement once Euler and Quaternion are available
-    throw new Error('applyEuler is not implemented yet');
+  public applyEuler(euler: Euler): this {
+    return this.applyQuaternion(_quaternion.setFromEuler(euler));
   }
 
   /**
@@ -359,8 +359,7 @@ export class Vector3 {
    * @returns The current instance.
    */
   public applyAxisAngle(axis: Vector3, angle: number): this {
-    // TODO: implement once Quaternion is available
-    throw new Error('applyAxisAngle is not implemented yet');
+    return this.applyQuaternion(_quaternion.setFromAxisAngle(axis, angle));
   }
 
   /**

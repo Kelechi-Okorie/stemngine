@@ -3,6 +3,7 @@ import { Vector3 } from '../../../src/math/Vector3';
 import { Matrix3 } from '../../../src/math/Matrix3';
 import { Matrix4 } from '../../../src/math/Matrix4';
 import { Quaternion } from '../../../src/math/Quaternion';
+import { Euler } from '../../../src/math/Euler';
 
 describe('Vector3', () => {
   describe('constructor()', () => {
@@ -920,6 +921,108 @@ describe('Vector3', () => {
     });
   });
 
+  describe('applyEuler()', () => {
+    it('should rotate a vector around X axis', () => {
+      const v = new Vector3(0, 1, 0);
+      const euler = new Euler(Math.PI / 2, 0, 0, 'XYZ'); // rotate 90 deg around X
+      v.applyEuler(euler);
+
+      // Y becomes Z, Z becomes -Y
+      expect(v.x).toBeCloseTo(0);
+      expect(v.y).toBeCloseTo(0);
+      expect(v.z).toBeCloseTo(1);
+    });
+
+    it('should rotate a vector around Y axis', () => {
+      const v = new Vector3(1, 0, 0);
+      const euler = new Euler(0, Math.PI / 2, 0, 'XYZ'); // rotate 90 deg around Y
+      v.applyEuler(euler);
+
+      // X becomes Z, Z becomes -X
+      expect(v.x).toBeCloseTo(0);
+      expect(v.y).toBeCloseTo(0);
+      expect(v.z).toBeCloseTo(-1);
+    });
+
+    it('should rotate a vector around Z axis', () => {
+      const v = new Vector3(1, 0, 0);
+      const euler = new Euler(0, 0, Math.PI / 2, 'XYZ'); // rotate 90 deg around Z
+      v.applyEuler(euler);
+
+      // X becomes Y, Y becomes -X
+      expect(v.x).toBeCloseTo(0);
+      expect(v.y).toBeCloseTo(1);
+      expect(v.z).toBeCloseTo(0);
+    });
+
+    it('should support chaining', () => {
+      const v = new Vector3(1, 0, 0);
+      const euler = new Euler(0, 0, Math.PI / 2, 'XYZ');
+      const result = v.applyEuler(euler);
+      expect(result).toBe(v); // returns same instance
+    });
+
+    it('should rotate zero vector to remain zero', () => {
+      const v = new Vector3(0, 0, 0);
+      const euler = new Euler(Math.PI / 3, Math.PI / 4, Math.PI / 6, 'XYZ');
+      v.applyEuler(euler);
+      expect(v.x).toBeCloseTo(0);
+      expect(v.y).toBeCloseTo(0);
+      expect(v.z).toBeCloseTo(0);
+    });
+  });
+
+  describe('applyAxisAngle()', () => {
+    it('should rotate vector 90 degrees around X axis', () => {
+      const v = new Vector3(0, 1, 0);
+      const axis = new Vector3(1, 0, 0);
+      v.applyAxisAngle(axis, Math.PI / 2);
+
+      // Y becomes Z, Z becomes -Y
+      expect(v.x).toBeCloseTo(0);
+      expect(v.y).toBeCloseTo(0);
+      expect(v.z).toBeCloseTo(1);
+    });
+
+    it('should rotate vector 90 degrees around Y axis', () => {
+      const v = new Vector3(1, 0, 0);
+      const axis = new Vector3(0, 1, 0);
+      v.applyAxisAngle(axis, Math.PI / 2);
+
+      // X becomes Z, Z becomes -X
+      expect(v.x).toBeCloseTo(0);
+      expect(v.y).toBeCloseTo(0);
+      expect(v.z).toBeCloseTo(-1);
+    });
+
+    it('should rotate vector 90 degrees around Z axis', () => {
+      const v = new Vector3(1, 0, 0);
+      const axis = new Vector3(0, 0, 1);
+      v.applyAxisAngle(axis, Math.PI / 2);
+
+      // X becomes Y, Y becomes -X
+      expect(v.x).toBeCloseTo(0);
+      expect(v.y).toBeCloseTo(1);
+      expect(v.z).toBeCloseTo(0);
+    });
+
+    it('should support chaining', () => {
+      const v = new Vector3(1, 0, 0);
+      const axis = new Vector3(0, 0, 1);
+      const result = v.applyAxisAngle(axis, Math.PI / 2);
+      expect(result).toBe(v); // returns same instance
+    });
+
+    it('should rotate zero vector to remain zero', () => {
+      const v = new Vector3(0, 0, 0);
+      const axis = new Vector3(1, 0, 0);
+      v.applyAxisAngle(axis, Math.PI / 4);
+      expect(v.x).toBeCloseTo(0);
+      expect(v.y).toBeCloseTo(0);
+      expect(v.z).toBeCloseTo(0);
+    });
+  });
+
   describe('applyMatrix3()', () => {
     it('should apply identity matrix and leave the vector unchanged', () => {
       const v = new Vector3(1, 2, 3);
@@ -1238,7 +1341,7 @@ describe('Vector3', () => {
   describe('applyQuaternion()', () => {
     it('should rotate a vector by a unit quaternion', () => {
       const v = new Vector3(1, 0, 0);
-      const q = new Quaternion(0, 0, Math.sin(Math.PI/4), Math.cos(Math.PI/4)); // 90° around Z
+      const q = new Quaternion(0, 0, Math.sin(Math.PI / 4), Math.cos(Math.PI / 4)); // 90° around Z
       v.applyQuaternion(q);
       expect(v.x).toBeCloseTo(0);
       expect(v.y).toBeCloseTo(1);
@@ -1263,7 +1366,7 @@ describe('Vector3', () => {
 
     it('should handle rotation around X axis', () => {
       const v = new Vector3(0, 1, 0);
-      const q = new Quaternion(Math.sin(Math.PI/4), 0, 0, Math.cos(Math.PI/4)); // 90° around X
+      const q = new Quaternion(Math.sin(Math.PI / 4), 0, 0, Math.cos(Math.PI / 4)); // 90° around X
       v.applyQuaternion(q);
       expect(v.x).toBeCloseTo(0);
       expect(v.y).toBeCloseTo(0);

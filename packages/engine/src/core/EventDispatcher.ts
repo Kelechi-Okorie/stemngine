@@ -2,6 +2,7 @@
 export interface BaseEvent {
   type: string;
   target?: any;
+  [key: string]: any;
 }
 
 type EventListener<E extends BaseEvent> = (event: E) => void;
@@ -96,7 +97,7 @@ export class EventDispatcher<TEvents extends  Record<string, BaseEvent> = any> {
         copy[i].call(this, event);
       }
 
-      (event as BaseEvent).target = null;
+      // (event as BaseEvent).target = null;
     }
   }
 
