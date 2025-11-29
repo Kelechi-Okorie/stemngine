@@ -69,7 +69,7 @@ export abstract class Node extends EventDispatcher {
    * This is a hint for renderers. Some renderers may choose to ignore this
    * property depending on the use-case.
    */
-  public readonly visible: boolean = true;
+  public visible: boolean = true;
 
   /**
    * Constructs a new node.

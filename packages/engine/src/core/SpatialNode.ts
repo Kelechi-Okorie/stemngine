@@ -1,8 +1,3 @@
-import type { Vector3 } from '../math/Vector3';
-import type { Euler } from '../math/Euler';
-import type { Quaternion } from '../math/Quaternion';
-import type { Vector2 } from '../math/Vector2';
-
 import { Node } from './Node';
 import { BaseEvent } from './EventDispatcher';
 
@@ -206,6 +201,31 @@ export abstract class SpatialNode extends Node {
   }
 
   /**
+   * Searches through the SpatialNode object and its children, starting with this SpatialNode
+   * and returns all SpatialNode's with a matching property value.
+   *
+   * @param name - The name of the property
+   * @param value - The value
+   * @param result - The method stores the result in this arry
+   * @returns The found SpatialNodes
+   */
+  public getObjectsByProperty(
+    name: keyof SpatialNode,
+    value: any
+    , result: SpatialNode[] = []
+  ): SpatialNode[] {
+    if (this[name] == value) result.push(this);
+
+    const children = this.children;
+
+    for (let i = 0, l = children.length; i < l; i++) {
+      children[i].getObjectsByProperty(name, value, result);
+    }
+
+    return result;
+  }
+
+  /**
    * Executes the callback on this node and all its children
    *
    * @remarks
@@ -261,6 +281,4 @@ export abstract class SpatialNode extends Node {
       parent.traverseAncestors(callback);
     }
   }
-
-  abstract onRotationChange(): void;
 }

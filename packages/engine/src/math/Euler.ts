@@ -130,7 +130,7 @@ export class Euler {
   /**
    * Gets the order of the euler angles
    */
-  public get order(): string {
+  public get order(): EulerOrder {
     return this._order;
   }
 

@@ -431,31 +431,17 @@ export function setQuaternionFromProperEuler(q: Quaternion, a: number, b: number
 }
 
 /**
- * Normalizes the given value according to the given typed array.
+ * Denormalizes the given value according to the given typed array.
  *
  * @remarks
  * This is a low-level numeric conversion utility that is quite common in graphics
  * pipelines like WebGL, image processing, or buffer data parsing.
  *
- * Converts a raw integer or float value into a normalized float that
- * is, a value in a fixed range [0, 1] depending on the data type of the array
- * that value comes from
- *
- * It interprets the numeric type of a given typed array (Float32AArray, Uint8Array, Int16Array,
- * Uint32Array, Int8Array, Int16Array, Int32Array)
- * and scales the number into a canonical range of [0, 1], for unsigned types,
- * or [-1, 1] for signed types.
- *
- * When reading binary geometry, textures, or vertex attributes from GPU buffers, data is
- * often stored compactly (e.g., 8-bit integers) to use it in computations or shaders,
- * you must scale it into a normalized float range first, which is what this function
- * automates
- *
  * @param value - The denormalized value to be normalized
  * @param array - The typed array to use for normalization
  * @returns The normalized (float) value in the range `[0, 1]`
  */
-export function normalize(value: number, array: AnyTypedArray): number {
+export function denormalize(value: number, array: AnyTypedArray): number {
   switch (array.constructor) {
     case Float32Array:
 
@@ -470,6 +456,7 @@ export function normalize(value: number, array: AnyTypedArray): number {
       return value / 65535.0;
 
     case Uint8Array:
+    case Uint8ClampedArray:
 
       return value / 255.0;
 
@@ -492,14 +479,14 @@ export function normalize(value: number, array: AnyTypedArray): number {
 }
 
 /**
- * Denormalizes the given normalized value according to the given typed array.
+ * Normalizes the given value according to the given typed array.
  *
  * @param value - The normalized value to be denormalized
  * @param array - The typed array to use for denormalization
  * @returns The denormalized value according to the typed array
  */
 
-export function denormalize(value: number, array: AnyTypedArray): number {
+export function normalize(value: number, array: AnyTypedArray): number {
   switch (array.constructor) {
     case Float32Array:
 
@@ -514,6 +501,7 @@ export function denormalize(value: number, array: AnyTypedArray): number {
       return Math.round(value * 65535.0);
 
     case Uint8Array:
+    case Uint8ClampedArray:
 
       return Math.round(value * 255.0);
 

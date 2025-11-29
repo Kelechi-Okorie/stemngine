@@ -717,98 +717,113 @@ describe('MathUtils', () => {
     // });
   });
 
-  describe('normalize()', () => {
-    it('returns value unchanged for Float32Array', () => {
-      const result = normalize(0.75, new Float32Array());
-
-      expect(result).toBe(0.75);
+  describe('denormalize()', () => {
+    it('returns the same value for Float32Array', () => {
+      const arr = new Float32Array(1);
+      expect(denormalize(0.5, arr)).toBe(0.5);
+      expect(denormalize(-2, arr)).toBe(-2);
     });
 
-    it('normalizes value for Uint8Array values to [0, 1]', () => {
-      expect(normalize(0, new Uint8Array(1))).toBe(0);
-      expect(normalize(255, new Uint8Array())).toBeCloseTo(1);
-      expect(normalize(128, new Uint8Array())).toBeCloseTo(128 / 255);
+    it('normalizes Uint32Array correctly', () => {
+      const arr = new Uint32Array(1);
+      expect(denormalize(0, arr)).toBe(0);
+      expect(denormalize(4294967295, arr)).toBeCloseTo(1);
+      expect(denormalize(2147483647, arr)).toBeCloseTo(2147483647 / 4294967295);
     });
 
-    it('normalizes Uint16Array values to [0,1]', () => {
-      expect(normalize(0, new Uint16Array())).toBeCloseTo(0);
-      expect(normalize(65535, new Uint16Array())).toBeCloseTo(1);
-      expect(normalize(32767, new Uint16Array())).toBeCloseTo(32767 / 65535);
+    it('normalizes Uint16Array correctly', () => {
+      const arr = new Uint16Array(1);
+      expect(denormalize(0, arr)).toBe(0);
+      expect(denormalize(65535, arr)).toBeCloseTo(1);
+      expect(denormalize(32767, arr)).toBeCloseTo(32767 / 65535);
     });
 
-    it('normalizes Uint32Array values to [0,1]', () => {
-      expect(normalize(0, new Uint32Array())).toBeCloseTo(0);
-      expect(normalize(4294967295, new Uint32Array())).toBeCloseTo(1);
-      expect(normalize(2147483647, new Uint32Array())).toBeCloseTo(2147483647 / 4294967295);
+    it('normalizes Uint8Array correctly', () => {
+      const arr = new Uint8Array(1);
+      expect(denormalize(0, arr)).toBe(0);
+      expect(denormalize(255, arr)).toBeCloseTo(1);
+      expect(denormalize(128, arr)).toBeCloseTo(128 / 255);
     });
 
-    it('normalizes Int8Array values to [-1,1]', () => {
-      expect(normalize(127, new Int8Array())).toBeCloseTo(1);
-      expect(normalize(-127, new Int8Array())).toBeCloseTo(-1);
-      expect(normalize(-128, new Int8Array())).toBeCloseTo(-1); // clamped
+    it('normalizes signed Int32Array correctly', () => {
+      const arr = new Int32Array(1);
+      expect(denormalize(2147483647, arr)).toBeCloseTo(1);
+      expect(denormalize(-2147483647, arr)).toBeCloseTo(-1);
+      expect(denormalize(-3000000000, arr)).toBe(-1); // clamp
     });
 
-    it('normalizes Int16Array values to [-1,1]', () => {
-      expect(normalize(32767, new Int16Array())).toBeCloseTo(1);
-      expect(normalize(-32767, new Int16Array())).toBeCloseTo(-1);
-      expect(normalize(-32768, new Int16Array())).toBeCloseTo(-1); // clamped
+    it('normalizes signed Int16Array correctly', () => {
+      const arr = new Int16Array(1);
+      expect(denormalize(32767, arr)).toBeCloseTo(1);
+      expect(denormalize(-32767, arr)).toBeCloseTo(-1);
+      expect(denormalize(-40000, arr)).toBe(-1); // clamp
     });
 
-    it('normalizes Int32Array values to [-1,1]', () => {
-      expect(normalize(2147483647, new Int32Array())).toBeCloseTo(1);
-      expect(normalize(-2147483647, new Int32Array())).toBeCloseTo(-1);
-      expect(normalize(-2147483648, new Int32Array())).toBeCloseTo(-1); // clamped
+    it('normalizes signed Int8Array correctly', () => {
+      const arr = new Int8Array(1);
+      expect(denormalize(127, arr)).toBeCloseTo(1);
+      expect(denormalize(-127, arr)).toBeCloseTo(-1);
+      expect(denormalize(-200, arr)).toBe(-1); // clamp
     });
 
-    it('throws error for unsupported types', () => {
-      expect(() => normalize(1, new (BigInt64Array as any)())).toThrow('Invalid component type.');
+    it('throws an error for unknown typed arrays', () => {
+      const arr = [1, 2, 3]; // plain array
+      expect(() => denormalize(0, arr as any)).toThrow('Invalid component type.');
     });
   });
 
-  describe('denormalize()', () => {
+  describe('normalize()', () => {
     it('returns the same value for Float32Array', () => {
-      const result = denormalize(0.75, new Float32Array());
-      expect(result).toBe(0.75);
+      const arr = new Float32Array(1);
+      expect(normalize(0.5, arr)).toBe(0.5);
+      expect(normalize(-2, arr)).toBe(-2);
     });
 
-    it('denormalizes Uint8Array values', () => {
-      expect(denormalize(0, new Uint8Array())).toBe(0);
-      expect(denormalize(1, new Uint8Array())).toBe(255);
-      expect(denormalize(0.5, new Uint8Array())).toBeCloseTo(128);
+    it('normalizes Uint32Array correctly', () => {
+      const arr = new Uint32Array(1);
+      expect(normalize(0, arr)).toBe(0);
+      expect(normalize(1, arr)).toBe(4294967295);
+      expect(normalize(0.5, arr)).toBe(Math.round(0.5 * 4294967295));
     });
 
-    it('denormalizes Uint16Array values', () => {
-      expect(denormalize(0, new Uint16Array())).toBe(0);
-      expect(denormalize(1, new Uint16Array())).toBe(65535);
-      expect(denormalize(0.5, new Uint16Array())).toBeCloseTo(32768);
+    it('normalizes Uint16Array correctly', () => {
+      const arr = new Uint16Array(1);
+      expect(normalize(0, arr)).toBe(0);
+      expect(normalize(1, arr)).toBe(65535);
+      expect(normalize(0.5, arr)).toBe(Math.round(0.5 * 65535));
     });
 
-    it('denormalizes Uint32Array values', () => {
-      expect(denormalize(0, new Uint32Array())).toBe(0);
-      expect(denormalize(1, new Uint32Array())).toBe(4294967295);
-      expect(denormalize(0.5, new Uint32Array())).toBeCloseTo(2147483648);
+    it('normalizes Uint8Array correctly', () => {
+      const arr = new Uint8Array(1);
+      expect(normalize(0, arr)).toBe(0);
+      expect(normalize(1, arr)).toBe(255);
+      expect(normalize(0.5, arr)).toBe(Math.round(0.5 * 255));
     });
 
-    it('denormalizes Int8Array values', () => {
-      expect(denormalize(1, new Int8Array())).toBe(127);
-      expect(denormalize(-1, new Int8Array())).toBe(-127);
-      expect(denormalize(0, new Int8Array())).toBe(0);
+    it('normalizes signed Int32Array correctly', () => {
+      const arr = new Int32Array(1);
+      expect(normalize(0, arr)).toBe(0);
+      expect(normalize(1, arr)).toBe(2147483647);
+      expect(normalize(-1, arr)).toBe(Math.round(-1 * 2147483647));
     });
 
-    it('denormalizes Int16Array values', () => {
-      expect(denormalize(1, new Int16Array())).toBe(32767);
-      expect(denormalize(-1, new Int16Array())).toBe(-32767);
-      expect(denormalize(0, new Int16Array())).toBe(0);
+    it('normalizes signed Int16Array correctly', () => {
+      const arr = new Int16Array(1);
+      expect(normalize(0, arr)).toBe(0);
+      expect(normalize(1, arr)).toBe(32767);
+      expect(normalize(-1, arr)).toBe(Math.round(-1 * 32767));
     });
 
-    it('denormalizes Int32Array values', () => {
-      expect(denormalize(1, new Int32Array())).toBe(2147483647);
-      expect(denormalize(-1, new Int32Array())).toBe(-2147483647);
-      expect(denormalize(0, new Int32Array())).toBe(0);
+    it('normalizes signed Int8Array correctly', () => {
+      const arr = new Int8Array(1);
+      expect(normalize(0, arr)).toBe(0);
+      expect(normalize(1, arr)).toBe(127);
+      expect(normalize(-1, arr)).toBe(Math.round(-1 * 127));
     });
 
-    it('throws an error for unsupported types', () => {
-      expect(() => denormalize(1, new (BigInt64Array as any)())).toThrow('Invalid component type.');
+    it('throws an error for unknown typed arrays', () => {
+      const arr = [1, 2, 3]; // plain array
+      expect(() => normalize(0, arr as any)).toThrow('Invalid component type.');
     });
   });
 });

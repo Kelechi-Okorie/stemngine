@@ -58,7 +58,19 @@ export type BufferUsage = typeof StaticDrawUsage | typeof DynamicDrawUsage | typ
 
 export type GpuType = typeof FloatType | typeof IntType;
 
-export type AnyTypedArray = Float32Array | Uint32Array | Uint16Array | Uint8Array | Int32Array | Int16Array | Int8Array;
+export type AnyTypedArray = Float32Array | Uint32Array | Uint16Array | Uint8Array | Uint8ClampedArray | Int32Array | Int16Array | Int8Array;
+
+/**
+ * A TypedArray with a buffer that has an optional _uuid property
+ */
+export type BufferViewWithUUID = AnyTypedArray & {
+  buffer: (ArrayBuffer | SharedArrayBuffer) & { _uuid?: string };
+};
+
+/**
+ * Color space
+ */
+export type ColorSpace = | typeof NoColorSpace | typeof SRGBColorSpace | typeof LinearSRGBColorSpace
 
 /**
  * Constructor type for TypedArrays

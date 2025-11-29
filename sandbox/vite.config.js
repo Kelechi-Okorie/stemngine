@@ -6,7 +6,8 @@ export default defineConfig({
   root: 'src',  // your HTML files live here
   resolve: {
     alias: {
-      '@stemngine/engine': path.resolve(__dirname, '../packages/engine/dist/engine.esm.js')
+      // '@stemngine/engine': path.resolve(__dirname, '../packages/engine/dist/engine.esm.js')
+      '@stemngine/engine': path.resolve(__dirname, '../packages/engine/src/engine.ts')
     }
   },
   // build: {

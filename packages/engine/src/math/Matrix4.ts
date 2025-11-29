@@ -592,6 +592,16 @@ export class Matrix4 {
    * Sets the rotation component of this transformation matrix, looking from `eye` towards
    * `target`, and oriented by the up-direction.
    *
+   * @remarks
+   * This function constructs a rotation matrix that orients an object so that:
+   * -  it forward axis (the -Z axis in OpenGL/WebGL convention) points from eye -> targe
+   * -  its right axis (the +X axis) is perpendicular to both forward and up
+   * -  its up axis (the +Y axis) becomes the corrected orthogonal up direction
+   *
+   * It generates the orientatino matrix of a camera or object that is "looking"
+   * at a point.
+   * It does not set translation. Only rotation
+   *
    * @param eye - The position of the viewer.
    * @param target - The point to look at.
    * @param up - The up direction.
@@ -600,14 +610,18 @@ export class Matrix4 {
   public lookAt(eye: Vector3, target: Vector3, up: Vector3): this {
     const te = this.elements;
 
+    /**
+     * Compute the orthogonal basis of this matrix _x, _y, _z
+    */
+
+    // _z = eye - target
     _z.subVectors(eye, target);
 
+    // eye == target
     if (_z.lengthSq() === 0) {
 
       // eye and target are in the same position
-
       _z.z = 1;
-
     }
 
     _z.normalize();
@@ -629,12 +643,14 @@ export class Matrix4 {
 
       _z.normalize();
       _x.crossVectors(up, _z);
-
     }
 
     _x.normalize();
     _y.crossVectors(_z, _x);
 
+    /**
+     * Write the orthogonal basis into this matrix (column-major)
+     */
     te[0] = _x.x; te[4] = _y.x; te[8] = _z.x;
     te[1] = _x.y; te[5] = _y.y; te[9] = _z.y;
     te[2] = _x.z; te[6] = _y.z; te[10] = _z.z;
