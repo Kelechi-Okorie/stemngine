@@ -1,0 +1,119 @@
+import { Light } from './Light.js';
+import { PointLightShadow } from './PointLightShadow';
+import { Color } from '../math/Color.js';
+
+/**
+ * A light that gets emitted from a single point in all directions. A common
+ * use case for this is to replicate the light emitted from a bare
+ * lightbulb.
+ *
+ * This light can cast shadows - see the {@link PointLightShadow} for details.
+ *
+ * ```js
+ * const light = new PointLight( 0xff0000, 1, 100 );
+ * light.position.set( 50, 50, 50 );
+ * scene.add( light );
+ * ```
+ *
+ * @augments Light
+ */
+export class PointLight extends Light {
+  /**
+   * This flag can be used for type testing.
+   *
+   * @type {boolean}
+   * @readonly
+   * @default true
+   */
+  public readonly isPointLight: boolean = true;
+
+  public type: string = 'PointLight';
+
+  /**
+   * Constructs a new point light.
+   *
+   * @param {(number|Color|string)} [color=0xffffff] - The light's color.
+   * @param {number} [intensity=1] - The light's strength/intensity measured in candela (cd).
+   * @param {number} [distance=0] - Maximum range of the light. `0` means no limit.
+   * @param {number} [decay=2] - The amount the light dims along the distance of the light.
+   */
+  constructor(
+    color: number | Color | string,
+    intensity: number = 1,
+    distance: number = 0,
+    decay: number = 2
+  ) {
+
+    super(color, intensity);
+
+    /**
+     * When distance is zero, light will attenuate according to inverse-square
+     * law to infinite distance. When distance is non-zero, light will attenuate
+     * according to inverse-square law until near the distance cutoff, where it
+     * will then attenuate quickly and smoothly to 0. Inherently, cutoffs are not
+     * physically correct.
+     *
+     * @type {number}
+     * @default 0
+     */
+    this.distance = distance;
+
+    /**
+     * The amount the light dims along the distance of the light. In context of
+     * physically-correct rendering the default value should not be changed.
+     *
+     * @type {number}
+     * @default 2
+     */
+    this.decay = decay;
+
+    /**
+     * This property holds the light's shadow configuration.
+     *
+     * @type {PointLightShadow}
+     */
+    this.shadow = new PointLightShadow();
+
+  }
+
+  /**
+   * The light's power. Power is the luminous power of the light measured in lumens (lm).
+   * Changing the power will also change the light's intensity.
+   *
+   * @type {number}
+   */
+  public get power(): number {
+
+    // compute the light's luminous power (in lumens) from its intensity (in candela)
+    // for an isotropic light source, luminous power (lm) = 4 π luminous intensity (cd)
+    return this.intensity * 4 * Math.PI;
+
+  }
+
+  public set power(power: number) {
+
+    // set the light's intensity (in candela) from the desired luminous power (in lumens)
+    this.intensity = power / (4 * Math.PI);
+
+  }
+
+  public dispose() {
+
+    this.shadow.dispose();
+
+  }
+
+  public copy(source: PointLight, recursive: boolean) {
+
+    super.copy(source, recursive);
+
+    this.distance = source.distance;
+    this.decay = source.decay;
+
+    this.shadow = source.shadow.clone();
+
+    return this;
+
+  }
+
+}

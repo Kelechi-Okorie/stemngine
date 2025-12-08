@@ -1,104 +1,425 @@
-import { Box3 } from "./Box3";
-import { Vector3 } from "./Vector3";
+import { Box3 } from './Box3.js';
+import { Vector3 } from './Vector3.js';
+import { Plane } from './Plane.js';
+import { Matrix4 } from './Matrix4.js';
 
 const _box = /*@__PURE__*/ new Box3();
 const _v1 = /*@__PURE__*/ new Vector3();
 const _v2 = /*@__PURE__*/ new Vector3();
 
 /**
- * An analytical 3D sphere defined by a center and a radius
- *
- * @remarks
- * This class is mainly used as a Bounding Sphere for 3D objects
+ * An analytical 3D sphere defined by a center and radius. This class is mainly
+ * used as a Bounding Sphere for 3D objects.
  */
 export class Sphere {
   /**
-   * this flag can be used for type testing.
+   * This flag can be used for type testing.
    *
    * @type {boolean}
    * @readonly
-   * @defaultValue true
-  */
-  public readonly isSphere: boolean = true;
-
-  /**
-   * The center of the spere
+   * @default true
    */
-  public center: Vector3;
+  public isSphere: boolean = true;
+
+      /**
+     * The center of the sphere
+     *
+     * @type {Vector3}
+     */
+    public center: Vector3;
+
+    /**
+     * The radius of the sphere.
+     *
+     * @type {number}
+     */
+    public radius: number;
+
 
   /**
-   * The radius of the sphere
-   */
-  public radius: number;
-
-  /**
-   * Constructs a new Sphere
+   * Constructs a new sphere.
    *
-   * @param center - The center of the sphere
-   * @param radius - The radius of the sphere
+   * @param {Vector3} [center=(0,0,0)] - The center of the sphere
+   * @param {number} [radius=-1] - The radius of the sphere.
    */
-  constructor(center?: Vector3, radius: number = -1) {
-    this.center = (center !== undefined) ? center : new Vector3(0, 0, 0);
+  constructor(center: Vector3 = new Vector3(), radius: number = - 1) {
+
+
+    this.center = center;
+
     this.radius = radius;
+
   }
 
   /**
-   * Sets the sphere's components by copying the given values
+   * Sets the sphere's components by copying the given values.
    *
-   * @param center - The center of the sphere
-   * @param radius - The radius of the sphere
-   * @returns A reference to this sphere
+   * @param {Vector3} center - The center.
+   * @param {number} radius - The radius.
+   * @return {Sphere} A reference to this sphere.
    */
-  public set(center: Vector3, radius: number): Sphere {
+  public set(center: Vector3, radius: number): this {
+
     this.center.copy(center);
     this.radius = radius;
 
     return this;
+
   }
 
   /**
-   * Returns true if this sphere is equal with the given one
+   * Computes the minimum bounding sphere for list of points.
+   * If the optional center point is given, it is used as the sphere's
+   * center. Otherwise, the center of the axis-aligned bounding box
+   * encompassing the points is calculated.
    *
-   * @param sphere - The sphere to compare with
-   * @returns Whether this bounding sphere is equal with the given one
+   * @param {Array<Vector3>} points - A list of points in 3D space.
+   * @param {Vector3} [optionalCenter] - The center of the sphere.
+   * @return {Sphere} A reference to this sphere.
    */
-  public equals(sphere: Sphere): boolean {
-    return sphere.center.equals(this.center) && (sphere.radius === this.radius);
+  public setFromPoints(points: Vector3[], optionalCenter?: Vector3): this {
+
+    const center = this.center;
+
+    if (optionalCenter !== undefined) {
+
+      center.copy(optionalCenter);
+
+    } else {
+
+      _box.setFromPoints(points).getCenter(center);
+
+    }
+
+    let maxRadiusSq = 0;
+
+    for (let i = 0, il = points.length; i < il; i++) {
+
+      maxRadiusSq = Math.max(maxRadiusSq, center.distanceToSquared(points[i]));
+
+    }
+
+    this.radius = Math.sqrt(maxRadiusSq);
+
+    return this;
+
   }
 
   /**
-   * Copies the values of the given sphere to this instance
+   * Copies the values of the given sphere to this instance.
    *
-   * @param sphere - The sphere to copy
-   * @returns A reference to this sphere
+   * @param {Sphere} sphere - The sphere to copy.
+   * @return {Sphere} A reference to this sphere.
    */
-  public copy(sphere: Sphere): Sphere {
+  public copy(sphere: Sphere): this {
+
     this.center.copy(sphere.center);
     this.radius = sphere.radius;
 
     return this;
+
   }
 
   /**
-   * Returns a new sphere that is a clone of this sphere
+   * Returns `true` if the sphere is empty (the radius set to a negative number).
    *
-   * @returns A clone of this instance
+   * Spheres with a radius of `0` contain only their center point and are not
+   * considered to be empty.
+   *
+   * @return {boolean} Whether this sphere is empty or not.
    */
-  public clone(): Sphere {
-    return new Sphere().copy(this);
+  public isEmpty(): boolean {
+
+    return (this.radius < 0);
+
   }
 
-  	/**
-	 * Returns a serialized structure of the bounding sphere.
-	 *
-	 * @return Serialized structure with fields representing the object state.
-	 */
-	public toJSON(): object {
+  /**
+   * Makes this sphere empty which means in encloses a zero space in 3D.
+   *
+   * @return {Sphere} A reference to this sphere.
+   */
+  public makeEmpty(): this {
 
-		return {
-			radius: this.radius,
-			center: this.center.toArray()
-		};
+    this.center.set(0, 0, 0);
+    this.radius = - 1;
 
-	}
+    return this;
+
+  }
+
+  /**
+   * Returns `true` if this sphere contains the given point inclusive of
+   * the surface of the sphere.
+   *
+   * @param {Vector3} point - The point to check.
+   * @return {boolean} Whether this sphere contains the given point or not.
+   */
+  public containsPoint(point: Vector3): boolean {
+
+    return (point.distanceToSquared(this.center) <= (this.radius * this.radius));
+
+  }
+
+  /**
+   * Returns the closest distance from the boundary of the sphere to the
+   * given point. If the sphere contains the point, the distance will
+   * be negative.
+   *
+   * @param {Vector3} point - The point to compute the distance to.
+   * @return {number} The distance to the point.
+   */
+  public distanceToPoint(point: Vector3): number {
+
+    return (point.distanceTo(this.center) - this.radius);
+
+  }
+
+  /**
+   * Returns `true` if this sphere intersects with the given one.
+   *
+   * @param {Sphere} sphere - The sphere to test.
+   * @return {boolean} Whether this sphere intersects with the given one or not.
+   */
+  public intersectsSphere(sphere: Sphere): boolean {
+
+    const radiusSum = this.radius + sphere.radius;
+
+    return sphere.center.distanceToSquared(this.center) <= (radiusSum * radiusSum);
+
+  }
+
+  /**
+   * Returns `true` if this sphere intersects with the given box.
+   *
+   * @param {Box3} box - The box to test.
+   * @return {boolean} Whether this sphere intersects with the given box or not.
+   */
+  public intersectsBox(box: Box3): boolean {
+
+    return box.intersectsSphere(this);
+
+  }
+
+  /**
+   * Returns `true` if this sphere intersects with the given plane.
+   *
+   * @param {Plane} plane - The plane to test.
+   * @return {boolean} Whether this sphere intersects with the given plane or not.
+   */
+  public intersectsPlane(plane: Plane): boolean {
+
+    return Math.abs(plane.distanceToPoint(this.center)) <= this.radius;
+
+  }
+
+  /**
+   * Clamps a point within the sphere. If the point is outside the sphere, it
+   * will clamp it to the closest point on the edge of the sphere. Points
+   * already inside the sphere will not be affected.
+   *
+   * @param {Vector3} point - The plane to clamp.
+   * @param {Vector3} target - The target vector that is used to store the method's result.
+   * @return {Vector3} The clamped point.
+   */
+  public clampPoint(point: Vector3, target: Vector3): Vector3 {
+
+    const deltaLengthSq = this.center.distanceToSquared(point);
+
+    target.copy(point);
+
+    if (deltaLengthSq > (this.radius * this.radius)) {
+
+      target.sub(this.center).normalize();
+      target.multiplyScalar(this.radius).add(this.center);
+
+    }
+
+    return target;
+
+  }
+
+  /**
+   * Returns a bounding box that encloses this sphere.
+   *
+   * @param {Box3} target - The target box that is used to store the method's result.
+   * @return {Box3} The bounding box that encloses this sphere.
+   */
+  public getBoundingBox(target: Box3): Box3 {
+
+    if (this.isEmpty()) {
+
+      // Empty sphere produces empty bounding box
+      target.makeEmpty();
+      return target;
+
+    }
+
+    target.set(this.center, this.center);
+    target.expandByScalar(this.radius);
+
+    return target;
+
+  }
+
+  /**
+   * Transforms this sphere with the given 4x4 transformation matrix.
+   *
+   * @param {Matrix4} matrix - The transformation matrix.
+   * @return {Sphere} A reference to this sphere.
+   */
+  public applyMatrix4(matrix: Matrix4): this {
+
+    this.center.applyMatrix4(matrix);
+    this.radius = this.radius * matrix.getMaxScaleOnAxis();
+
+    return this;
+
+  }
+
+  /**
+   * Translates the sphere's center by the given offset.
+   *
+   * @param {Vector3} offset - The offset.
+   * @return {Sphere} A reference to this sphere.
+   */
+  public translate(offset: Vector3): this {
+
+    this.center.add(offset);
+
+    return this;
+
+  }
+
+  /**
+   * Expands the boundaries of this sphere to include the given point.
+   *
+   * @param {Vector3} point - The point to include.
+   * @return {Sphere} A reference to this sphere.
+   */
+  public expandByPoint(point: Vector3): this {
+
+    if (this.isEmpty()) {
+
+      this.center.copy(point);
+
+      this.radius = 0;
+
+      return this;
+
+    }
+
+    _v1.subVectors(point, this.center);
+
+    const lengthSq = _v1.lengthSq();
+
+    if (lengthSq > (this.radius * this.radius)) {
+
+      // calculate the minimal sphere
+
+      const length = Math.sqrt(lengthSq);
+
+      const delta = (length - this.radius) * 0.5;
+
+      this.center.addScaledVector(_v1, delta / length);
+
+      this.radius += delta;
+
+    }
+
+    return this;
+
+  }
+
+  /**
+   * Expands this sphere to enclose both the original sphere and the given sphere.
+   *
+   * @param {Sphere} sphere - The sphere to include.
+   * @return {Sphere} A reference to this sphere.
+   */
+  public union(sphere: Sphere): Sphere {
+
+    if (sphere.isEmpty()) {
+
+      return this;
+
+    }
+
+    if (this.isEmpty()) {
+
+      this.copy(sphere);
+
+      return this;
+
+    }
+
+    if (this.center.equals(sphere.center) === true) {
+
+      this.radius = Math.max(this.radius, sphere.radius);
+
+    } else {
+
+      _v2.subVectors(sphere.center, this.center).setLength(sphere.radius);
+
+      this.expandByPoint(_v1.copy(sphere.center).add(_v2));
+
+      this.expandByPoint(_v1.copy(sphere.center).sub(_v2));
+
+    }
+
+    return this;
+
+  }
+
+  /**
+   * Returns `true` if this sphere is equal with the given one.
+   *
+   * @param {Sphere} sphere - The sphere to test for equality.
+   * @return {boolean} Whether this bounding sphere is equal with the given one.
+   */
+  public equals(sphere: Sphere): boolean {
+
+    return sphere.center.equals(this.center) && (sphere.radius === this.radius);
+
+  }
+
+  /**
+   * Returns a new sphere with copied values from this instance.
+   *
+   * @return {Sphere} A clone of this instance.
+   */
+  public clone(): Sphere {
+
+    return new Sphere().copy(this);
+
+  }
+
+  /**
+   * Returns a serialized structure of the bounding sphere.
+   *
+   * @return {Object} Serialized structure with fields representing the object state.
+   */
+  public toJSON(): {[key: string]: any} {
+
+    return {
+      radius: this.radius,
+      center: this.center.toArray()
+    };
+
+  }
+
+  /**
+   * Returns a serialized structure of the bounding sphere.
+   *
+   * @param {Object} json - The serialized json to set the sphere from.
+   * @return {Box3} A reference to this bounding sphere.
+   */
+  public fromJSON(json: {[key: string]: any}): this {
+
+    this.radius = json.radius;
+    this.center.fromArray(json.center);
+    return this;
+
+  }
+
 }

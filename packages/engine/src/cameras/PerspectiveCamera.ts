@@ -726,3 +726,9 @@ export class PerspectiveCamera extends Camera {
     return this;
   }
 }
+
+export function isPerspectiveCamera(
+  cam: Camera
+): cam is PerspectiveCamera {
+  return (cam as any).isPerspectiveCamera === true;
+}

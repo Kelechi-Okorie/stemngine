@@ -1,21 +1,17 @@
-import type { Vector3 } from "../math/Vector3";
-import type { Euler } from "../math/Euler";
-import type { Quaternion } from "../math/Quaternion";
-import type { Matrix4 } from "../math/Matrix4";
-import type { Layers } from "./Layers";
-import type { AnimationClip } from "../animation/AnimationClip";
-import type { Material } from "../materials/Material";
-import type { BufferGeometry } from "./BufferGeometry";
-import type { WebGLRenderer } from "../renderer/WebGLRenderer";
-import type { Group3D } from "../objects/Group3D";
+import { Vector3 } from "../math/Vector3";
+import { Euler } from "../math/Euler";
+import { Quaternion } from "../math/Quaternion";
+import { Matrix4 } from "../math/Matrix4";
+import { Layers } from "./Layers";
+import { AnimationClip } from "../animation/AnimationClip";
+import { Material } from "../materials/Material";
+import { BufferGeometry } from "./BufferGeometry";
+import { WebGLRenderer } from "../renderers/WebGLRenderer";
+import { Group } from "../objects/Group";
 
 import { SpatialNode } from "./SpatialNode";
-import { Vector3 as Vector3Impl } from "../math/Vector3";
-import { Euler as EulerImpl } from "../math/Euler";
-import { Quaternion as QuaternionImpl } from "../math/Quaternion";
-import { Matrix4 as Matrix4Impl } from "../math/Matrix4";
-import { Layers as LayersImpl } from './Layers';
 import { Camera } from "../cameras/Camera";
+import { Raycaster, RaycasterIntersection } from "./Raycaster";
 
 type UserDataValue = string | number | null | UserDataValue[] | { [key: string]: UserDataValue };
 
@@ -84,18 +80,18 @@ interface Node3DJSON {
   animations: object[];
 }
 
-const _v = /*@__PURE__*/ new Vector3Impl();
-const _q = /*@__PURE__*/ new QuaternionImpl();
-const _m = /*@__PURE__*/ new Matrix4Impl();
-const _target = /*@__PURE__*/ new Vector3Impl();
+const _v = /*@__PURE__*/ new Vector3();
+const _q = /*@__PURE__*/ new Quaternion();
+const _m = /*@__PURE__*/ new Matrix4();
+const _target = /*@__PURE__*/ new Vector3();
 
-const _position = /*@__PURE__*/ new Vector3Impl();
-const _scale = /*@__PURE__*/ new Vector3Impl();
-const _quaternion = /*@__PURE__*/ new QuaternionImpl();
+const _position = /*@__PURE__*/ new Vector3();
+const _scale = /*@__PURE__*/ new Vector3();
+const _quaternion = /*@__PURE__*/ new Quaternion();
 
-const _xAxis = /*@__PURE__*/ new Vector3Impl(1, 0, 0);
-const _yAxis = /*@__PURE__*/ new Vector3Impl(0, 1, 0);
-const _zAxis = /*@__PURE__*/ new Vector3Impl(0, 0, 1);
+const _xAxis = /*@__PURE__*/ new Vector3(1, 0, 0);
+const _yAxis = /*@__PURE__*/ new Vector3(0, 1, 0);
+const _zAxis = /*@__PURE__*/ new Vector3(0, 0, 1);
 
 /**
  * Node3D uses WebGL object
@@ -127,7 +123,7 @@ export class Node3D extends SpatialNode {
    * @name Node3D#position
    * @defaultValue (0, 0, 0)
    */
-  public position: Vector3 = new Vector3Impl();
+  public position: Vector3 = new Vector3();
 
   /**
    * Represents the node's local rotation as Euler angles, in radians.
@@ -135,7 +131,7 @@ export class Node3D extends SpatialNode {
    * @name Node3D#rotation
    * @defaultValue (0, 0, 0)
    */
-  public rotation: Euler = new EulerImpl();
+  public rotation: Euler = new Euler();
 
   /**
    * Represents the node's local rotation as a quaternion.
@@ -143,7 +139,7 @@ export class Node3D extends SpatialNode {
    * @name Node3D#quaternion
    * @defaultValue (0, 0, 0, 1)
    */
-  public quaternion: Quaternion = new QuaternionImpl();
+  public quaternion: Quaternion = new Quaternion();
 
   /**
    * Represents the node's local scale in 3D space.
@@ -151,14 +147,20 @@ export class Node3D extends SpatialNode {
    * @name Node3D#scale
    * @defaultValue (1, 1, 1)
    */
-  public scale: Vector3 = new Vector3Impl(1, 1, 1);
+  public scale: Vector3 = new Vector3(1, 1, 1);
+
+  // /**
+  //  * An array holding the child objects of this Node instance
+  //  */
+  // public children: Node3D[] = [];
+
 
   /**
    * Represents the node's transformation matrix in local/model space
    *
    * @name Node3D#matrix
  */
-  public matrix: Matrix4 = new Matrix4Impl();
+  public matrix: Matrix4 = new Matrix4();
 
   /**
    * Represents the node's transformation matrix in world space.
@@ -169,21 +171,21 @@ export class Node3D extends SpatialNode {
    *
    * @name Node3D#matrixWorld
    */
-  public matrixWorld: Matrix4 = new Matrix4Impl();
+  public matrixWorld: Matrix4 = new Matrix4();
 
   /**
    * Represents the node's normal matrix
    *
    * @name Node3D#normalMatrix
    */
-  public normalMatrix: Matrix4 = new Matrix4Impl();
+  public normalMatrix: Matrix4 = new Matrix4();
 
   /**
    * Represents the node's model-view matrix
    *
    * @name Node3D#modelViewMatrix
    */
-  public modelViewMatrix: Matrix4 = new Matrix4Impl();
+  public modelViewMatrix: Matrix4 = new Matrix4();
 
   /**
    * When set to `true`, the engine automatically computes the local matrix from
@@ -219,7 +221,7 @@ export class Node3D extends SpatialNode {
    * This property can also be used to filter out unwanted objects in ray-intersection tests
    * when using a {@link Raycaster}.
    */
-  public layers: Layers = new LayersImpl();
+  public layers: Layers = new Layers();
 
   /**
    * When set to `true`, the Node3D gets rendered into shadow maps.
@@ -323,7 +325,7 @@ export class Node3D extends SpatialNode {
     shadowCamera: Camera,
     geometry: BufferGeometry,
     depthMaterial: Material,
-    group: Group3D
+    group: Group
   ): void {
     // empty
   }
@@ -346,7 +348,7 @@ export class Node3D extends SpatialNode {
     shadowCamera: Camera,
     geometry: BufferGeometry,
     depthMaterial: Material,
-    group: Group3D
+    group: Group
   ): void {
     // empty
   }
@@ -368,7 +370,7 @@ export class Node3D extends SpatialNode {
     camera: Camera,
     geometry: BufferGeometry,
     material: Material,
-    group: Group3D
+    group: Group
   ): void {
     // empty
   }
@@ -390,7 +392,7 @@ export class Node3D extends SpatialNode {
     camera: Camera,
     geometry: BufferGeometry,
     material: Material,
-    group: Group3D
+    group: Group
   ): void {
     // empty
   }
@@ -647,7 +649,7 @@ export class Node3D extends SpatialNode {
      * or a sclalar coordinates
      * Both become _target in world space
      */
-    if (x instanceof Vector3Impl) {
+    if (x instanceof Vector3) {
       _target.copy(x);
     } else {
       if (y === undefined || z === undefined) {
@@ -818,13 +820,13 @@ export class Node3D extends SpatialNode {
    *
    * @remarks
    * Renderable Node3D objects such as {@link Mesh}, {@link Line} or {@link Points}
-   * implement this method in order to use raycasting
+   * ement this method in order to use raycasting
    *
    * @abstract
    * @param raycaster - The raycaster
    * @param intersects - An array holding the result of the method
    */
-  // abstract raycast(/* raycaster, intersect */) {}
+  public raycast(raycaster: Raycaster, intersects: RaycasterIntersection[]) { }
 
 
 
@@ -1029,7 +1031,7 @@ export class Node3D extends SpatialNode {
 
 
 
-  // TODO: Implement ToJSON function
+  // TODO: ement ToJSON function
   /**
    * Serializes this node to a JSON object.
    *
@@ -1039,7 +1041,7 @@ export class Node3D extends SpatialNode {
    * @returns The serialized JSON object
    */
   public toJSON(meta?: object | string): any {
-    // this function will be implemented later
+    // this function will be emented later
     // return JSON.stringify({});
 
 
@@ -1050,7 +1052,7 @@ export class Node3D extends SpatialNode {
 
     /**
      * meta is a has used to collect geometries, materials
-     * not providing it implies that this is the root Node
+     * not providing it ies that this is the root Node
      * being serialized
      */
     if (isRootNode) {
@@ -1090,7 +1092,7 @@ export class Node3D extends SpatialNode {
     node.layers = this.layers.mask;
 
     // return JSON.stringify({});
-    return {...output, node};
+    return { ...output, node };
   }
 
   /**
@@ -1164,7 +1166,7 @@ export class Node3D extends SpatialNode {
   *
   * @defaultValue (0, 1, 0)
   */
-  public static readonly DEFAULT_UP: Vector3 = /*@__PURE__*/ new Vector3Impl(0, 1, 0);
+  public static readonly DEFAULT_UP: Vector3 = /*@__PURE__*/ new Vector3(0, 1, 0);
 
   /**
    * The default setting for {@link Node3D.matrixAutoUpdate}

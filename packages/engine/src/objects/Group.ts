@@ -4,7 +4,7 @@ import { Node3D } from "../core/Node3D";
  * This is almost identical to SpatialNode, but
  * it is used as a base class for grouping objects.
  */
-export class Group3D extends Node3D {
+export class Group extends Node3D {
 
   /**
   * this flag can be used for type testing.

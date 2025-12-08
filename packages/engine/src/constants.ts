@@ -76,7 +76,7 @@ export type ColorSpace = | typeof NoColorSpace | typeof SRGBColorSpace | typeof 
  * Constructor type for TypedArrays
  */
 export type TypedArrayConstructor<T extends AnyTypedArray> = {
-  new (arr: number[] | ArrayLike<number>): T;
+  new(arr: number[] | ArrayLike<number>): T;
   BYTES_PER_ELEMENT: number;
 }
 
@@ -93,6 +93,164 @@ export const EulerDefaultOrder = 'XYZ';
 export type InterpolationMode = typeof InterpolateLinear | typeof InterpolateDiscrete | typeof InterpolateSmooth;
 
 export type AnimationBlendMode = typeof NormalBlending | typeof AdditiveBlending;
+
+export type MaterialBlendMode = typeof NoBlending | typeof NormalBlending | typeof AdditiveBlending | typeof SubtractiveBlending | typeof MultiplyBlending | typeof CustomBlending;
+
+export type MaterialSide = typeof FrontSide | typeof BackSide | typeof DoubleSide;
+
+/** Union type for all blending factors */
+export type MaterialBlendFactor =
+  | typeof ZeroFactor
+  | typeof OneFactor
+  | typeof SrcColorFactor
+  | typeof OneMinusSrcColorFactor
+  | typeof SrcAlphaFactor
+  | typeof OneMinusSrcAlphaFactor
+  | typeof DstAlphaFactor
+  | typeof OneMinusDstAlphaFactor
+  | typeof DstColorFactor
+  | typeof OneMinusDstColorFactor
+  | typeof SrcAlphaSaturateFactor
+  | typeof ConstantColorFactor
+  | typeof OneMinusConstantColorFactor
+  | typeof ConstantAlphaFactor
+  | typeof OneMinusConstantAlphaFactor;
+
+/** Union type for material blending equations */
+export type MaterialBlendEquation =
+  | typeof AddEquation
+  | typeof SubtractEquation
+  | typeof ReverseSubtractEquation
+  | typeof MinEquation
+  | typeof MaxEquation;
+
+/** Union type for material depth functions */
+export type MaterialDepthFunc =
+  | typeof NeverDepth
+  | typeof AlwaysDepth
+  | typeof LessDepth
+  | typeof LessEqualDepth
+  | typeof EqualDepth
+  | typeof GreaterEqualDepth
+  | typeof GreaterDepth
+  | typeof NotEqualDepth;
+
+export type StencilFunc =
+  | typeof NeverStencilFunc
+  | typeof LessStencilFunc
+  | typeof EqualStencilFunc
+  | typeof LessEqualStencilFunc
+  | typeof GreaterStencilFunc
+  | typeof NotEqualStencilFunc
+  | typeof GreaterEqualStencilFunc
+  | typeof AlwaysStencilFunc;
+
+export type StencilOp =
+  | typeof ZeroStencilOp
+  | typeof KeepStencilOp
+  | typeof ReplaceStencilOp
+  | typeof IncrementStencilOp
+  | typeof DecrementStencilOp
+  | typeof IncrementWrapStencilOp
+  | typeof DecrementWrapStencilOp
+  | typeof InvertStencilOp;
+
+export type EnvironmentColorOperation =
+  | typeof MultiplyOperation
+  | typeof MixOperation
+  | typeof AddOperation
+
+export type LineJoin = 'round' | 'bevel' | 'miter';
+export type LineCap = 'butt' | 'round' | 'square';
+
+export type TextureWrapping = typeof RepeatWrapping | typeof ClampToEdgeWrapping | typeof MirroredRepeatWrapping;
+
+export type TextureMagFilter = typeof NearestFilter | typeof LinearFilter;
+
+export type TextureMinFilter = typeof NearestFilter | typeof LinearFilter | typeof NearestMipmapNearestFilter | typeof NearestMipmapLinearFilter | typeof LinearMipmapNearestFilter | typeof LinearMipmapLinearFilter;
+
+export type TextureFormat =
+  | typeof AlphaFormat
+  | typeof RGBAFormat
+  | typeof RGBFormat
+  // | typeof LuminanceFormat
+  // | typeof LuminanceAlphaFormat
+  | typeof RedFormat
+  | typeof DepthFormat
+  | typeof DepthStencilFormat
+  | typeof RGBAIntegerFormat
+  | typeof RedIntegerFormat
+  | typeof RGBIntegerFormat;
+
+export type TextureDataType =
+  | typeof UnsignedByteType
+  | typeof ByteType
+  | typeof ShortType
+  | typeof UnsignedShortType
+  | typeof IntType
+  | typeof UnsignedIntType
+  | typeof FloatType
+  | typeof HalfFloatType
+  | typeof UnsignedShort4444Type
+  | typeof UnsignedShort5551Type
+  | typeof UnsignedInt248Type;
+
+export type TextureMapping =
+  | typeof UVMapping
+  | typeof CubeReflectionMapping
+  | typeof CubeRefractionMapping
+  | typeof EquirectangularReflectionMapping
+  | typeof EquirectangularRefractionMapping
+  | typeof CubeUVReflectionMapping;
+
+export type TextureInternalFormat =
+  | 'RGBA8'
+  | 'RGB8'
+  | 'RGBA16F'
+  | 'RGBA32F'
+  | 'R8'
+  | 'R16F'
+  | 'R32F'
+  | 'RGB16F'
+  | 'RGB32F'
+  | 'SRGB8'
+  | 'SRGB8_ALPHA8'; // add more as needed
+
+export interface Mipmap {
+  data: Uint8Array | Float32Array;
+  width: number;
+  height: number;
+}
+
+/**
+ * Used to hold subregions of a texture to update
+ */
+export interface UpdateRange {
+  start: number;
+  count: number;
+}
+
+export interface TextureOptions {
+  // Texture options
+  mapping?: number;
+  generateMipmaps?: boolean;
+  magFilter?: number;
+  minFilter?: number;
+  format?: number;
+  type?: number;
+  internalFormat?: string | null;
+  wrapS?: number;
+  wrapT?: number;
+  wrapR?: number;
+  anisotropy?: number;
+  colorSpace?: string;
+  flipY?: boolean;
+}
+
+export type Precision = 'highp' | 'mediump' | 'lowp';
+
+export type NormalMapType = typeof TangentSpaceNormalMap | typeof ObjectSpaceNormalMap;
+
 
 export const REVISION = '180dev';
 
@@ -1686,8 +1844,8 @@ export const WebGPUCoordinateSystem: number = 2001 as const;
  * @constant
  */
 export const TimestampQuery: ConstantsTimestampQuery = {
-	COMPUTE: 'compute',
-	RENDER: 'render'
+  COMPUTE: 'compute',
+  RENDER: 'render'
 };
 
 /**
@@ -1697,9 +1855,9 @@ export const TimestampQuery: ConstantsTimestampQuery = {
  * @constant
  */
 export const InterpolationSamplingType: ConstantsInterpolationSamplingType = {
-	PERSPECTIVE: 'perspective',
-	LINEAR: 'linear',
-	FLAT: 'flat'
+  PERSPECTIVE: 'perspective',
+  LINEAR: 'linear',
+  FLAT: 'flat'
 };
 
 /**
@@ -1709,9 +1867,9 @@ export const InterpolationSamplingType: ConstantsInterpolationSamplingType = {
  * @constant
  */
 export const InterpolationSamplingMode: ConstantsInterpolationSamplingMode = {
-	NORMAL: 'normal',
-	CENTROID: 'centroid',
-	SAMPLE: 'sample',
-	FIRST: 'first',
-	EITHER: 'either'
+  NORMAL: 'normal',
+  CENTROID: 'centroid',
+  SAMPLE: 'sample',
+  FIRST: 'first',
+  EITHER: 'either'
 };

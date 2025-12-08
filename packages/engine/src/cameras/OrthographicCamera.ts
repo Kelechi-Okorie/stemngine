@@ -287,3 +287,10 @@ export class OrthographicCamera extends Camera {
     return this;
   }
 }
+
+export function isOrthographicCamera(
+  cam: Camera
+): cam is OrthographicCamera {
+  return (cam as any).isOrthographicCamera === true;
+}
+
