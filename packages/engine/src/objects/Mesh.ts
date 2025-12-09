@@ -65,7 +65,8 @@ export class Mesh extends Node3D {
    * @type {Material|Array<Material>}
    * @default MeshBasicMaterial
    */
-  public material: MeshBasicMaterial | MeshBasicMaterial[];
+  // public material: MeshBasicMaterial | MeshBasicMaterial[];
+  public material: Material | Material[];
 
   /**
    * A dictionary representing the morph targets in the geometry. The key is the
@@ -104,7 +105,8 @@ export class Mesh extends Node3D {
    */
   constructor(
     geometry: BufferGeometry = new BufferGeometry(),
-    material: MeshBasicMaterial | MeshBasicMaterial[] = new MeshBasicMaterial()
+    // material: MeshBasicMaterial | MeshBasicMaterial[] = new MeshBasicMaterial()
+    material: Material | Material[] = new MeshBasicMaterial()
   ) {
 
     super();

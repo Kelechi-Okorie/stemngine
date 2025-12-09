@@ -251,6 +251,16 @@ export type Precision = 'highp' | 'mediump' | 'lowp';
 
 export type NormalMapType = typeof TangentSpaceNormalMap | typeof ObjectSpaceNormalMap;
 
+export type ToneMappingType =
+  | typeof NoToneMapping
+  | typeof LinearToneMapping
+  | typeof ReinhardToneMapping
+  | typeof CineonToneMapping
+  | typeof ACESFilmicToneMapping
+  | typeof CustomToneMapping
+  | typeof AgXToneMapping
+  | typeof NeutralToneMapping;
+
 
 export const REVISION = '180dev';
 

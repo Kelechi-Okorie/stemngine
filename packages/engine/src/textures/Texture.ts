@@ -805,3 +805,8 @@ export class Texture extends EventDispatcher {
     }
   }
 }
+
+export function isTexture(obj: any): obj is Texture {
+  return obj && obj.isTexture === true;
+}
+

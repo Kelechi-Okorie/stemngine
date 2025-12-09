@@ -957,3 +957,7 @@ export class Color {
 }
 
 const _color = /*@__PURE__*/ new Color();
+
+export function isColor(obj: any): obj is Color {
+  return obj && obj.isColor === true;
+}
