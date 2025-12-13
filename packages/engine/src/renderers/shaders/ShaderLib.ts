@@ -297,7 +297,7 @@ export const ShaderLib = {
 		fragmentShader: ShaderChunk.shadow_frag
 
 	},
-  physical: {uniforms: {[key: string]: any}};
+  physical: {uniforms: {[key: string]: any}}
 
 };
 
