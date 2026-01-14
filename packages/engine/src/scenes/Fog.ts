@@ -95,3 +95,10 @@ export class Fog {
   }
 
 }
+
+export function isFog(
+  fog: Fog
+): fog is Fog {
+  return (fog as any).isFog === true;
+}
+

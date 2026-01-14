@@ -78,3 +78,10 @@ export class CubeTexture extends Texture {
   }
 
 }
+
+export function isCubeTexture(
+  renderTarget: Texture
+): renderTarget is CubeTexture {
+  return (renderTarget as any).isCubeTexture === true;
+}
+

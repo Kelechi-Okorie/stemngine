@@ -1,13 +1,21 @@
-import { CubeReflectionMapping, CubeRefractionMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping } from '../../constants.js';
-import { PMREMGenerator } from '../../extras/PMREMGenerator.js';
+import { CubeReflectionMapping, CubeRefractionMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping } from '../../constants';
+import { BaseEvent } from '../../core/EventDispatcher';
+import { PMREMGenerator } from '../../extras/PMREMGenerator';
+import { Texture } from '../../textures/Texture';
+import { WebGLRenderer } from '../WebGLRenderer';
 
-export function WebGLCubeUVMaps( renderer ) {
+export class WebGLCubeUVMaps {
+  private renderer: WebGLRenderer
 
-	let cubeUVmaps = new WeakMap();
+	private cubeUVmaps = new WeakMap();
 
-	let pmremGenerator = null;
+	private pmremGenerator: PMREMGenerator | null = null;
 
-	function get( texture ) {
+  constructor( renderer: WebGLRenderer ) {
+    this.renderer = renderer;
+  }
+
+	public get( texture: Texture ) {
 
 		if ( texture && texture.isTexture ) {
 
@@ -20,18 +28,18 @@ export function WebGLCubeUVMaps( renderer ) {
 
 			if ( isEquirectMap || isCubeMap ) {
 
-				let renderTarget = cubeUVmaps.get( texture );
+				let renderTarget = this.cubeUVmaps.get( texture );
 
 				const currentPMREMVersion = renderTarget !== undefined ? renderTarget.texture.pmremVersion : 0;
 
 				if ( texture.isRenderTargetTexture && texture.pmremVersion !== currentPMREMVersion ) {
 
-					if ( pmremGenerator === null ) pmremGenerator = new PMREMGenerator( renderer );
+					if ( this.pmremGenerator === null ) this.pmremGenerator = new PMREMGenerator( this.renderer );
 
-					renderTarget = isEquirectMap ? pmremGenerator.fromEquirectangular( texture, renderTarget ) : pmremGenerator.fromCubemap( texture, renderTarget );
+					renderTarget = isEquirectMap ? this.pmremGenerator.fromEquirectangular( texture, renderTarget ) : this.pmremGenerator.fromCubemap( texture, renderTarget );
 					renderTarget.texture.pmremVersion = texture.pmremVersion;
 
-					cubeUVmaps.set( texture, renderTarget );
+					this.cubeUVmaps.set( texture, renderTarget );
 
 					return renderTarget.texture;
 
@@ -45,16 +53,16 @@ export function WebGLCubeUVMaps( renderer ) {
 
 						const image = texture.image;
 
-						if ( ( isEquirectMap && image && image.height > 0 ) || ( isCubeMap && image && isCubeTextureComplete( image ) ) ) {
+						if ( ( isEquirectMap && image && image.height > 0 ) || ( isCubeMap && image && this.isCubeTextureComplete( image ) ) ) {
 
-							if ( pmremGenerator === null ) pmremGenerator = new PMREMGenerator( renderer );
+							if ( this.pmremGenerator === null ) this.pmremGenerator = new PMREMGenerator( this.renderer );
 
-							renderTarget = isEquirectMap ? pmremGenerator.fromEquirectangular( texture ) : pmremGenerator.fromCubemap( texture );
+							renderTarget = isEquirectMap ? this.pmremGenerator.fromEquirectangular( texture ) : this.pmremGenerator.fromCubemap( texture );
 							renderTarget.texture.pmremVersion = texture.pmremVersion;
 
-							cubeUVmaps.set( texture, renderTarget );
+							this.cubeUVmaps.set( texture, renderTarget );
 
-							texture.addEventListener( 'dispose', onTextureDispose );
+							texture.addEventListener( 'dispose', this.onTextureDispose );
 
 							return renderTarget.texture;
 
@@ -78,7 +86,7 @@ export function WebGLCubeUVMaps( renderer ) {
 
 	}
 
-	function isCubeTextureComplete( image ) {
+	public isCubeTextureComplete( image: ArrayLike<any> ) {
 
 		let count = 0;
 		const length = 6;
@@ -94,39 +102,34 @@ export function WebGLCubeUVMaps( renderer ) {
 
 	}
 
-	function onTextureDispose( event ) {
+	public onTextureDispose( event: BaseEvent<Texture> ) {
 
 		const texture = event.target;
 
-		texture.removeEventListener( 'dispose', onTextureDispose );
+		texture.removeEventListener( 'dispose', this.onTextureDispose );
 
-		const cubemapUV = cubeUVmaps.get( texture );
+		const cubemapUV = this.cubeUVmaps.get( texture );
 
 		if ( cubemapUV !== undefined ) {
 
-			cubeUVmaps.delete( texture );
+			this.cubeUVmaps.delete( texture );
 			cubemapUV.dispose();
 
 		}
 
 	}
 
-	function dispose() {
+	public dispose() {
 
-		cubeUVmaps = new WeakMap();
+		this.cubeUVmaps = new WeakMap();
 
-		if ( pmremGenerator !== null ) {
+		if ( this.pmremGenerator !== null ) {
 
-			pmremGenerator.dispose();
-			pmremGenerator = null;
+			this.pmremGenerator.dispose();
+			this.pmremGenerator = null;
 
 		}
 
 	}
-
-	return {
-		get: get,
-		dispose: dispose
-	};
 
 }

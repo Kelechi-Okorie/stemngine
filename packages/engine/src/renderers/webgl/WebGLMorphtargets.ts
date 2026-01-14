@@ -1,43 +1,55 @@
-import { FloatType } from '../../constants';
+import { FloatType } from '../../constants.js';
 import { DataArrayTexture } from '../../textures/DataArrayTexture';
-import { Vector4 } from '../../math/Vector4';
-import { Vector2 } from '../../math/Vector2';
-import { BufferAttribute } from '../../core/BufferAttribute';
-import { BufferGeometry } from '../../core/BufferGeometry';
-import { Node3D } from '../../core/Node3D';
-import { WebGLProgram } from './WebGLProgram';
-import { WebGLTextures } from './WebGLTextures';
-import { WebGLCapabilities } from './WebGLCapabilities';
+import { Vector4 } from '../../math/Vector4.js';
+import { Vector2 } from '../../math/Vector2.js';
+import { WebGLCapabilities } from './WebGLCapabilities.js';
+import { BufferGeometry } from '../../core/BufferGeometry.js';
+import { Node3D } from '../../core/Node3D.js';
 
-interface MorphTextureEntry {
-  count: number;
-  texture: DataArrayTexture;
-  size: Vector2;
+export class WebGLMorphtargets {
+    private readonly gl: WebGL2RenderingContext;
+  private readonly capabilities: WebGLCapabilities;
+  private readonly textures: Record<string, WebGLTexture>;
+
+
+  protected morphTextures = new WeakMap();
+  protected morph = new Vector4();
+
+  constructor(
+  gl: WebGL2RenderingContext,
+  capabilities: WebGLCapabilities,
+  textures: Record<string, WebGLTexture>
+) {
+  this.gl = gl;
+  this.capabilities = capabilities;
+  this.textures = textures;
 }
 
-export function WebGLMorphtargets(
-  gl: WebGL2RenderingContext,
-  capabilities: ReturnType<typeof WebGLCapabilities>,
-  textures: ReturnType<typeof WebGLTextures>
-) {
-
-  const morphTextures = new WeakMap();
-  const morph = new Vector4();
-
-  function update(
-    object: Node3D & { morphTargetInfluces?: number[], isInstancedMesh?: boolean, morphTexture?: DataArrayTexture },
-    geometry: BufferGeometry,
-    program: ReturnType<typeof WebGLProgram>
+  public update(
+    object: Node3D & {
+      morphTargetInfluences: number[];
+      morphTexture?: DataArrayTexture | null;
+      isInstancedMesh?: boolean;
+    },
+    geometry: BufferGeometry & {
+      morphAttributes: Record<'position' | 'normal' | 'color', Array<any>>;
+      morphTargetsRelative?: boolean;
+    },
+    program: {
+      getUniforms(): {
+        setValue(gl: WebGL2RenderingContext, name: string, value: any, textures?: Record<string, WebGLTexture>): void;
+      };
+    }
   ) {
 
-    const objectInfluences = object.morphTargetInfluences || [];
+    const objectInfluences = object.morphTargetInfluences;
 
     // the following encodes morph targets into an array of data textures. Each layer represents a single morph target.
 
     const morphAttribute = geometry.morphAttributes.position || geometry.morphAttributes.normal || geometry.morphAttributes.color;
     const morphTargetsCount = (morphAttribute !== undefined) ? morphAttribute.length : 0;
 
-    let entry = morphTextures.get(geometry);
+    let entry = this.morphTextures.get(geometry);
 
     if (entry === undefined || entry.count !== morphTargetsCount) {
 
@@ -60,10 +72,10 @@ export function WebGLMorphtargets(
       let width = geometry.attributes.position.count * vertexDataCount;
       let height = 1;
 
-      if (width > capabilities.maxTextureSize) {
+      if (width > this.capabilities.maxTextureSize) {
 
-        height = Math.ceil(width / capabilities.maxTextureSize);
-        width = capabilities.maxTextureSize;
+        height = Math.ceil(width / this.capabilities.maxTextureSize);
+        width = this.capabilities.maxTextureSize;
 
       }
 
@@ -91,34 +103,34 @@ export function WebGLMorphtargets(
 
           if (hasMorphPosition === true) {
 
-            morph.fromBufferAttribute(morphTarget, j);
+            this.morph.fromBufferAttribute(morphTarget, j);
 
-            buffer[offset + stride + 0] = morph.x;
-            buffer[offset + stride + 1] = morph.y;
-            buffer[offset + stride + 2] = morph.z;
+            buffer[offset + stride + 0] = this.morph.x;
+            buffer[offset + stride + 1] = this.morph.y;
+            buffer[offset + stride + 2] = this.morph.z;
             buffer[offset + stride + 3] = 0;
 
           }
 
           if (hasMorphNormals === true) {
 
-            morph.fromBufferAttribute(morphNormal, j);
+            this.morph.fromBufferAttribute(morphNormal, j);
 
-            buffer[offset + stride + 4] = morph.x;
-            buffer[offset + stride + 5] = morph.y;
-            buffer[offset + stride + 6] = morph.z;
+            buffer[offset + stride + 4] = this.morph.x;
+            buffer[offset + stride + 5] = this.morph.y;
+            buffer[offset + stride + 6] = this.morph.z;
             buffer[offset + stride + 7] = 0;
 
           }
 
           if (hasMorphColors === true) {
 
-            morph.fromBufferAttribute(morphColor, j);
+            this.morph.fromBufferAttribute(morphColor, j);
 
-            buffer[offset + stride + 8] = morph.x;
-            buffer[offset + stride + 9] = morph.y;
-            buffer[offset + stride + 10] = morph.z;
-            buffer[offset + stride + 11] = (morphColor.itemSize === 4) ? morph.w : 1;
+            buffer[offset + stride + 8] = this.morph.x;
+            buffer[offset + stride + 9] = this.morph.y;
+            buffer[offset + stride + 10] = this.morph.z;
+            buffer[offset + stride + 11] = (morphColor.itemSize === 4) ? this.morph.w : 1;
 
           }
 
@@ -132,13 +144,13 @@ export function WebGLMorphtargets(
         size: new Vector2(width, height)
       };
 
-      morphTextures.set(geometry, entry);
+      this.morphTextures.set(geometry, entry);
 
-      function disposeTexture() {
+      const disposeTexture = () => {
 
         texture.dispose();
 
-        morphTextures.delete(geometry);
+        this.morphTextures.delete(geometry);
 
         geometry.removeEventListener('dispose', disposeTexture);
 
@@ -151,7 +163,7 @@ export function WebGLMorphtargets(
     //
     if (object.isInstancedMesh === true && object.morphTexture !== null) {
 
-      program.getUniforms().setValue(gl, 'morphTexture', object.morphTexture, textures);
+      program.getUniforms().setValue(this.gl, 'morphTexture', object.morphTexture, this.textures);
 
     } else {
 
@@ -166,16 +178,14 @@ export function WebGLMorphtargets(
       const morphBaseInfluence = geometry.morphTargetsRelative ? 1 : 1 - morphInfluencesSum;
 
 
-      program.getUniforms().setValue(gl, 'morphTargetBaseInfluence', morphBaseInfluence);
-      program.getUniforms().setValue(gl, 'morphTargetInfluences', objectInfluences);
+      program.getUniforms().setValue(this.gl, 'morphTargetBaseInfluence', morphBaseInfluence);
+      program.getUniforms().setValue(this.gl, 'morphTargetInfluences', objectInfluences);
 
     }
 
-    program.getUniforms().setValue(gl, 'morphTargetsTexture', entry.texture, textures);
-    program.getUniforms().setValue(gl, 'morphTargetsTextureSize', entry.size);
+    program.getUniforms().setValue(this.gl, 'morphTargetsTexture', entry.texture, this.textures);
+    program.getUniforms().setValue(this.gl, 'morphTargetsTextureSize', entry.size);
 
   }
-
-  return { update };
 
 }

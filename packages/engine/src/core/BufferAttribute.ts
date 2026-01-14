@@ -123,7 +123,7 @@ export class BufferAttribute {
    *
    * @type {Array<Object>}
    */
-  public updateRanges: { offset: number; count: number }[] = [];
+  public updateRanges: { start: number; count: number }[] = [];
 
   /**
    * Configures the bound GPU type for use in shaders.
@@ -434,7 +434,7 @@ export class BufferAttribute {
    * @param count - The number of components to update
    */
   public addUpdateRange(start: number, count: number): void {
-    this.updateRanges.push({ offset: start, count });
+    this.updateRanges.push({ start, count });
   }
 
   /**

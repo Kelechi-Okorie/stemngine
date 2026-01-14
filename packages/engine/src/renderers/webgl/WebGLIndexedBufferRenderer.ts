@@ -1,55 +1,69 @@
 import { WebGLExtensions } from "./WebGLExtensions";
 import { WebGLInfo } from "./WebGLInfo";
-import { BufferAttribute } from "../../core/BufferAttribute";
 
-export function WebGLIndexedBufferRenderer(
-  gl: WebGL2RenderingContext,
-  extensions: ReturnType<typeof WebGLExtensions>,
-  info: ReturnType<typeof WebGLInfo>
-) {
+export class WebGLIndexedBufferRenderer {
 
-  let mode: number;
-  let type: number;
-  let bytesPerElement: number;
+  public gl: WebGL2RenderingContext;
+  public extensions: WebGLExtensions;
+  public info: WebGLInfo;
 
+  public mode!: GLenum; // WebGL draw mode, e.g., gl.TRIANGLES, gl.LINES, etc.
 
-  function setMode(value: number) {
+  public type!: GLenum; // WebGL index type, e.g., gl.UNSIGNED_SHORT or gl.UNSIGNED_INT;
+  public bytesPerElement!: number;
 
-    mode = value;
+  constructor(
+    gl: WebGL2RenderingContext,
+    extensions: WebGLExtensions,
+    info: WebGLInfo
+  ) {
+    this.gl = gl;
+    this.extensions = extensions;
+    this.info = info;
+  }
+
+  public setMode(value: GLenum) {
+
+    this.mode = value;
 
   }
 
-  function setIndex(value: BufferAttribute) {
 
-    type = value.type;
-    bytesPerElement = value.bytesPerElement;
+  public setIndex(value: { type: GLenum; bytesPerElement: number }) {
 
-  }
-
-  function render(start: number, count: number) {
-
-    gl.drawElements(mode, count, type, start * bytesPerElement);
-
-    info.update(count, mode, 1);
+    this.type = value.type;
+    this.bytesPerElement = value.bytesPerElement;
 
   }
 
-  function renderInstances(start: number, count: number, primcount: number) {
+  public render(start: number, count: number) {
+
+    this.gl.drawElements(this.mode, count, this.type, start * this.bytesPerElement);
+
+    this.info.update(count, this.mode, 1);
+
+  }
+
+  public renderInstances(start: number, count: number, primcount: number) {
 
     if (primcount === 0) return;
 
-    gl.drawElementsInstanced(mode, count, type, start * bytesPerElement, primcount);
+    this.gl.drawElementsInstanced(this.mode, count, this.type, start * this.bytesPerElement, primcount);
 
-    info.update(count, mode, primcount);
+    this.info.update(count, this.mode, primcount);
 
   }
 
-  function renderMultiDraw(starts: Int32Array, counts: Int32Array, drawCount: number) {
+  public renderMultiDraw(
+    starts: Int32Array | Uint32Array,
+    counts: Int32Array | Uint32Array,
+    drawCount: number
+  ) {
 
     if (drawCount === 0) return;
 
-    const extension = extensions.get('WEBGL_multi_draw');
-    extension.multiDrawElementsWEBGL(mode, counts, 0, type, starts, 0, drawCount);
+    const extension = this.extensions.get('WEBGL_multi_draw');
+    extension.multiDrawElementsWEBGL(this.mode, counts, 0, this.type, starts, 0, drawCount);
 
     let elementCount = 0;
     for (let i = 0; i < drawCount; i++) {
@@ -58,33 +72,33 @@ export function WebGLIndexedBufferRenderer(
 
     }
 
-    info.update(elementCount, mode, 1);
+    this.info.update(elementCount, this.mode, 1);
 
 
   }
 
-  function renderMultiDrawInstances(
-    starts: Int32Array,
-    counts: Int32Array,
+  public renderMultiDrawInstances(
+    starts: Int32Array | Uint32Array,
+    counts: Int32Array | Uint32Array,
     drawCount: number,
-    primcount: Int32Array
+    primcount: Int32Array | Uint32Array
   ) {
 
     if (drawCount === 0) return;
 
-    const extension = extensions.get('WEBGL_multi_draw');
+    const extension = this.extensions.get('WEBGL_multi_draw');
 
     if (extension === null) {
 
       for (let i = 0; i < starts.length; i++) {
 
-        renderInstances(starts[i] / bytesPerElement, counts[i], primcount[i]);
+        this.renderInstances(starts[i] / this.bytesPerElement, counts[i], primcount[i]);
 
       }
 
     } else {
 
-      extension.multiDrawElementsInstancedWEBGL(mode, counts, 0, type, starts, 0, primcount, 0, drawCount);
+      extension.multiDrawElementsInstancedWEBGL(this.mode, counts, 0, this.type, starts, 0, primcount, 0, drawCount);
 
       let elementCount = 0;
       for (let i = 0; i < drawCount; i++) {
@@ -93,28 +107,10 @@ export function WebGLIndexedBufferRenderer(
 
       }
 
-      info.update(elementCount, mode, 1);
+      this.info.update(elementCount, this.mode, 1);
 
     }
 
   }
-
-  //
-
-  // this.setMode = setMode;
-  // this.setIndex = setIndex;
-  // this.render = render;
-  // this.renderInstances = renderInstances;
-  // this.renderMultiDraw = renderMultiDraw;
-  // this.renderMultiDrawInstances = renderMultiDrawInstances;
-
-  return {
-    setMode,
-    setIndex,
-    render,
-    renderInstances,
-    renderMultiDraw,
-    renderMultiDrawInstances
-  };
 
 }

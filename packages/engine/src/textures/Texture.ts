@@ -95,7 +95,8 @@ export class Texture extends EventDispatcher {
   /**
    * An array holding user-defined mipmaps
    */
-  public mipmaps: Mipmap[] = [];
+  // public mipmaps: Mipmap[] = [];
+  public mipmaps: any[] = []
 
   /**
    * How the texture is applied to the object
@@ -319,7 +320,7 @@ export class Texture extends EventDispatcher {
    * Indicates whether this texture should be processed by PMREMGenerator or not
    * (only relevent for render target textures)
    */
-  private pmremVersion: number = 0;
+  public pmremVersion: number = 0;
 
   /**
  * The default image for all textures.

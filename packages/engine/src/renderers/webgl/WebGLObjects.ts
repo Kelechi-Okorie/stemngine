@@ -1,69 +1,78 @@
-import { BufferGeometry } from "../../core/BufferGeometry";
+import { BaseEvent } from "../../core/EventDispatcher";
 import { WebGLAttributes } from "./WebGLAttributes";
 import { WebGLGeometries } from "./WebGLGeometries";
 import { WebGLInfo } from "./WebGLInfo";
-import { Node3D } from "../../core/Node3D";
-import { EventDispatcher } from "../../core/EventDispatcher";
 
-export function WebGLObjects(
+export class WebGLObjects {
+  private readonly gl: WebGL2RenderingContext;
+  private readonly geometries: WebGLGeometries;
+  private readonly attributes: WebGLAttributes;
+  private readonly info: WebGLInfo
+
+  protected updateMap = new WeakMap();
+
+  constructor(
   gl: WebGL2RenderingContext,
-  geometries: ReturnType<typeof WebGLGeometries>,
-  attributes: ReturnType<typeof WebGLAttributes>,
-  info: ReturnType<typeof WebGLInfo>
+  geometries: WebGLGeometries,
+  attributes: WebGLAttributes,
+  info: WebGLInfo
 ) {
+  this.gl = gl;
+  this.geometries = geometries;
+  this.attributes = attributes;
+  this.info = info;
+}
 
-  let updateMap = new WeakMap();
+  public update(object: any) {  // TODO: type better
 
-  function update(object: Node3D & {geometry:  BufferGeometry}) {
-
-    const frame = info.render.frame;
+    const frame = this.info.render.frame;
 
     const geometry = object.geometry;
-    const buffergeometry = geometries.get(object, geometry);
+    const buffergeometry = this.geometries.get(object, geometry);
 
     // Update once per frame
 
-    if (updateMap.get(buffergeometry) !== frame) {
+    if (this.updateMap.get(buffergeometry) !== frame) {
 
-      geometries.update(buffergeometry);
+      this.geometries.update(buffergeometry);
 
-      updateMap.set(buffergeometry, frame);
+      this.updateMap.set(buffergeometry, frame);
 
     }
 
-    if ('isInstancedMesh' in object /* object.isInstancedMesh */) {
+    if (object.isInstancedMesh) {
 
-      if (object.hasEventListener('dispose', onInstancedMeshDispose) === false) {
+      if (object.hasEventListener('dispose', this.onInstancedMeshDispose) === false) {
 
-        object.addEventListener('dispose', onInstancedMeshDispose);
+        object.addEventListener('dispose', this.onInstancedMeshDispose);
 
       }
 
-      if (updateMap.get(object) !== frame) {
+      if (this.updateMap.get(object) !== frame) {
 
-        attributes.update(object.instanceMatrix, gl.ARRAY_BUFFER);
+        this.attributes.update(object.instanceMatrix, this.gl.ARRAY_BUFFER);
 
         if (object.instanceColor !== null) {
 
-          attributes.update(object.instanceColor, gl.ARRAY_BUFFER);
+          this.attributes.update(object.instanceColor, this.gl.ARRAY_BUFFER);
 
         }
 
-        updateMap.set(object, frame);
+        this.updateMap.set(object, frame);
 
       }
 
     }
 
-    if ('isSkinnedMesh' in object/* object.isSkinnedMesh */) {
+    if (object.isSkinnedMesh) {
 
       const skeleton = object.skeleton;
 
-      if (updateMap.get(skeleton) !== frame) {
+      if (this.updateMap.get(skeleton) !== frame) {
 
         skeleton.update();
 
-        updateMap.set(skeleton, frame);
+        this.updateMap.set(skeleton, frame);
 
       }
 
@@ -73,24 +82,29 @@ export function WebGLObjects(
 
   }
 
-  function dispose() {
+  public dispose() {
 
-    updateMap = new WeakMap();
+    this.updateMap = new WeakMap();
 
   }
 
-  function onInstancedMeshDispose(event: EventDispatcher & { target: any}) {
+  private onInstancedMeshDispose = (event: BaseEvent) => {
 
     const instancedMesh = event.target;
 
-    instancedMesh.removeEventListener('dispose', onInstancedMeshDispose);
+    instancedMesh.removeEventListener('dispose', this.onInstancedMeshDispose);
 
-    attributes.remove(instancedMesh.instanceMatrix);
+    this.attributes.remove(instancedMesh.instanceMatrix);
 
-    if (instancedMesh.instanceColor !== null) attributes.remove(instancedMesh.instanceColor);
+    if (instancedMesh.instanceColor !== null) this.attributes.remove(instancedMesh.instanceColor);
 
   }
 
-  return { update, dispose };
+  // return {
+
+  //   update,
+  //   dispose
+
+  // };
 
 }

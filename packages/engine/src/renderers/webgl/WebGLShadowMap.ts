@@ -1,432 +1,479 @@
-import { FrontSide, BackSide, DoubleSide, NearestFilter, PCFShadowMap, VSMShadowMap, RGBADepthPacking, NoBlending } from '../../constants.js';
-import { WebGLRenderTarget } from '../WebGLRenderTarget.js';
-import { MeshDepthMaterial } from '../../materials/MeshDepthMaterial.js';
-import { MeshDistanceMaterial } from '../../materials/MeshDistanceMaterial.js';
-import { ShaderMaterial } from '../../materials/ShaderMaterial.js';
-import { BufferAttribute } from '../../core/BufferAttribute.js';
-import { BufferGeometry } from '../../core/BufferGeometry.js';
-import { Mesh } from '../../objects/Mesh.js';
-import { Vector4 } from '../../math/Vector4.js';
-import { Vector2 } from '../../math/Vector2.js';
-import { Frustum } from '../../math/Frustum.js';
+import { FrontSide, BackSide, DoubleSide, NearestFilter, PCFShadowMap, VSMShadowMap, RGBADepthPacking, NoBlending } from '../../constants';
+import { WebGLRenderTarget } from '../WebGLRenderTarget';
+import { MeshDepthMaterial } from '../../materials/MeshDepthMaterial';
+import { MeshDistanceMaterial } from '../../materials/MeshDistanceMaterial';
+import { ShaderMaterial } from '../../materials/ShaderMaterial';
+import { BufferAttribute } from '../../core/BufferAttribute';
+import { BufferGeometry } from '../../core/BufferGeometry';
+import { Mesh } from '../../objects/Mesh';
+import { Vector4 } from '../../math/Vector4';
+import { Vector2 } from '../../math/Vector2';
+import { Frustum } from '../../math/Frustum';
+import { Light } from '../../lights/Light';
 
-import * as vsm from '../shaders/ShaderLib/vsm.glsl.js';
+import * as vsm from '../shaders/ShaderLib/vsm.glsl';
+import { WebGLRenderer } from '../WebGLRenderer';
+import { WebGLObjects } from './WebGLObjects';
+import { WebGLCapabilities } from './WebGLCapabilities';
+import { Scene } from '../../scenes/Scene';
+import { Camera } from '../../cameras/Camera';
+import { LightShadow } from '../../lights/LightShadow';
+import { WebGLMaterials } from './WebGLMaterials';
+import { BaseEvent } from '../../core/EventDispatcher';
 
-export function WebGLShadowMap( renderer, objects, capabilities ) {
+export class WebGLShadowMap {
 
-	let _frustum = new Frustum();
+  public _frustum = new Frustum();
 
-	const _shadowMapSize = new Vector2(),
-		_viewportSize = new Vector2(),
+  public _shadowMapSize = new Vector2();
+  public _viewportSize = new Vector2();
 
-		_viewport = new Vector4(),
+  public _viewport = new Vector4();
 
-		_depthMaterial = new MeshDepthMaterial( { depthPacking: RGBADepthPacking } ),
-		_distanceMaterial = new MeshDistanceMaterial(),
+  public _depthMaterial = new MeshDepthMaterial({ depthPacking: RGBADepthPacking });
+  public _distanceMaterial = new MeshDistanceMaterial();
 
-		_materialCache = {},
+  public _materialCache: any = {};
 
-		_maxTextureSize = capabilities.maxTextureSize;
+  public _maxTextureSize: any;
 
-	const shadowSide = { [ FrontSide ]: BackSide, [ BackSide ]: FrontSide, [ DoubleSide ]: DoubleSide };
+  public shadowSide = { [FrontSide]: BackSide, [BackSide]: FrontSide, [DoubleSide]: DoubleSide };
 
-	const shadowMaterialVertical = new ShaderMaterial( {
-		defines: {
-			VSM_SAMPLES: 8
-		},
-		uniforms: {
-			shadow_pass: { value: null },
-			resolution: { value: new Vector2() },
-			radius: { value: 4.0 }
-		},
+  public shadowMaterialVertical = new ShaderMaterial({
+    defines: {
+      VSM_SAMPLES: 8
+    },
+    uniforms: {
+      shadow_pass: { value: null },
+      resolution: { value: new Vector2() },
+      radius: { value: 4.0 }
+    },
 
-		vertexShader: vsm.vertex,
-		fragmentShader: vsm.fragment
+    vertexShader: vsm.vertex,
+    fragmentShader: vsm.fragment
 
-	} );
+  });
 
-	const shadowMaterialHorizontal = shadowMaterialVertical.clone();
-	shadowMaterialHorizontal.defines.HORIZONTAL_PASS = 1;
+  public shadowMaterialHorizontal = this.shadowMaterialVertical.clone();
 
-	const fullScreenTri = new BufferGeometry();
-	fullScreenTri.setAttribute(
-		'position',
-		new BufferAttribute(
-			new Float32Array( [ - 1, - 1, 0.5, 3, - 1, 0.5, - 1, 3, 0.5 ] ),
-			3
-		)
-	);
+  public fullScreenTri = new BufferGeometry();
 
-	const fullScreenMesh = new Mesh( fullScreenTri, shadowMaterialVertical );
+  public fullScreenMesh = new Mesh(this.fullScreenTri, this.shadowMaterialVertical);
 
-	const scope = this;
+  public scope = this;
 
-	this.enabled = false;
+  public enabled = false;
 
-	this.autoUpdate = true;
-	this.needsUpdate = false;
+  public autoUpdate = true;
+  public needsUpdate = false;
 
-	this.type = PCFShadowMap;
-	let _previousType = this.type;
+  public type = PCFShadowMap;
+  public _previousType = this.type;
 
-	this.render = function ( lights, scene, camera ) {
+  public renderer: WebGLRenderer;
+  public objects: WebGLObjects;
 
-		if ( scope.enabled === false ) return;
-		if ( scope.autoUpdate === false && scope.needsUpdate === false ) return;
+  constructor(
+    renderer: WebGLRenderer,
+    objects: WebGLObjects,
+    capabilities: WebGLCapabilities
+  ) {
+    this.renderer = renderer;
+    this.objects = objects;
+    this._maxTextureSize = capabilities.maxTextureSize;
+    this.shadowMaterialHorizontal.defines.HORIZONTAL_PASS = 1;
 
-		if ( lights.length === 0 ) return;
+    this.fullScreenTri.setAttribute(
+      'position',
+      new BufferAttribute(
+        new Float32Array([- 1, - 1, 0.5, 3, - 1, 0.5, - 1, 3, 0.5]),
+        3
+      )
+    );
 
-		const currentRenderTarget = renderer.getRenderTarget();
-		const activeCubeFace = renderer.getActiveCubeFace();
-		const activeMipmapLevel = renderer.getActiveMipmapLevel();
 
-		const _state = renderer.state;
+  }
 
-		// Set GL state for depth map.
-		_state.setBlending( NoBlending );
+  public render(
+    lights: Light[],
+    scene: Scene,
+    camera: Camera
+  ) {
 
-		if ( _state.buffers.depth.getReversed() === true ) {
+    if (this.enabled === false) return;
+    if (this.autoUpdate === false && this.needsUpdate === false) return;
 
-			_state.buffers.color.setClear( 0, 0, 0, 0 );
+    if (lights.length === 0) return;
 
-		} else {
+    const currentRenderTarget = this.renderer.getRenderTarget();
+    const activeCubeFace = this.renderer.getActiveCubeFace();
+    const activeMipmapLevel = this.renderer.getActiveMipmapLevel();
 
-			_state.buffers.color.setClear( 1, 1, 1, 1 );
+    const _state = this.renderer.state;
 
-		}
+    // Set GL state for depth map.
+    _state.setBlending(NoBlending);
 
-		_state.buffers.depth.setTest( true );
-		_state.setScissorTest( false );
+    if (_state.buffers.depth.getReversed() === true) {
 
-		// check for shadow map type changes
+      _state.buffers.color.setClear(0, 0, 0, 0);
 
-		const toVSM = ( _previousType !== VSMShadowMap && this.type === VSMShadowMap );
-		const fromVSM = ( _previousType === VSMShadowMap && this.type !== VSMShadowMap );
+    } else {
 
-		// render depth map
+      _state.buffers.color.setClear(1, 1, 1, 1);
 
-		for ( let i = 0, il = lights.length; i < il; i ++ ) {
+    }
 
-			const light = lights[ i ];
-			const shadow = light.shadow;
+    _state.buffers.depth.setTest(true);
+    _state.setScissorTest(false);
 
-			if ( shadow === undefined ) {
+    // check for shadow map type changes
 
-				console.warn( 'THREE.WebGLShadowMap:', light, 'has no shadow.' );
-				continue;
+    const toVSM = (this._previousType !== VSMShadowMap && this.type === VSMShadowMap);
+    const fromVSM = (this._previousType === VSMShadowMap && this.type !== VSMShadowMap);
 
-			}
+    // render depth map
 
-			if ( shadow.autoUpdate === false && shadow.needsUpdate === false ) continue;
+    for (let i = 0, il = lights.length; i < il; i++) {
 
-			_shadowMapSize.copy( shadow.mapSize );
+      const light = lights[i];
+      const shadow = light.shadow;
 
-			const shadowFrameExtents = shadow.getFrameExtents();
+      if (shadow === undefined) {
 
-			_shadowMapSize.multiply( shadowFrameExtents );
+        console.warn('WebGLShadowMap:', light, 'has no shadow.');
+        continue;
 
-			_viewportSize.copy( shadow.mapSize );
+      }
 
-			if ( _shadowMapSize.x > _maxTextureSize || _shadowMapSize.y > _maxTextureSize ) {
+      if (shadow.autoUpdate === false && shadow.needsUpdate === false) continue;
 
-				if ( _shadowMapSize.x > _maxTextureSize ) {
+      this._shadowMapSize.copy(shadow.mapSize);
 
-					_viewportSize.x = Math.floor( _maxTextureSize / shadowFrameExtents.x );
-					_shadowMapSize.x = _viewportSize.x * shadowFrameExtents.x;
-					shadow.mapSize.x = _viewportSize.x;
+      const shadowFrameExtents = shadow.getFrameExtents();
 
-				}
+      this._shadowMapSize.multiply(shadowFrameExtents);
 
-				if ( _shadowMapSize.y > _maxTextureSize ) {
+      this._viewportSize.copy(shadow.mapSize);
 
-					_viewportSize.y = Math.floor( _maxTextureSize / shadowFrameExtents.y );
-					_shadowMapSize.y = _viewportSize.y * shadowFrameExtents.y;
-					shadow.mapSize.y = _viewportSize.y;
+      if (this._shadowMapSize.x > this._maxTextureSize || this._shadowMapSize.y > this._maxTextureSize) {
 
-				}
+        if (this._shadowMapSize.x > this._maxTextureSize) {
 
-			}
+          this._viewportSize.x = Math.floor(this._maxTextureSize / shadowFrameExtents.x);
+          this._shadowMapSize.x = this._viewportSize.x * shadowFrameExtents.x;
+          shadow.mapSize.x = this._viewportSize.x;
 
-			if ( shadow.map === null || toVSM === true || fromVSM === true ) {
+        }
 
-				const pars = ( this.type !== VSMShadowMap ) ? { minFilter: NearestFilter, magFilter: NearestFilter } : {};
+        if (this._shadowMapSize.y > this._maxTextureSize) {
 
-				if ( shadow.map !== null ) {
+          this._viewportSize.y = Math.floor(this._maxTextureSize / shadowFrameExtents.y);
+          this._shadowMapSize.y = this._viewportSize.y * shadowFrameExtents.y;
+          shadow.mapSize.y = this._viewportSize.y;
 
-					shadow.map.dispose();
+        }
 
-				}
+      }
 
-				shadow.map = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y, pars );
-				shadow.map.texture.name = light.name + '.shadowMap';
+      if (shadow.map === null || toVSM === true || fromVSM === true) {
 
-				shadow.camera.updateProjectionMatrix();
+        const pars = (this.type !== VSMShadowMap) ? { minFilter: NearestFilter, magFilter: NearestFilter } : {};
 
-			}
+        if (shadow.map !== null) {
 
-			renderer.setRenderTarget( shadow.map );
-			renderer.clear();
+          shadow.map.dispose();
 
-			const viewportCount = shadow.getViewportCount();
+        }
 
-			for ( let vp = 0; vp < viewportCount; vp ++ ) {
+        shadow.map = new WebGLRenderTarget(this._shadowMapSize.x, this._shadowMapSize.y, pars);
+        shadow.map.texture.name = light.name + '.shadowMap';
 
-				const viewport = shadow.getViewport( vp );
+        shadow.camera.updateProjectionMatrix();
 
-				_viewport.set(
-					_viewportSize.x * viewport.x,
-					_viewportSize.y * viewport.y,
-					_viewportSize.x * viewport.z,
-					_viewportSize.y * viewport.w
-				);
+      }
 
-				_state.viewport( _viewport );
+      this.renderer.setRenderTarget(shadow.map);
+      this.renderer.clear();
 
-				shadow.updateMatrices( light, vp );
+      const viewportCount = shadow.getViewportCount();
 
-				_frustum = shadow.getFrustum();
+      for (let vp = 0; vp < viewportCount; vp++) {
 
-				renderObject( scene, camera, shadow.camera, light, this.type );
+        const viewport = shadow.getViewport(vp);
 
-			}
+        this._viewport.set(
+          this._viewportSize.x * viewport.x,
+          this._viewportSize.y * viewport.y,
+          this._viewportSize.x * viewport.z,
+          this._viewportSize.y * viewport.w
+        );
 
-			// do blur pass for VSM
+        _state.viewport(this._viewport);
 
-			if ( shadow.isPointLightShadow !== true && this.type === VSMShadowMap ) {
+        shadow.updateMatrices(light, vp);
 
-				VSMPass( shadow, camera );
+        this._frustum = shadow.getFrustum();
 
-			}
+        this.renderObject(scene, camera, shadow.camera, light, this.type);
 
-			shadow.needsUpdate = false;
+      }
 
-		}
+      // do blur pass for VSM
 
-		_previousType = this.type;
+      if (shadow.isPointLightShadow !== true && this.type === VSMShadowMap) {
 
-		scope.needsUpdate = false;
+        this.VSMPass(shadow, camera);
 
-		renderer.setRenderTarget( currentRenderTarget, activeCubeFace, activeMipmapLevel );
+      }
 
-	};
+      shadow.needsUpdate = false;
 
-	function VSMPass( shadow, camera ) {
+    }
 
-		const geometry = objects.update( fullScreenMesh );
+    this._previousType = this.type;
 
-		if ( shadowMaterialVertical.defines.VSM_SAMPLES !== shadow.blurSamples ) {
+    this.scope.needsUpdate = false;
 
-			shadowMaterialVertical.defines.VSM_SAMPLES = shadow.blurSamples;
-			shadowMaterialHorizontal.defines.VSM_SAMPLES = shadow.blurSamples;
+    this.renderer.setRenderTarget(currentRenderTarget, activeCubeFace, activeMipmapLevel);
 
-			shadowMaterialVertical.needsUpdate = true;
-			shadowMaterialHorizontal.needsUpdate = true;
+  };
 
-		}
+  public VSMPass(
+    shadow: LightShadow,
+    camera: Camera
+  ) {
 
-		if ( shadow.mapPass === null ) {
+    const geometry = this.objects.update(this.fullScreenMesh);
 
-			shadow.mapPass = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y );
+    if (this.shadowMaterialVertical.defines.VSM_SAMPLES !== shadow.blurSamples) {
 
-		}
+      this.shadowMaterialVertical.defines.VSM_SAMPLES = shadow.blurSamples;
+      this.shadowMaterialHorizontal.defines.VSM_SAMPLES = shadow.blurSamples;
 
-		// vertical pass
+      this.shadowMaterialVertical.needsUpdate = true;
+      this.shadowMaterialHorizontal.needsUpdate = true;
 
-		shadowMaterialVertical.uniforms.shadow_pass.value = shadow.map.texture;
-		shadowMaterialVertical.uniforms.resolution.value = shadow.mapSize;
-		shadowMaterialVertical.uniforms.radius.value = shadow.radius;
-		renderer.setRenderTarget( shadow.mapPass );
-		renderer.clear();
-		renderer.renderBufferDirect( camera, null, geometry, shadowMaterialVertical, fullScreenMesh, null );
+    }
 
-		// horizontal pass
+    if (shadow.mapPass === null) {
 
-		shadowMaterialHorizontal.uniforms.shadow_pass.value = shadow.mapPass.texture;
-		shadowMaterialHorizontal.uniforms.resolution.value = shadow.mapSize;
-		shadowMaterialHorizontal.uniforms.radius.value = shadow.radius;
-		renderer.setRenderTarget( shadow.map );
-		renderer.clear();
-		renderer.renderBufferDirect( camera, null, geometry, shadowMaterialHorizontal, fullScreenMesh, null );
+      shadow.mapPass = new WebGLRenderTarget(this._shadowMapSize.x, this._shadowMapSize.y);
 
-	}
+    }
 
-	function getDepthMaterial( object, material, light, type ) {
+    // vertical pass
 
-		let result = null;
+    if (shadow.map !== null) {
+      this.shadowMaterialVertical.uniforms.shadow_pass.value = shadow.map.texture;
+    }
+    this.shadowMaterialVertical.uniforms.resolution.value = shadow.mapSize;
+    this.shadowMaterialVertical.uniforms.radius.value = shadow.radius;
+    this.renderer.setRenderTarget(shadow.mapPass);
+    this.renderer.clear();
+    this.renderer.renderBufferDirect(camera, null, geometry, this.shadowMaterialVertical, this.fullScreenMesh, null);
 
-		const customMaterial = ( light.isPointLight === true ) ? object.customDistanceMaterial : object.customDepthMaterial;
+    // horizontal pass
 
-		if ( customMaterial !== undefined ) {
+    this.shadowMaterialHorizontal.uniforms.shadow_pass.value = shadow.mapPass.texture;
+    this.shadowMaterialHorizontal.uniforms.resolution.value = shadow.mapSize;
+    this.shadowMaterialHorizontal.uniforms.radius.value = shadow.radius;
+    this.renderer.setRenderTarget(shadow.map);
+    this.renderer.clear();
+    this.renderer.renderBufferDirect(camera, null, geometry, this.shadowMaterialHorizontal, this.fullScreenMesh, null);
 
-			result = customMaterial;
+  }
 
-		} else {
+  // TODO: type well
+  public getDepthMaterial(
+    object: any,
+    material: any,
+    light: any,
+    type: any
+  ) {
 
-			result = ( light.isPointLight === true ) ? _distanceMaterial : _depthMaterial;
+    let result = null;
 
-			if ( ( renderer.localClippingEnabled && material.clipShadows === true && Array.isArray( material.clippingPlanes ) && material.clippingPlanes.length !== 0 ) ||
-				( material.displacementMap && material.displacementScale !== 0 ) ||
-				( material.alphaMap && material.alphaTest > 0 ) ||
-				( material.map && material.alphaTest > 0 ) ||
-				( material.alphaToCoverage === true ) ) {
+    const customMaterial = (light.isPointLight === true) ? object.customDistanceMaterial : object.customDepthMaterial;
 
-				// in this case we need a unique material instance reflecting the
-				// appropriate state
+    if (customMaterial !== undefined) {
 
-				const keyA = result.uuid, keyB = material.uuid;
+      result = customMaterial;
 
-				let materialsForVariant = _materialCache[ keyA ];
+    } else {
 
-				if ( materialsForVariant === undefined ) {
+      result = (light.isPointLight === true) ? this._distanceMaterial : this._depthMaterial;
 
-					materialsForVariant = {};
-					_materialCache[ keyA ] = materialsForVariant;
+      if ((this.renderer.localClippingEnabled && material.clipShadows === true && Array.isArray(material.clippingPlanes) && material.clippingPlanes.length !== 0) ||
+        (material.displacementMap && material.displacementScale !== 0) ||
+        (material.alphaMap && material.alphaTest > 0) ||
+        (material.map && material.alphaTest > 0) ||
+        (material.alphaToCoverage === true)) {
 
-				}
+        // in this case we need a unique material instance reflecting the
+        // appropriate state
 
-				let cachedMaterial = materialsForVariant[ keyB ];
+        const keyA = result.uuid, keyB = material.uuid;
 
-				if ( cachedMaterial === undefined ) {
+        let materialsForVariant = this._materialCache[keyA];
 
-					cachedMaterial = result.clone();
-					materialsForVariant[ keyB ] = cachedMaterial;
-					material.addEventListener( 'dispose', onMaterialDispose );
+        if (materialsForVariant === undefined) {
 
-				}
+          materialsForVariant = {};
+          this._materialCache[keyA] = materialsForVariant;
 
-				result = cachedMaterial;
+        }
 
-			}
+        let cachedMaterial = materialsForVariant[keyB];
 
-		}
+        if (cachedMaterial === undefined) {
 
-		result.visible = material.visible;
-		result.wireframe = material.wireframe;
+          cachedMaterial = result.clone();
+          materialsForVariant[keyB] = cachedMaterial;
+          material.addEventListener('dispose', this.onMaterialDispose);
 
-		if ( type === VSMShadowMap ) {
+        }
 
-			result.side = ( material.shadowSide !== null ) ? material.shadowSide : material.side;
+        result = cachedMaterial;
 
-		} else {
+      }
 
-			result.side = ( material.shadowSide !== null ) ? material.shadowSide : shadowSide[ material.side ];
+    }
 
-		}
+    result.visible = material.visible;
+    result.wireframe = material.wireframe;
 
-		result.alphaMap = material.alphaMap;
-		result.alphaTest = ( material.alphaToCoverage === true ) ? 0.5 : material.alphaTest; // approximate alphaToCoverage by using a fixed alphaTest value
-		result.map = material.map;
+    if (type === VSMShadowMap) {
 
-		result.clipShadows = material.clipShadows;
-		result.clippingPlanes = material.clippingPlanes;
-		result.clipIntersection = material.clipIntersection;
+      result.side = (material.shadowSide !== null) ? material.shadowSide : material.side;
 
-		result.displacementMap = material.displacementMap;
-		result.displacementScale = material.displacementScale;
-		result.displacementBias = material.displacementBias;
+    } else {
 
-		result.wireframeLinewidth = material.wireframeLinewidth;
-		result.linewidth = material.linewidth;
+      result.side = (material.shadowSide !== null) ? material.shadowSide : this.shadowSide[material.side];
 
-		if ( light.isPointLight === true && result.isMeshDistanceMaterial === true ) {
+    }
 
-			const materialProperties = renderer.properties.get( result );
-			materialProperties.light = light;
+    result.alphaMap = material.alphaMap;
+    result.alphaTest = (material.alphaToCoverage === true) ? 0.5 : material.alphaTest; // approximate alphaToCoverage by using a fixed alphaTest value
+    result.map = material.map;
 
-		}
+    result.clipShadows = material.clipShadows;
+    result.clippingPlanes = material.clippingPlanes;
+    result.clipIntersection = material.clipIntersection;
 
-		return result;
+    result.displacementMap = material.displacementMap;
+    result.displacementScale = material.displacementScale;
+    result.displacementBias = material.displacementBias;
 
-	}
+    result.wireframeLinewidth = material.wireframeLinewidth;
+    result.linewidth = material.linewidth;
 
-	function renderObject( object, camera, shadowCamera, light, type ) {
+    if (light.isPointLight === true && result.isMeshDistanceMaterial === true) {
 
-		if ( object.visible === false ) return;
+      const materialProperties = this.renderer.properties.get(result);
+      materialProperties.light = light;
 
-		const visible = object.layers.test( camera.layers );
+    }
 
-		if ( visible && ( object.isMesh || object.isLine || object.isPoints ) ) {
+    return result;
 
-			if ( ( object.castShadow || ( object.receiveShadow && type === VSMShadowMap ) ) && ( ! object.frustumCulled || _frustum.intersectsObject( object ) ) ) {
+  }
 
-				object.modelViewMatrix.multiplyMatrices( shadowCamera.matrixWorldInverse, object.matrixWorld );
+  // TODO: type well
+  public renderObject(
+    object: any,
+    camera: any,
+    shadowCamera: any,
+    light: any,
+    type: any
+  ) {
 
-				const geometry = objects.update( object );
-				const material = object.material;
+    if (object.visible === false) return;
 
-				if ( Array.isArray( material ) ) {
+    const visible = object.layers.test(camera.layers);
 
-					const groups = geometry.groups;
+    if (visible && (object.isMesh || object.isLine || object.isPoints)) {
 
-					for ( let k = 0, kl = groups.length; k < kl; k ++ ) {
+      if ((object.castShadow || (object.receiveShadow && type === VSMShadowMap)) && (!object.frustumCulled || this._frustum.intersectsObject(object))) {
 
-						const group = groups[ k ];
-						const groupMaterial = material[ group.materialIndex ];
+        object.modelViewMatrix.multiplyMatrices(shadowCamera.matrixWorldInverse, object.matrixWorld);
 
-						if ( groupMaterial && groupMaterial.visible ) {
+        const geometry = this.objects.update(object);
+        const material = object.material;
 
-							const depthMaterial = getDepthMaterial( object, groupMaterial, light, type );
+        if (Array.isArray(material)) {
 
-							object.onBeforeShadow( renderer, object, camera, shadowCamera, geometry, depthMaterial, group );
+          const groups = geometry.groups;
 
-							renderer.renderBufferDirect( shadowCamera, null, geometry, depthMaterial, object, group );
+          for (let k = 0, kl = groups.length; k < kl; k++) {
 
-							object.onAfterShadow( renderer, object, camera, shadowCamera, geometry, depthMaterial, group );
+            const group = groups[k];
+            const groupMaterial = material[group.materialIndex!];
 
-						}
+            if (groupMaterial && groupMaterial.visible) {
 
-					}
+              const depthMaterial = this.getDepthMaterial(object, groupMaterial, light, type);
 
-				} else if ( material.visible ) {
+              object.onBeforeShadow(this.renderer, object, camera, shadowCamera, geometry, depthMaterial, group);
 
-					const depthMaterial = getDepthMaterial( object, material, light, type );
+              this.renderer.renderBufferDirect(shadowCamera, null, geometry, depthMaterial, object, group);
 
-					object.onBeforeShadow( renderer, object, camera, shadowCamera, geometry, depthMaterial, null );
+              object.onAfterShadow(this.renderer, object, camera, shadowCamera, geometry, depthMaterial, group);
 
-					renderer.renderBufferDirect( shadowCamera, null, geometry, depthMaterial, object, null );
+            }
 
-					object.onAfterShadow( renderer, object, camera, shadowCamera, geometry, depthMaterial, null );
+          }
 
-				}
+        } else if (material.visible) {
 
-			}
+          const depthMaterial = this.getDepthMaterial(object, material, light, type);
 
-		}
+          object.onBeforeShadow(this.renderer, object, camera, shadowCamera, geometry, depthMaterial, null);
 
-		const children = object.children;
+          this.renderer.renderBufferDirect(shadowCamera, null, geometry, depthMaterial, object, null);
 
-		for ( let i = 0, l = children.length; i < l; i ++ ) {
+          object.onAfterShadow(this.renderer, object, camera, shadowCamera, geometry, depthMaterial, null);
 
-			renderObject( children[ i ], camera, shadowCamera, light, type );
+        }
 
-		}
+      }
 
-	}
+    }
 
-	function onMaterialDispose( event ) {
+    const children = object.children;
 
-		const material = event.target;
+    for (let i = 0, l = children.length; i < l; i++) {
 
-		material.removeEventListener( 'dispose', onMaterialDispose );
+      this.renderObject(children[i], camera, shadowCamera, light, type);
 
-		// make sure to remove the unique distance/depth materials used for shadow map rendering
+    }
 
-		for ( const id in _materialCache ) {
+  }
 
-			const cache = _materialCache[ id ];
+  public onMaterialDispose(event: BaseEvent) {
 
-			const uuid = event.target.uuid;
+    const material = event.target;
 
-			if ( uuid in cache ) {
+    material.removeEventListener('dispose', this.onMaterialDispose);
 
-				const shadowMaterial = cache[ uuid ];
-				shadowMaterial.dispose();
-				delete cache[ uuid ];
+    // make sure to remove the unique distance/depth materials used for shadow map rendering
 
-			}
+    for (const id in this._materialCache) {
 
-		}
+      const cache = this._materialCache[id];
 
-	}
+      const uuid = event.target.uuid;
+
+      if (uuid in cache) {
+
+        const shadowMaterial = cache[uuid];
+        shadowMaterial.dispose();
+        delete cache[uuid];
+
+      }
+
+    }
+
+  }
 
 }

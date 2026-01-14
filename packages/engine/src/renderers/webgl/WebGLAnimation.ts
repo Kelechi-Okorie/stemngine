@@ -1,58 +1,53 @@
-export function WebGLAnimation() {
+export class WebGLAnimation {
 
-  let context: any = null;
-  let isAnimating: boolean = false;
-  let animationLoop: ((time: number, frame: any) => void) | null = null;
-  let requestId: number | null = null;
+  private context: Window | null = null;
+  private isAnimating = false;
+  private animationLoop: ((time: number, frame?: any) => void) | null = null;
+  private requestId: number | null = null;
 
-  function onAnimationFrame(time: number, frame: any) {
+  constructor() { }
 
-    if (animationLoop) {
-      animationLoop(time, frame);
-    }
+  private onAnimationFrame = (time: number, frame?: any) => {
 
-    requestId = context.requestAnimationFrame(onAnimationFrame);
+    if (this.animationLoop) this.animationLoop(time, frame);
+
+    if (this.context) this.requestId = this.context.requestAnimationFrame(this.onAnimationFrame);
 
   }
 
-  return {
 
-    start: function (): void {
+  public start(): void {
 
-      if (isAnimating === true) return;
-      if (animationLoop === null) return;
+    if (this.isAnimating === true) return;
+    if (this.animationLoop === null) return;
 
-      requestId = context.requestAnimationFrame(onAnimationFrame);
+    if (!this.context) throw new Error('WebGLAnimation: context is not set.');
 
-      isAnimating = true;
+    this.requestId = this.context.requestAnimationFrame(this.onAnimationFrame);
 
-    },
+    this.isAnimating = true;
 
-    stop: function () {
+  }
 
-      context.cancelAnimationFrame(requestId);
+  public stop(): void {
 
-      isAnimating = false;
-
-    },
-
-    setAnimationLoop: function (callback: (time: number, frame?: any) => void): void {
-
-      animationLoop = callback;
-
-    },
-
-    setContext: function (
-      value: {
-        requestAnimationFrame: Function;
-        cancelAnimationFrame: Function
-      }
-    ): void {
-
-      context = value;
-
+    if (this.context && this.requestId !== null) {
+      this.context.cancelAnimationFrame(this.requestId);
     }
 
-  };
+    this.isAnimating = false;
 
+  }
+
+  public setAnimationLoop(callback: (time: number, frame?: any) => void): void {
+
+    this.animationLoop = callback;
+
+  }
+
+  public setContext(value: Window): void {
+
+    this.context = value;
+
+  }
 }

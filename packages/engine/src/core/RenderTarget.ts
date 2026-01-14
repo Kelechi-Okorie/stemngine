@@ -334,7 +334,7 @@ export class RenderTarget extends EventDispatcher {
    * @param {RenderTarget} source - The render target to copy.
    * @return {RenderTarget} A reference to this instance.
    */
-  public copy(source: RenderTarget) {
+  public copy(source: RenderTarget): this {
 
     this.width = source.width;
     this.height = source.height;
@@ -380,7 +380,7 @@ export class RenderTarget extends EventDispatcher {
    *
    * @fires RenderTarget#dispose
    */
-  dispose() {
+  public dispose(): void {
 
     this.dispatchEvent({ type: 'dispose' });
 

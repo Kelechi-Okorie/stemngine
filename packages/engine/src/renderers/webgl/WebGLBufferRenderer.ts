@@ -1,45 +1,52 @@
-import { WebGLRenderer } from "../WebGLRenderer";
 import { WebGLExtensions } from "./WebGLExtensions";
 import { WebGLInfo } from "./WebGLInfo";
 
-export function WebGLBufferRenderer(
-  gl: WebGL2RenderingContext,
-  extensions: ReturnType<typeof WebGLExtensions>,
-  info: ReturnType<typeof WebGLInfo>
-) {
+export class WebGLBufferRenderer {
+  public gl: WebGL2RenderingContext;
+  public extensions: WebGLExtensions;
+  public info: WebGLInfo;
+  public mode!: GLenum; // WebGL draw mode, e.g., gl.TRIANGLES, gl.LINES, etc.
 
-  let mode: number;
+  constructor(
+    gl: WebGL2RenderingContext,
+    extensions: WebGLExtensions,
+    info: WebGLInfo
+  ) {
+    this.gl = gl;
+    this.extensions = extensions;
+    this.info = info;
+  }
 
-  function setMode(value: number) {
+  publicsetMode(value: GLenum): void {
 
-    mode = value;
+    this.mode = value;
 
   }
 
-  function render(start: number, count: number) {
+  public render(start: number, count: number): void {
 
-    gl.drawArrays(mode, start, count);
+    this.gl.drawArrays(this.mode, start, count);
 
-    info.update(count, mode, 1);
+    this.info.update(count, this.mode, 1);
 
   }
 
-  function renderInstances(start: number, count: number, primcount: number) {
+  public renderInstances(start: number, count: number, primcount: number): void {
 
     if (primcount === 0) return;
 
-    gl.drawArraysInstanced(mode, start, count, primcount);
+    this.gl.drawArraysInstanced(this.mode, start, count, primcount);
 
-    info.update(count, mode, primcount);
+    this.info.update(count, this.mode, primcount);
 
   }
 
-  function renderMultiDraw(starts: Int32Array, counts: Int32Array, drawCount: number) {
+  public renderMultiDraw(starts: Int32Array, counts: Int32Array, drawCount: number): void {
 
     if (drawCount === 0) return;
 
-    const extension = extensions.get('WEBGL_multi_draw');
-    extension.multiDrawArraysWEBGL(mode, starts, 0, counts, 0, drawCount);
+    const extension = this.extensions.get('WEBGL_multi_draw');
+    extension.multiDrawArraysWEBGL(this.mode, starts, 0, counts, 0, drawCount);
 
     let elementCount = 0;
     for (let i = 0; i < drawCount; i++) {
@@ -48,32 +55,32 @@ export function WebGLBufferRenderer(
 
     }
 
-    info.update(elementCount, mode, 1);
+    this.info.update(elementCount, this.mode, 1);
 
   }
 
-  function renderMultiDrawInstances(
+  public renderMultiDrawInstances(
     starts: Int32Array,
     counts: Int32Array,
     drawCount: number,
     primcount: Int32Array
-  ) {
+  ): void {
 
     if (drawCount === 0) return;
 
-    const extension = extensions.get('WEBGL_multi_draw');
+    const extension = this.extensions.get('WEBGL_multi_draw');
 
     if (extension === null) {
 
       for (let i = 0; i < starts.length; i++) {
 
-        renderInstances(starts[i], counts[i], primcount[i]);
+        this.renderInstances(starts[i], counts[i], primcount[i]);
 
       }
 
     } else {
 
-      extension.multiDrawArraysInstancedWEBGL(mode, starts, 0, counts, 0, primcount, 0, drawCount);
+      extension.multiDrawArraysInstancedWEBGL(this.mode, starts, 0, counts, 0, primcount, 0, drawCount);
 
       let elementCount = 0;
       for (let i = 0; i < drawCount; i++) {
@@ -82,19 +89,9 @@ export function WebGLBufferRenderer(
 
       }
 
-      info.update(elementCount, mode, 1);
+      this.info.update(elementCount, this.mode, 1);
 
     }
 
   }
-
-  //
-
-  // this.setMode = setMode;
-  // this.render = render;
-  // this.renderInstances = renderInstances;
-  // this.renderMultiDraw = renderMultiDraw;
-  // this.renderMultiDrawInstances = renderMultiDrawInstances;
-
-  return { setMode, render, renderInstances, renderMultiDraw, renderMultiDrawInstances };
 }

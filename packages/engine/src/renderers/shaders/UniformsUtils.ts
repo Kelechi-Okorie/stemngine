@@ -105,3 +105,10 @@ export function getUnlitUniformColorSpace( renderer: WebGLRenderer ): string {
 	return cm.workingColorSpace;
 
 }
+
+// // Legacy
+
+// const UniformsUtils = { clone: cloneUniforms, merge: mergeUniforms };
+
+// export { UniformsUtils };
+

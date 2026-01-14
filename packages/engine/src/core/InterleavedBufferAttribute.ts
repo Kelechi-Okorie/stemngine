@@ -521,3 +521,10 @@ export class InterleavedBufferAttribute {
     }
   }
 }
+
+export function isInterleavedBufferAttribute(
+	attr: BufferAttribute | InterleavedBufferAttribute
+): attr is InterleavedBufferAttribute {
+	return (attr as InterleavedBufferAttribute).isInterleavedBufferAttribute === true;
+}
+

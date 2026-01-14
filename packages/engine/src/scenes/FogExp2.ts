@@ -10,78 +10,81 @@ import { Color } from '../math/Color.js';
  * scene.fog = new FogExp2( 0xcccccc, 0.002 );
  * ```
  */
-class FogExp2 {
-  		/**
-       * This flag can be used for type testing.
-       *
-       * @type {boolean}
-       * @readonly
-       * @default true
-       */
-		public isFogExp2: boolean = true;
+export class FogExp2 {
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  public isFogExp2 = true;
 
-		/**
-		 * The name of the fog.
-		 *
-		 * @type {string}
-		 */
-	  public name: string = '';
+  /**
+   * The name of the fog.
+   *
+   * @type {string}
+   */
+  public name: string = '';
 
-		/**
-		 * The fog's color.
-		 *
-		 * @type {Color}
-		 */
-		public color: Color;
+  /**
+   * The fog's color.
+   *
+   * @type {Color}
+   */
+  public color: Color;
 
-		/**
-		 *  Defines how fast the fog will grow dense.
-		 *
-		 * @type {number}
-		 * @default 0.00025
-		 */
-		public density: number;
+  /**
+   *  Defines how fast the fog will grow dense.
+   *
+   * @type {number}
+   * @default 0.00025
+   */
+  public density: number;
 
 
-	/**
-	 * Constructs a new fog.
-	 *
-	 * @param {number|Color} color - The fog's color.
-	 * @param {number} [density=0.00025] - Defines how fast the fog will grow dense.
-	 */
-	constructor( color: Color, density: number = 0.00025 ) {
+  /**
+   * Constructs a new fog.
+   *
+   * @param {number|Color} color - The fog's color.
+   * @param {number} [density=0.00025] - Defines how fast the fog will grow dense.
+   */
+  constructor(color: Color, density: number = 0.00025) {
     this.color = new Color(color);
     this.density = density;
-	}
+  }
 
-	/**
-	 * Returns a new fog with copied values from this instance.
-	 *
-	 * @return {FogExp2} A clone of this instance.
-	 */
-	public clone(): FogExp2 {
+  /**
+   * Returns a new fog with copied values from this instance.
+   *
+   * @return {FogExp2} A clone of this instance.
+   */
+  public clone(): FogExp2 {
 
-		return new FogExp2( this.color, this.density );
+    return new FogExp2(this.color, this.density);
 
-	}
+  }
 
-	/**
-	 * Serializes the fog into JSON.
-	 *
-	 * @param {?(Object|string)} meta - An optional value holding meta information about the serialization.
-	 * @return {Object} A JSON object representing the serialized fog
-	 */
-	public toJSON( /* meta */ ): {[key: string]: any} {
+  /**
+   * Serializes the fog into JSON.
+   *
+   * @param {?(Object|string)} meta - An optional value holding meta information about the serialization.
+   * @return {Object} A JSON object representing the serialized fog
+   */
+  public toJSON( /* meta */): { [key: string]: any } {
 
-		return {
-			type: 'FogExp2',
-			name: this.name,
-			color: this.color.getHex(),
-			density: this.density
-		};
+    return {
+      type: 'FogExp2',
+      name: this.name,
+      color: this.color.getHex(),
+      density: this.density
+    };
 
-	}
+  }
 
 }
 
-export { FogExp2 };
+export function isFogExp2(
+  fog: FogExp2
+): fog is FogExp2 {
+  return (fog as any).isFogExp2 === true;
+}

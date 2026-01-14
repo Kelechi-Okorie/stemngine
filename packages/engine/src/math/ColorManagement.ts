@@ -272,7 +272,7 @@ export class ColorManagement {
    * @param targetColorSpace
    * @returns
    */
-  private _getMatrix(targetMatrix: Matrix3, sourceColorSpace: ColorSpace, targetColorSpace: ColorSpace): Matrix3 {
+  public _getMatrix(targetMatrix: Matrix3, sourceColorSpace: ColorSpace, targetColorSpace: ColorSpace): Matrix3 {
     return targetMatrix
       .copy(this.spaces[sourceColorSpace].toXYZ)
       .multiply(this.spaces[targetColorSpace].fromXYZ);

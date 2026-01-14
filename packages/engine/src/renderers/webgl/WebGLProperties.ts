@@ -1,21 +1,23 @@
-export function WebGLProperties() {
+export class WebGLProperties<T extends object = object> {
 
-	let properties = new WeakMap();
+	private properties = new WeakMap<T, Record<string, any>>();
 
-	function has( object ) {
+  constructor() {}
 
-		return properties.has( object );
+	public has( object: T ): boolean {
+
+		return this.properties.has( object );
 
 	}
 
-	function get( object ) {
+	public get( object: T ): Record<string, any> {
 
-		let map = properties.get( object );
+		let map = this.properties.get( object );
 
 		if ( map === undefined ) {
 
 			map = {};
-			properties.set( object, map );
+			this.properties.set( object, map );
 
 		}
 
@@ -23,30 +25,25 @@ export function WebGLProperties() {
 
 	}
 
-	function remove( object ) {
+	public remove( object: T ): void {
 
-		properties.delete( object );
-
-	}
-
-	function update( object, key, value ) {
-
-		properties.get( object )[ key ] = value;
+		this.properties.delete( object );
 
 	}
 
-	function dispose() {
+	public update( object: T, key: string, value: any ): void {
 
-		properties = new WeakMap();
+		// properties.get( object )[ key ] = value;
+
+    const map = this.get(object);
+    map[key] = value;
 
 	}
 
-	return {
-		has: has,
-		get: get,
-		remove: remove,
-		update: update,
-		dispose: dispose
-	};
+	public dispose(): void {
+
+		this.properties = new WeakMap();
+
+	}
 
 }

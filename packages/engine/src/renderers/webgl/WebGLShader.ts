@@ -1,10 +1,16 @@
-export function WebGLShader( gl, type, string ) {
+export function WebGLShader(
+  gl: WebGL2RenderingContext,
+  type: GLenum,  // VERTEX_SHADER, FRAGMENT_SHADER, etc.
+  string: string
+) {
 
-	const shader = gl.createShader( type );
+  const shader: WebGLShader | null = gl.createShader(type);
 
-	gl.shaderSource( shader, string );
-	gl.compileShader( shader );
+  if (!shader) return null;
 
-	return shader;
+  gl.shaderSource(shader, string);
+  gl.compileShader(shader);
+
+  return shader;
 
 }

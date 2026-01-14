@@ -86,7 +86,7 @@ describe('BufferAttribute', () => {
       expect(attr.array).toEqual(newValues);
     });
 
-    it('should set values with an offset', () => {
+    it('should set values with an start', () => {
       const array = new Float32Array([0, 0, 0, 0, 0, 0]);
       const attr = new BufferAttribute(array, 3);
 
@@ -126,7 +126,7 @@ describe('BufferAttribute', () => {
       expect(attr.getComponent(1, 2)).toBe(6); // second vector, z
     });
 
-    it('calculates the correct offset using itemSize', () => {
+    it('calculates the correct start using itemSize', () => {
       const array = new Float32Array([10, 11, 12, 20, 21, 22]);
       const attr = new BufferAttribute(array, 3);
 
@@ -224,7 +224,7 @@ describe('BufferAttribute', () => {
       expect(attr.getX(1)).toBe(4);
     });
 
-    it('calculates the correct offset using itemSize', () => {
+    it('calculates the correct start using itemSize', () => {
       const array = new Float32Array([10, 11, 12, 20, 21, 22]);
       const attr = new BufferAttribute(array, 3);
 
@@ -273,7 +273,7 @@ describe('BufferAttribute', () => {
       expect(returned).toBe(attr);
     });
 
-    it('writes to the correct offset using itemSize', () => {
+    it('writes to the correct start using itemSize', () => {
       const array = new Float32Array([0, 0, 0, 0, 0, 0, 0, 0, 0]);
       const attr = new BufferAttribute(array, 3);
 
@@ -528,7 +528,7 @@ describe('BufferAttribute', () => {
       expect(returned).toBe(attr);
     });
 
-    it('writes to the correct offset using itemSize', () => {
+    it('writes to the correct start using itemSize', () => {
       const array = new Float32Array(8);
       const attr = new BufferAttribute(array, 4);
 
@@ -940,7 +940,7 @@ describe('BufferAttribute', () => {
       attr.addUpdateRange(2, 5);
 
       expect(attr.updateRanges.length).toBe(1);
-      expect(attr.updateRanges[0]).toEqual({ offset: 2, count: 5 });
+      expect(attr.updateRanges[0]).toEqual({ start: 2, count: 5 });
     });
 
     it('should add multiple update ranges in order', () => {
@@ -949,9 +949,9 @@ describe('BufferAttribute', () => {
       attr.addUpdateRange(10, 1);
 
       expect(attr.updateRanges).toEqual([
-        { offset: 0, count: 3 },
-        { offset: 4, count: 2 },
-        { offset: 10, count: 1 }
+        { start: 0, count: 3 },
+        { start: 4, count: 2 },
+        { start: 10, count: 1 }
       ]);
     });
 
@@ -959,14 +959,14 @@ describe('BufferAttribute', () => {
       attr.addUpdateRange(7, 9);
 
       const r = attr.updateRanges[0];
-      expect(r.offset).toBe(7);
+      expect(r.start).toBe(7);
       expect(r.count).toBe(9);
     });
 
     it('should allow zero-length ranges', () => {
       attr.addUpdateRange(3, 0);
 
-      expect(attr.updateRanges[0]).toEqual({ offset: 3, count: 0 });
+      expect(attr.updateRanges[0]).toEqual({ start: 3, count: 0 });
     });
   });
 
@@ -988,8 +988,8 @@ describe('BufferAttribute', () => {
 
     it("should clear updateRanges after adding some ranges", () => {
 
-      attr.updateRanges.push({ offset: 0, count: 3 });
-      attr.updateRanges.push({ offset: 4, count: 2 });
+      attr.updateRanges.push({ start: 0, count: 3 });
+      attr.updateRanges.push({ start: 4, count: 2 });
 
       expect(attr.updateRanges.length).toBe(2);
 
@@ -1001,7 +1001,7 @@ describe('BufferAttribute', () => {
     it("should not break the array reference", () => {
       const ref = attr.updateRanges; // keep reference
 
-      attr.updateRanges.push({ offset: 1, count: 1 });
+      attr.updateRanges.push({ start: 1, count: 1 });
       expect(ref.length).toBe(1);
 
       attr.clearUpdateRanges();

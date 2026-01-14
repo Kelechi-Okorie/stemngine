@@ -182,6 +182,52 @@ export type TextureFormat =
   | typeof RedIntegerFormat
   | typeof RGBIntegerFormat;
 
+export type CompressedTextureFormat =
+  // S3TC / DXT
+  | typeof RGB_S3TC_DXT1_Format
+  | typeof RGBA_S3TC_DXT1_Format
+  | typeof RGBA_S3TC_DXT3_Format
+  | typeof RGBA_S3TC_DXT5_Format
+
+  // PVRTC
+  | typeof RGB_PVRTC_2BPPV1_Format
+  | typeof RGB_PVRTC_4BPPV1_Format
+  | typeof RGBA_PVRTC_2BPPV1_Format
+  | typeof RGBA_PVRTC_4BPPV1_Format
+
+  // ETC
+  | typeof RGB_ETC1_Format
+  | typeof RGB_ETC2_Format
+  | typeof RGBA_ETC2_EAC_Format
+
+  // ASTC
+  | typeof RGBA_ASTC_4x4_Format
+  | typeof RGBA_ASTC_5x4_Format
+  | typeof RGBA_ASTC_5x5_Format
+  | typeof RGBA_ASTC_6x5_Format
+  | typeof RGBA_ASTC_6x6_Format
+  | typeof RGBA_ASTC_8x5_Format
+  | typeof RGBA_ASTC_8x6_Format
+  | typeof RGBA_ASTC_8x8_Format
+  | typeof RGBA_ASTC_10x5_Format
+  | typeof RGBA_ASTC_10x6_Format
+  | typeof RGBA_ASTC_10x8_Format
+  | typeof RGBA_ASTC_10x10_Format
+  | typeof RGBA_ASTC_12x10_Format
+  | typeof RGBA_ASTC_12x12_Format
+
+  // BPTC
+  | typeof RGBA_BPTC_Format
+  | typeof RGB_BPTC_SIGNED_Format
+  | typeof RGB_BPTC_UNSIGNED_Format
+
+  // RGTC
+  | typeof RED_RGTC1_Format
+  | typeof SIGNED_RED_RGTC1_Format
+  | typeof RED_GREEN_RGTC2_Format
+  | typeof SIGNED_RED_GREEN_RGTC2_Format;
+
+
 export type TextureDataType =
   | typeof UnsignedByteType
   | typeof ByteType
@@ -261,6 +307,17 @@ export type ToneMappingType =
   | typeof AgXToneMapping
   | typeof NeutralToneMapping;
 
+export type CullFace =
+  | typeof CullFaceNone
+  | typeof CullFaceBack
+  | typeof CullFaceFront
+  | typeof CullFaceFrontBack;
+
+
+export type WebGLInternalFormatName =
+  { [K in keyof WebGL2RenderingContext]:
+    WebGL2RenderingContext[K] extends number ? K : never
+  }[keyof WebGL2RenderingContext]
 
 export const REVISION = '180dev';
 

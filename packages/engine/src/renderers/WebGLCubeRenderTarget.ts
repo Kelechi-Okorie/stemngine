@@ -65,7 +65,7 @@ export class WebGLCubeRenderTarget extends WebGLRenderTarget {
    * @param {Texture} texture - The equirectangular texture.
    * @return {WebGLCubeRenderTarget} A reference to this cube render target.
    */
-  fromEquirectangularTexture(renderer: WebGLRenderer, texture: Texture) {
+  public fromEquirectangularTexture(renderer: WebGLRenderer, texture: Texture) {
 
     this.texture.type = texture.type;
     this.texture.colorSpace = texture.colorSpace;
@@ -163,7 +163,7 @@ export class WebGLCubeRenderTarget extends WebGLRenderTarget {
    * @param {boolean} [depth=true] - Whether the depth buffer should be cleared or not.
    * @param {boolean} [stencil=true] - Whether the stencil buffer should be cleared or not.
    */
-  clear(renderer: WebGLRenderer, color = true, depth = true, stencil = true) {
+  public clear(renderer: WebGLRenderer, color = true, depth = true, stencil = true) {
 
     const currentRenderTarget = renderer.getRenderTarget();
 

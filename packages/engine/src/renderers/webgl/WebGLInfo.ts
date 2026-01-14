@@ -1,77 +1,68 @@
-export function WebGLInfo( gl: WebGL2RenderingContext ) {
+export class WebGLInfo {
+  private readonly gl: WebGL2RenderingContext;
 
-	const memory: {
-    geometries: number;
-    textures: number;
-  } = {
-		geometries: 0,
-		textures: 0
-	};
+  public memory = {
+    geometries: 0,
+    textures: 0
+  };
 
-	const render: {
-    frame: number;
-    calls: number;
-    triangles: number;
-    points: number;
-    lines: number;
-  } = {
-		frame: 0,
-		calls: 0,
-		triangles: 0,
-		points: 0,
-		lines: 0
-	};
+  public render = {
+    frame: 0,
+    calls: 0,
+    triangles: 0,
+    points: 0,
+    lines: 0
+  };
 
-	function update( count:number, mode: number, instanceCount: number ): void {
+  public programs = null;
+  public autoReset = true;
 
-		render.calls ++;
 
-		switch ( mode ) {
+  constructor(gl: WebGL2RenderingContext) {
+    this.gl = gl;
+  }
 
-			case gl.TRIANGLES:
-				render.triangles += instanceCount * ( count / 3 );
-				break;
+  public update(count: number, mode: number, instanceCount: number): void {
 
-			case gl.LINES:
-				render.lines += instanceCount * ( count / 2 );
-				break;
+    this.render.calls++;
 
-			case gl.LINE_STRIP:
-				render.lines += instanceCount * ( count - 1 );
-				break;
+    switch (mode) {
 
-			case gl.LINE_LOOP:
-				render.lines += instanceCount * count;
-				break;
+      case this.gl.TRIANGLES:
+        this.render.triangles += instanceCount * (count / 3);
+        break;
 
-			case gl.POINTS:
-				render.points += instanceCount * count;
-				break;
+      case this.gl.LINES:
+        this.render.lines += instanceCount * (count / 2);
+        break;
 
-			default:
-				console.error( 'THREE.WebGLInfo: Unknown draw mode:', mode );
-				break;
+      case this.gl.LINE_STRIP:
+        this.render.lines += instanceCount * (count - 1);
+        break;
 
-		}
+      case this.gl.LINE_LOOP:
+        this.render.lines += instanceCount * count;
+        break;
 
-	}
+      case this.gl.POINTS:
+        this.render.points += instanceCount * count;
+        break;
 
-	function reset(): void {
+      default:
+        console.error('WebGLInfo: Unknown draw mode:', mode);
+        break;
 
-		render.calls = 0;
-		render.triangles = 0;
-		render.points = 0;
-		render.lines = 0;
+    }
 
-	}
+  }
 
-	return {
-		memory,
-		render,
-		programs: null as any[] | null,
-		autoReset: true,
-		reset,
-		update
-	};
+  public reset() {
+
+    this.render.calls = 0;
+    this.render.triangles = 0;
+    this.render.points = 0;
+    this.render.lines = 0;
+
+  }
 
 }

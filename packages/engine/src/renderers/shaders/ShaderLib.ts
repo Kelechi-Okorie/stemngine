@@ -1,4 +1,4 @@
-import { ShaderChunk } from './ShaderChunk';
+import { ShaderChunk } from './ShaderChunk.js';
 import { mergeUniforms } from './UniformsUtils.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';

@@ -1,156 +1,107 @@
-import { Matrix3 } from '../../math/Matrix3.js';
-import { Plane } from '../../math/Plane.js';
 import { Camera } from '../../cameras/Camera.js';
 import { Material } from '../../materials/Material.js';
+import { Matrix3 } from '../../math/Matrix3.js';
+import { Plane } from '../../math/Plane.js';
 
-// What the renderer stores in properties.get(material)
-export interface MaterialProperties {
-  clippingState?: Float32Array | null;
-}
+export class WebGLClipping {
 
-// Three.js property store pattern: WeakMap<any, any>
-export interface Properties {
-  get(obj: any): MaterialProperties;
-}
+  public globalState: Float32Array | null = null;
+  public numGlobalPlanes = 0;
+  public localClippingEnabled = false;
+  public renderingShadows = false;
 
-export interface ClippingUniform {
-  value: Float32Array | null;
-  needsUpdate: boolean;
-}
+  public plane = new Plane();
+  public viewNormalMatrix = new Matrix3();
 
-export interface WebGLClippingInstance {
-  uniform: ClippingUniform;
-  numPlanes: number;
-  numIntersection: number;
+  public uniform: { value: Float32Array | null, needsUpdate: boolean } = { value: null, needsUpdate: false };
 
-  init(planes: Plane[], enableLocalClipping: boolean): boolean;
-  beginShadows(): void;
-  endShadows(): void;
-  setGlobalState(planes: Plane[] | null, camera: Camera): void;
-  setState(material: Material & ClippingMaterial, camera: Camera, useCache: boolean): void;
-}
+  public numPlanes = 0;
+  public numIntersection = 0;
 
-export interface ClippingMaterial {
-  clippingPlanes: Plane[] | null;
-  clipIntersection: boolean;
-  clipShadows: boolean;
-}
+  private properties: any;
 
-export function WebGLClipping(properties: Properties): void {
+  constructor(properties: any) {
+    this.properties = properties;
+  }
 
-  const scope = {} as WebGLClippingInstance;
-
-  let globalState: Float32Array | null = null;
-  let numGlobalPlanes = 0;
-  let localClippingEnabled = false;
-  let renderingShadows = false;
-
-  const tempPlane = new Plane();
-  const viewNormalMatrix = new Matrix3();
-
-  const uniform: ClippingUniform = { value: null, needsUpdate: false };
-
-  scope.uniform = uniform;
-  scope.numPlanes = 0;
-  scope.numIntersection = 0;
-
-  // ------------------------------------------------------
-  // init()
-  // ------------------------------------------------------
-
-  scope.init = function (planes, enableLocalClipping) {
+  public init(
+    planes: Plane[],
+    enableLocalClipping: boolean
+  ) {
 
     const enabled =
       planes.length !== 0 ||
       enableLocalClipping ||
       // enable state of previous frame - the clipping code has to
       // run another frame in order to reset the state:
-      numGlobalPlanes !== 0 ||
-      localClippingEnabled;
+      this.numGlobalPlanes !== 0 ||
+      this.localClippingEnabled;
 
-    localClippingEnabled = enableLocalClipping;
+    this.localClippingEnabled = enableLocalClipping;
 
-    numGlobalPlanes = planes.length;
+    this.numGlobalPlanes = planes.length;
 
     return enabled;
 
   };
 
-  // ------------------------------------------------------
-  // Shadows
-  // ------------------------------------------------------
+  public beginShadows() {
 
-  scope.beginShadows = function () {
-
-    renderingShadows = true;
-    projectPlanes(null);
+    this.renderingShadows = true;
+    this.projectPlanes(null);
 
   };
 
-  scope.endShadows = function () {
+  public endShadows() {
 
-    renderingShadows = false;
-
-  };
-
-  // ------------------------------------------------------
-  // Global state
-  // ------------------------------------------------------
-
-  scope.setGlobalState = function (planes: Plane[] | null, camera: Camera) {
-
-    globalState = projectPlanes(planes, camera, 0);
+    this.renderingShadows = false;
 
   };
 
-  // ------------------------------------------------------
-  // Per-material state
-  // ------------------------------------------------------
+  public setGlobalState(planes: Plane[], camera: Camera) {
 
-  scope.setState = function (
-    material: Material & ClippingMaterial,
-    camera: Camera,
-    useCache: boolean
-  ): void {
+    this.globalState = this.projectPlanes(planes, camera, 0);
 
-    // const planes = material.clippingPlanes,
-    //   clipIntersection = material.clipIntersection,
-    //   clipShadows = material.clipShadows;
+  };
 
-    const { clippingPlanes: planes, clipIntersection, clipShadows } = material;
+  public setState(material: Material, camera: Camera, useCache: boolean) {
 
-    const materialProperties = properties.get(material);
+    const planes = material.clippingPlanes,
+      clipIntersection = material.clipIntersection,
+      clipShadows = material.clipShadows;
 
-    if (!localClippingEnabled || planes === null || planes.length === 0 || renderingShadows && !clipShadows) {
+    const materialProperties = this.properties.get(material);
+
+    if (!this.localClippingEnabled || planes === null || planes.length === 0 || this.renderingShadows && !clipShadows) {
 
       // there's no local clipping
 
-      if (renderingShadows) {
+      if (this.renderingShadows) {
 
         // there's no global clipping
 
-        projectPlanes(null);
+        this.projectPlanes(null);
 
       } else {
 
-        resetGlobalState();
+        this.resetGlobalState();
 
       }
 
     } else {
 
-      const nGlobal = renderingShadows ? 0 : numGlobalPlanes,
+      const nGlobal = this.renderingShadows ? 0 : this.numGlobalPlanes,
         lGlobal = nGlobal * 4;
 
       let dstArray = materialProperties.clippingState || null;
 
-      uniform.value = dstArray; // ensure unique state
+      this.uniform.value = dstArray; // ensure unique state
 
-      dstArray = projectPlanes(planes, camera, lGlobal, useCache);
+      dstArray = this.projectPlanes(planes, camera, lGlobal, useCache);
 
       for (let i = 0; i !== lGlobal; ++i) {
 
-        dstArray![i] = globalState![i];
+        dstArray[i] = this.globalState![i];
 
       }
 
@@ -163,40 +114,46 @@ export function WebGLClipping(properties: Properties): void {
 
   };
 
-  function resetGlobalState(): void {
+  private resetGlobalState() {
 
-    if (uniform.value !== globalState) {
+    if (this.uniform.value !== this.globalState) {
 
-      uniform.value = globalState;
-      uniform.needsUpdate = numGlobalPlanes > 0;
+      this.uniform.value = this.globalState;
+      this.uniform.needsUpdate = this.numGlobalPlanes > 0;
 
     }
 
-    scope.numPlanes = numGlobalPlanes;
-    scope.numIntersection = 0;
+    this.numPlanes = this.numGlobalPlanes;
+    this.numIntersection = 0;
 
   }
 
-  function projectPlanes(
+  private projectPlanes(
     planes: Plane[] | null,
     camera?: Camera,
     dstOffset: number = 0,
-    skipTransform: boolean = false
+    skipTransform?: boolean
   ): Float32Array | null {
 
     const nPlanes = planes !== null ? planes.length : 0;
-    let dstArray = null;
+    let dstArray: Float32Array | null = null;
 
     if (nPlanes !== 0) {
+      if (!camera) {
+        console.warn('WebGLClipping: camera is required when planes are provided.');
+        return null; // early return if camera is not provided
+      }
 
-      dstArray = uniform.value;
+
+      dstArray = this.uniform.value;
 
       if (skipTransform !== true || dstArray === null) {
 
-        const flatSize = dstOffset + nPlanes * 4,
-          viewMatrix = camera!.matrixWorldInverse;
+        const flatSize = dstOffset + nPlanes * 4;
+        const viewMatrix = camera.matrixWorldInverse;
 
-        viewNormalMatrix.getNormalMatrix(viewMatrix);
+
+        this.viewNormalMatrix.getNormalMatrix(viewMatrix);
 
         if (dstArray === null || dstArray.length < flatSize) {
 
@@ -206,22 +163,22 @@ export function WebGLClipping(properties: Properties): void {
 
         for (let i = 0, i4 = dstOffset; i !== nPlanes; ++i, i4 += 4) {
 
-          tempPlane.copy(planes![i]).applyMatrix4(viewMatrix, viewNormalMatrix);
+          this.plane.copy(planes![i]).applyMatrix4(viewMatrix, this.viewNormalMatrix);
 
-          tempPlane.normal.toArray(dstArray as any, i4);
-          dstArray[i4 + 3] = tempPlane.constant;
+          this.plane.normal.toArray(dstArray as any, i4);
+          dstArray[i4 + 3] = this.plane.constant;
 
         }
 
       }
 
-      uniform.value = dstArray;
-      uniform.needsUpdate = true;
+      this.uniform.value = dstArray;
+      this.uniform.needsUpdate = true;
 
     }
 
-    scope.numPlanes = nPlanes;
-    scope.numIntersection = 0;
+    this.numPlanes = nPlanes;
+    this.numIntersection = 0;
 
     return dstArray;
 
