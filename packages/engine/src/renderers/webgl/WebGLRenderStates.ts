@@ -13,7 +13,7 @@ type WebGLRenderStateType = {
   transmissionRenderTarget: Record<string, any>;
 };
 
-class WebGLRenderState {
+export class WebGLRenderState {
   private readonly extensions: WebGLExtensions;
 
   protected lights: WebGLLights;

@@ -1,5 +1,6 @@
 import { WebGLExtensions } from "./WebGLExtensions";
 import { WebGLInfo } from "./WebGLInfo";
+import { WebGLBufferRenderer } from "./WebGLBufferRenderer";
 
 export class WebGLIndexedBufferRenderer {
 
@@ -114,3 +115,10 @@ export class WebGLIndexedBufferRenderer {
   }
 
 }
+
+export function isIndexedRenderer(
+  r: WebGLBufferRenderer | WebGLIndexedBufferRenderer
+): r is WebGLIndexedBufferRenderer {
+  return 'setIndex' in r;
+}
+

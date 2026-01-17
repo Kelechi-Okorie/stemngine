@@ -34,7 +34,7 @@ export class WebGLPrograms {
   protected _programLayers = new Layers();
   protected _customShaders = new WebGLShaderCache();
   protected _activeChannels = new Set();
-  protected programs: WebGLProgram[] = [];
+  public programs: WebGLProgram[] = [];
 
   protected logarithmicDepthBuffer: boolean;
   protected SUPPORTS_VERTEX_TEXTURES: boolean;

@@ -1163,7 +1163,7 @@ export class WebGLProgram {
   public onFirstUse(/* self: any */) {  // TODO: type very well
 
     // check for link errors
-    if (renderer.debug.checkShaderErrors) {
+    if (this.renderer.debug.checkShaderErrors) {
 
       const programInfoLog = this.gl.getProgramInfoLog(this.program) || '';
       const vertexShaderInfoLog = this.gl.getShaderInfoLog(this.glVertexShader) || '';

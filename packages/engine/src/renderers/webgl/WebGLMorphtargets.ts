@@ -7,7 +7,7 @@ import { BufferGeometry } from '../../core/BufferGeometry.js';
 import { Node3D } from '../../core/Node3D.js';
 
 export class WebGLMorphtargets {
-    private readonly gl: WebGL2RenderingContext;
+  private readonly gl: WebGL2RenderingContext;
   private readonly capabilities: WebGLCapabilities;
   private readonly textures: Record<string, WebGLTexture>;
 
@@ -16,14 +16,14 @@ export class WebGLMorphtargets {
   protected morph = new Vector4();
 
   constructor(
-  gl: WebGL2RenderingContext,
-  capabilities: WebGLCapabilities,
-  textures: Record<string, WebGLTexture>
-) {
-  this.gl = gl;
-  this.capabilities = capabilities;
-  this.textures = textures;
-}
+    gl: WebGL2RenderingContext,
+    capabilities: WebGLCapabilities,
+    textures: Record<string, WebGLTexture>
+  ) {
+    this.gl = gl;
+    this.capabilities = capabilities;
+    this.textures = textures;
+  }
 
   public update(
     object: Node3D & {

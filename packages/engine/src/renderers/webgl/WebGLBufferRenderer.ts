@@ -17,7 +17,7 @@ export class WebGLBufferRenderer {
     this.info = info;
   }
 
-  publicsetMode(value: GLenum): void {
+  public setMode(value: GLenum): void {
 
     this.mode = value;
 

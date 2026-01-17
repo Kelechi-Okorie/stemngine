@@ -64,6 +64,64 @@ const reversedFuncs = {
   [GreaterEqualDepth]: LessEqualDepth,
 };
 
+export interface ColorBuffer {
+  setMask(colorMask: boolean): void;
+
+  setLocked(lock: boolean): void;
+
+  setClear(
+    r: number,
+    g: number,
+    b: number,
+    a: number,
+    premultipliedAlpha?: boolean
+  ): void;
+
+  reset(): void;
+}
+
+export interface DepthBuffer {
+  setReversed(reversed: boolean): void;
+
+  getReversed(): boolean;
+
+  setTest(depthTest: boolean): void;
+
+  setMask(depthMask: boolean): void;
+
+  setFunc(depthFunc: any | null): void;
+
+  setLocked(lock: boolean): void;
+
+  setClear(depth: number): void;
+
+  reset(): void;
+}
+
+export interface StencilBuffer {
+  setTest(stencilTest: boolean): void;
+
+  setMask(stencilMask: number): void;
+
+  setFunc(
+    stencilFunc: number,
+    stencilRef: number,
+    stencilMask: number
+  ): void;
+
+  setOp(
+    stencilFail: number,
+    stencilZFail: number,
+    stencilZPass: number
+  ): void;
+
+  setLocked(lock: boolean): void;
+
+  setClear(stencil: number): void;
+
+  reset(): void;
+}
+
 export class WebGLState {
   private readonly gl;
   private extensions: WebGLExtensions;
@@ -123,6 +181,13 @@ export class WebGLState {
 
   private equationToGL!: Record<number, GLenum>;
   private factorToGL!: Record<number, GLenum>;
+
+  public readonly buffers: {
+    color: ColorBuffer;
+    depth: DepthBuffer;
+    stencil: StencilBuffer;
+  };
+
 
   constructor(
     gl: WebGL2RenderingContext,
@@ -191,6 +256,16 @@ export class WebGLState {
       [OneMinusConstantColorFactor]: gl.ONE_MINUS_CONSTANT_COLOR,
       [ConstantAlphaFactor]: gl.CONSTANT_ALPHA,
       [OneMinusConstantAlphaFactor]: gl.ONE_MINUS_CONSTANT_ALPHA
+    };
+
+    const colorBuffer = this.ColorBuffer();
+    const depthBuffer = this.DepthBuffer();
+    const stencilBuffer = this.StencilBuffer();
+
+    this.buffers = {
+      color: colorBuffer,
+      depth: depthBuffer,
+      stencil: stencilBuffer
     };
 
   }
@@ -584,10 +659,6 @@ export class WebGLState {
     return texture;
 
   }
-
-
-
-  //
 
   public enable(id: number) {
 
@@ -1099,7 +1170,6 @@ export class WebGLState {
     }
 
   }
-
 
   public compressedTexImage2D(
     target: GLenum,

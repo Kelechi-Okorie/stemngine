@@ -148,7 +148,7 @@ export class Color {
    * @param {number} [b] - The blue component.
    * @return {Color} A reference to this color.
    */
-  public set(r: Color | number | string, g: number, b: number): this {
+  public set(r: Color | number | string, g?: number, b?: number): this {
 
     if (g === undefined && b === undefined) {
 
@@ -172,7 +172,7 @@ export class Color {
 
     } else {
 
-      this.setRGB(r as number, g, b);
+      this.setRGB(r as number, g!, b!);
 
     }
 

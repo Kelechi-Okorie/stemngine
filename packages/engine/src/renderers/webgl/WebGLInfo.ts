@@ -1,3 +1,5 @@
+import { WebGLProgram } from "./WebGLProgram";
+
 export class WebGLInfo {
   private readonly gl: WebGL2RenderingContext;
 
@@ -14,7 +16,7 @@ export class WebGLInfo {
     lines: 0
   };
 
-  public programs = null;
+  public programs: WebGLProgram[] = [];
   public autoReset = true;
 
 

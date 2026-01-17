@@ -1,6 +1,6 @@
 import { Scene } from "../../scenes/Scene";
 
-interface RenderItem {
+export interface RenderItem {
   id: number | null;
   object: { id: number; renderOrder?: number } | null; // typically Mesh/Object3D;
   geometry: any | null;      // usually BufferGeometry

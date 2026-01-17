@@ -1064,3 +1064,12 @@ export class Vector4 {
   }
 
 }
+
+export function isVector4(value: unknown): value is Vector4 {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    (value as any).isVector4 === true
+  );
+}
+

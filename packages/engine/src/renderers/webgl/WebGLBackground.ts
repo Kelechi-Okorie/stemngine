@@ -35,10 +35,10 @@ export class WebGLBackground {
   public currentTonemapping: number | null = null;
 
   public renderer: WebGLRenderer;
-  public cubemaps: ReturnType<typeof WebGLCubeMaps>;
-  public cubeuvmaps: ReturnType<typeof WebGLCubeUVMaps>;
-  public state: ReturnType<typeof WebGLState>;
-  public objects: ReturnType<typeof WebGLObjects>;
+  public cubemaps: WebGLCubeMaps;
+  public cubeuvmaps: WebGLCubeUVMaps;
+  public state: WebGLState;
+  public objects: WebGLObjects;
   public alpha: boolean;
   public premultipliedAlpha: boolean;
 
@@ -46,10 +46,10 @@ export class WebGLBackground {
 
   constructor(
     renderer: WebGLRenderer,
-    cubemaps: ReturnType<typeof WebGLCubeMaps>,
-    cubeuvmaps: ReturnType<typeof WebGLCubeUVMaps>,
-    state: ReturnType<typeof WebGLState>,
-    objects: ReturnType<typeof WebGLObjects>,
+    cubemaps: WebGLCubeMaps,
+    cubeuvmaps: WebGLCubeUVMaps,
+    state: WebGLState,
+    objects: WebGLObjects,
     alpha: boolean,
     premultipliedAlpha: boolean
   ) {
@@ -132,26 +132,32 @@ export class WebGLBackground {
 
   }
 
-  public setClearColor(color: number, alpha = 1) {
+  public getClearColor(): Color {
+    return this.clearColor;
+  }
+
+  public setClearColor(color: Color | number, alpha = 1): void {
 
     this.clearColor.set(color);
     this.clearAlpha = alpha;
     this.setClear(this.clearColor, this.clearAlpha);
 
   }
-  public getClearAlpha() {
+
+  public getClearAlpha(): number {
 
     return this.clearAlpha;
 
   }
-  public setClearAlpha(alpha: number) {
+
+  public setClearAlpha(alpha: number): void {
 
     this.clearAlpha = alpha;
     this.setClear(this.clearColor, this.clearAlpha);
 
   }
 
-  public dispose() {
+  public dispose(): void {
 
     if (this.boxMesh !== null) {
 
@@ -180,7 +186,7 @@ export class WebGLBackground {
   }
 
   public addToRenderList(
-    renderList: ReturnType<typeof WebGLRenderList>,
+    renderList: WebGLRenderList,
     scene: Scene
   ) {
 
@@ -243,7 +249,7 @@ export class WebGLBackground {
 
       }
 
-      // TODO: confirm this works. this.boxMesh.materail were replaced by material
+      // TODO: confirm this works. this.boxMesh.material were replaced by material
       const material = this.boxMesh.material as ShaderMaterial;
 
       material.uniforms.envMap.value = background;
