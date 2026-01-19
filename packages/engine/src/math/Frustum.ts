@@ -7,6 +7,7 @@ import { Plane } from './Plane.js';
 import { Node3D } from '../core/Node3D.js';
 import { Box3 } from './Box3.js';
 import { Mesh } from '../objects/Mesh.js';
+import { Sprite } from '../objects/Sprite.js';
 
 const _sphere = /*@__PURE__*/ new Sphere();
 const _defaultSpriteCenter = /*@__PURE__*/ new Vector2(0.5, 0.5);
@@ -195,18 +196,18 @@ export class Frustum {
   //  * @param {Sprite} sprite - The sprite to test.
   //  * @return {boolean} Whether the sprite is intersecting this frustum or not.
   //  */
-  // public intersectsSprite(sprite): boolean {
+  public intersectsSprite(sprite: Sprite): boolean {
 
-  //   _sphere.center.set(0, 0, 0);
+    _sphere.center.set(0, 0, 0);
 
-  //   const offset = _defaultSpriteCenter.distanceTo(sprite.center);
+    const offset = _defaultSpriteCenter.distanceTo(sprite.center);
 
-  //   _sphere.radius = 0.7071067811865476 + offset;
-  //   _sphere.applyMatrix4(sprite.matrixWorld);
+    _sphere.radius = 0.7071067811865476 + offset;
+    _sphere.applyMatrix4(sprite.matrixWorld);
 
-  //   return this.intersectsSphere(_sphere);
+    return this.intersectsSphere(_sphere);
 
-  // }
+  }
 
   /**
    * Returns `true` if the given bounding sphere is intersecting this frustum.

@@ -42,11 +42,20 @@ export class ArrayCamera extends PerspectiveCamera {
    *
    * @param {Array<PerspectiveCamera>} [array=[]] - An array of perspective sub cameras.
    */
-  constructor(array = []) {
+  constructor(array: PerspectiveCamera[] = []) {
 
     super();
     this.cameras = array;
 
   }
 
+}
+
+export function isArrayCamera(object: any): object is ArrayCamera {
+  return (
+    object !== null &&
+    typeof object === 'object' &&
+    'isArrayCamera' in object &&
+    object.isArrayCamera === true
+  );
 }

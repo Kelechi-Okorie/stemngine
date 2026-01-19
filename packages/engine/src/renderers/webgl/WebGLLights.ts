@@ -53,7 +53,7 @@ type LightUniforms =
   | HemisphereLightUniforms
   | RectAreaLightUniforms;
 
-  type DirectionalLightShadowUniforms = {
+type DirectionalLightShadowUniforms = {
   shadowIntensity: number;
   shadowBias: number;
   shadowNormalBias: number;
@@ -273,7 +273,7 @@ export class WebGLLights {
 
   private shadowCache = ShadowUniformsCache();
 
-  private state: WebGLLightsState = {
+  public state: WebGLLightsState = {
 
     version: 0,
 
@@ -323,7 +323,7 @@ export class WebGLLights {
   constructor(extensions: WebGLExtensions) {
     this.extensions = extensions;
 
-      for (let i = 0; i < 9; i++) this.state.probe.push(new Vector3());
+    for (let i = 0; i < 9; i++) this.state.probe.push(new Vector3());
 
   }
 
@@ -366,7 +366,7 @@ export class WebGLLights {
         g += color.g * intensity;
         b += color.b * intensity;
 
-      } else if ( isLightProbe(light)) {
+      } else if (isLightProbe(light)) {
 
         for (let j = 0; j < 9; j++) {
 
@@ -630,7 +630,7 @@ export class WebGLLights {
 
         spotLength++;
 
-      } else if ( isRectAreaLight(light)) {
+      } else if (isRectAreaLight(light)) {
 
         const uniforms = this.state.rectArea[rectAreaLength];
 

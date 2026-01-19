@@ -350,3 +350,18 @@ export class LightShadow {
   }
 
 }
+
+export function isLightShadow(object: any): object is LightShadow {
+  // Check that the object is not null/undefined
+  if (!object) return false;
+
+  // Check that object is an instance of LightShadow (preferred if possible)
+  if (object instanceof LightShadow) return true;
+
+  // Fallback: structural check for minimal required properties
+  return (
+    typeof object === 'object' &&
+    'camera' in object &&
+    object.camera instanceof Camera
+  );
+}

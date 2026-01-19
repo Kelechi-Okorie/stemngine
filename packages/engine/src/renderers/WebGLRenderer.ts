@@ -46,7 +46,7 @@ import { WebGLMorphtargets } from './webgl/WebGLMorphtargets';
 import { WebGLObjects } from './webgl/WebGLObjects';
 import { WebGLPrograms } from './webgl/WebGLPrograms';
 import { WebGLProperties } from './webgl/WebGLProperties';
-import { WebGLRenderLists } from './webgl/WebGLRenderLists';
+import { WebGLRenderLists, WebGLRenderList } from './webgl/WebGLRenderLists';
 import { WebGLRenderStates, WebGLRenderState } from './webgl/WebGLRenderStates';
 import { WebGLRenderTarget } from './WebGLRenderTarget';
 import { WebGLShadowMap } from './webgl/WebGLShadowMap';
@@ -63,6 +63,11 @@ import { BaseEvent, EventDispatcher } from '../core/EventDispatcher';
 import { Mesh } from '../objects/Mesh';
 import { Scene } from '../scenes/Scene';
 import { Texture } from '../textures/Texture';
+
+import { isLight } from '../lights/Light';
+import { isLightShadow } from '../lights/LightShadow';
+import { isArrayCamera } from '../cameras/ArrayCamera';
+import { Plane } from '../math/Plane';
 
 export interface WebGLRendererOptions {
   canvas?: HTMLCanvasElement;
@@ -141,7 +146,6 @@ export class WebGLRenderer {
   /**
    * Whether the renderer should automatically clear its output before rendering a frame or not.
    *
-   * @type {boolean}
    * @default true
    */
   public autoClear = true;
@@ -150,7 +154,6 @@ export class WebGLRenderer {
    * If {@link WebGLRenderer#autoClear} set to `true`, whether the renderer should clear
    * the color buffer or not.
    *
-   * @type {boolean}
    * @default true
    */
   public autoClearColor = true;
@@ -159,7 +162,6 @@ export class WebGLRenderer {
    * If {@link WebGLRenderer#autoClear} set to `true`, whether the renderer should clear
    * the depth buffer or not.
    *
-   * @type {boolean}
    * @default true
    */
   public autoClearDepth = true;
@@ -168,7 +170,6 @@ export class WebGLRenderer {
    * If {@link WebGLRenderer#autoClear} set to `true`, whether the renderer should clear
    * the stencil buffer or not.
    *
-   * @type {boolean}
    * @default true
    */
   public autoClearStencil = true;
@@ -184,7 +185,6 @@ export class WebGLRenderer {
    * off sorting and use other methods to deal with transparency rendering e.g.
    * manually determining each object's rendering order.
    *
-   * @type {boolean}
    * @default true
    */
   public sortObjects = true;
@@ -195,14 +195,12 @@ export class WebGLRenderer {
    * User-defined clipping planes specified in world space. These planes apply globally.
    * Points in space whose dot product with the plane is negative are cut away.
    *
-   * @type {Array<Plane>}
    */
-  public clippingPlanes = [];
+  public clippingPlanes: Plane[] = [];
 
   /**
    * Whether the renderer respects object-level clipping planes or not.
    *
-   * @type {boolean}
    * @default false
    */
   public localClippingEnabled = false;
@@ -219,7 +217,6 @@ export class WebGLRenderer {
   /**
  * Exposure level of tone mapping.
  *
- * @type {number}
  * @default 1
  */
   public toneMappingExposure = 1.0;
@@ -231,7 +228,6 @@ export class WebGLRenderer {
    * of viewport dimensions. Lowering this value can result in significant performance improvements
    * when using {@link MeshPhysicalMaterial#transmission}.
    *
-   * @type {number}
    * @default 1
    */
   public transmissionResolutionScale = 1.0;
@@ -251,7 +247,7 @@ export class WebGLRenderer {
 
   private _currentViewport = new Vector4();
   private _currentScissor = new Vector4();
-  private _currentScissorTest: boolean | null = null;
+  private _currentScissorTest: boolean;
 
   private _currentClearColor = new Color(0x000000);
   private _currentClearAlpha = 0;
@@ -296,6 +292,8 @@ export class WebGLRenderer {
   protected canvas: HTMLCanvasElement;
   protected _gl: WebGL2RenderingContext;
   protected reversedDepthBuffer: boolean;
+
+  protected stencil: boolean;
 
   protected _alpha: boolean;
 
@@ -342,10 +340,10 @@ export class WebGLRenderer {
   protected uintClearColor = new Uint32Array(4);
   protected intClearColor = new Int32Array(4);
 
-  protected currentRenderList!: WebGLRenderLists;
-  protected currentRenderState!: WebGLRenderState;
+  protected currentRenderList: WebGLRenderList | null = null;
+  protected currentRenderState: WebGLRenderState | null = null;
 
-  protected renderListStack: WebGLRenderLists[] = [];
+  protected renderListStack: WebGLRenderList[] = [];
   protected renderStateStack: WebGLRenderState[] = [];
 
   private cm = ColorManagement.instance;
@@ -415,7 +413,9 @@ export class WebGLRenderer {
     this._viewport = new Vector4(0, 0, width, height);
     this._scissor = new Vector4(0, 0, width, height);
 
-    //
+    this._currentScissorTest = this._scissorTest;
+
+    this.stencil = stencil;
 
     try {
 
@@ -475,7 +475,45 @@ export class WebGLRenderer {
 
     }
 
-    this.initGLContext();
+    // this.initGLContext();
+    this.extensions = new WebGLExtensions(this._gl);
+    this.extensions.init();
+
+    this.utils = new WebGLUtils(this._gl, this.extensions);
+
+    this.capabilities = new WebGLCapabilities(this._gl, this.extensions, this.parameters, this.utils);
+
+    this.state = new WebGLState(this._gl, this.extensions);
+
+    if (this.capabilities.reversedDepthBuffer && this.reversedDepthBuffer) {
+
+      this.state.buffers.depth.setReversed(true);
+
+    }
+
+    this.info = new WebGLInfo(this._gl);
+    this.properties = new WebGLProperties();
+    this.textures = new WebGLTextures(this._gl, this.extensions, this.state, this.properties, this.capabilities, this.utils, this.info);
+    this.cubemaps = new WebGLCubeMaps(this);
+    this.cubeuvmaps = new WebGLCubeUVMaps(this);
+    this.attributes = new WebGLAttributes(this._gl);
+    this.bindingStates = new WebGLBindingStates(this._gl, this.attributes);
+    this.geometries = new WebGLGeometries(this._gl, this.attributes, this.info, this.bindingStates);
+    this.objects = new WebGLObjects(this._gl, this.geometries, this.attributes, this.info);
+    this.morphtargets = new WebGLMorphtargets(this._gl, this.capabilities, this.textures);
+    this.clipping = new WebGLClipping(this.properties);
+    this.programCache = new WebGLPrograms(this, this.cubemaps, this.cubeuvmaps, this.extensions, this.capabilities, this.bindingStates, this.clipping);
+    this.materials = new WebGLMaterials(this, this.properties);
+    this.renderLists = new WebGLRenderLists();
+    this.renderStates = new WebGLRenderStates(this.extensions);
+    this.background = new WebGLBackground(this, this.cubemaps, this.cubeuvmaps, this.state, this.objects, this._alpha, this.premultipliedAlpha);
+    this.shadowMap = new WebGLShadowMap(this, this.objects, this.capabilities);
+    this.uniformsGroups = new WebGLUniformsGroups(this._gl, this.info, this.capabilities, this.state);
+
+    this.bufferRenderer = new WebGLBufferRenderer(this._gl, this.extensions, this.info);
+    this.indexedBufferRenderer = new WebGLIndexedBufferRenderer(this._gl, this.extensions, this.info);
+
+    this.info.programs = this.programCache.programs;
 
     this.animation.setAnimationLoop(this.onAnimationFrame);
 
@@ -491,17 +529,6 @@ export class WebGLRenderer {
      * @type {WebXRManager}
      */
     // this.xr = xr;
-
-    /**
-     * Returns the rendering context.
-     *
-     * @return {WebGL2RenderingContext} The rendering context.
-     */
-    // this.getContext = function () {
-
-    //   return this._gl;
-
-    // };
 
     this._scratchFrameBuffer = this._gl.createFramebuffer();
 
@@ -573,7 +600,6 @@ export class WebGLRenderer {
     return this._currentRenderTarget === null ? this._pixelRatio : 1;
 
   }
-
 
   /**
   * Returns the rendering context.
@@ -1411,7 +1437,7 @@ export class WebGLRenderer {
     this.currentRenderState = this.renderStates.get(targetScene!);
     this.currentRenderState.init(camera);
 
-    this.renderStateStack.push(this.currentRenderState);
+    this.renderStateStack.push(this.currentRenderState!);
 
     // gather lights from both the target scene and the new object that will be added to the scene.
 
@@ -1419,11 +1445,15 @@ export class WebGLRenderer {
 
       if ('isLight' in object && object.layers.test(camera.layers)) {
 
-        this.currentRenderState.pushLight(object);
+        if (isLight(object)) {
 
-        if ('castShadow' in object) {
+          this.currentRenderState?.pushLight(object);
 
-          this.currentRenderState.pushShadow(object);
+        }
+
+        if (isLightShadow(object)) {
+
+          this.currentRenderState?.pushShadow(object);
 
         }
 
@@ -1437,11 +1467,11 @@ export class WebGLRenderer {
 
         if (object.isLight && object.layers.test(camera.layers)) {
 
-          this.currentRenderState.pushLight(object);
+          this.currentRenderState?.pushLight(object);
 
           if (object.castShadow) {
 
-            this.currentRenderState.pushShadow(object);
+            this.currentRenderState?.pushShadow(object);
 
           }
 
@@ -1451,7 +1481,7 @@ export class WebGLRenderer {
 
     }
 
-    this.currentRenderState.setupLights();
+    this.currentRenderState?.setupLights();
 
     // Only initialize materials in the new scene, not the targetScene.
 
@@ -1659,9 +1689,9 @@ export class WebGLRenderer {
     // if (scene.isScene === true) scene.onBeforeRender(this, scene, camera, this._currentRenderTarget);
 
     this.currentRenderState = this.renderStates.get(scene, this.renderStateStack.length);
-    this.currentRenderState.init(camera);
+    this.currentRenderState!.init(camera);
 
-    this.renderStateStack.push(this.currentRenderState);
+    this.renderStateStack.push(this.currentRenderState!);
 
     this._projScreenMatrix.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
     this._frustum.setFromProjectionMatrix(this._projScreenMatrix, WebGLCoordinateSystem, camera.reversedDepth);
@@ -1670,9 +1700,9 @@ export class WebGLRenderer {
     this._clippingEnabled = this.clipping.init(this.clippingPlanes, this._localClippingEnabled);
 
     this.currentRenderList = this.renderLists.get(scene, this.renderListStack.length);
-    this.currentRenderList.init();
+    this.currentRenderList!.init();
 
-    this.renderListStack.push(this.currentRenderList);
+    this.renderListStack.push(this.currentRenderList!);
 
     // if (xr.enabled === true && xr.isPresenting === true) {
 
@@ -1688,11 +1718,11 @@ export class WebGLRenderer {
 
     this.projectObject(scene, camera, 0, this.sortObjects);
 
-    this.currentRenderList.finish();
+    this.currentRenderList?.finish();
 
     if (this.sortObjects === true) {
 
-      this.currentRenderList.sort(this._opaqueSort, this._transparentSort);
+      this.currentRenderList?.sort(this._opaqueSort, this._transparentSort);
 
     }
 
@@ -1709,7 +1739,7 @@ export class WebGLRenderer {
 
     if (this._clippingEnabled === true) this.clipping.beginShadows();
 
-    const shadowsArray = this.currentRenderState.state.shadowsArray;
+    const shadowsArray = this.currentRenderState?.state.shadowsArray;
 
     this.shadowMap.render(shadowsArray, scene, camera);
 
@@ -1721,12 +1751,12 @@ export class WebGLRenderer {
 
     // render scene
 
-    const opaqueObjects = this.currentRenderList.opaque;
-    const transmissiveObjects = this.currentRenderList.transmissive;
+    const opaqueObjects = this.currentRenderList?.opaque;
+    const transmissiveObjects = this.currentRenderList?.transmissive ?? [];
 
-    this.currentRenderState.setupLights();
+    this.currentRenderState?.setupLights();
 
-    if ('isArrayCamera' in camera) {
+    if (/* 'isArrayCamera' in camera */ isArrayCamera(camera)) {
 
       const cameras = camera.cameras;
 
@@ -1791,7 +1821,10 @@ export class WebGLRenderer {
 
       this.currentRenderState = this.renderStateStack[this.renderStateStack.length - 1];
 
-      if (this._clippingEnabled === true) this.clipping.setGlobalState(this.clippingPlanes, this.currentRenderState.state.camera);
+      if (this._clippingEnabled === true) {
+
+        this.clipping.setGlobalState(this.clippingPlanes, this.currentRenderState.state.camera!);
+      }
 
     } else {
 
@@ -1837,11 +1870,11 @@ export class WebGLRenderer {
 
       } else if (object.isLight) {
 
-        this.currentRenderState.pushLight(object);
+        this.currentRenderState!.pushLight(object);
 
         if (object.castShadow) {
 
-          this.currentRenderState.pushShadow(object);
+          this.currentRenderState!.pushShadow(object);
 
         }
 
@@ -1861,7 +1894,7 @@ export class WebGLRenderer {
 
           if (material.visible) {
 
-            this.currentRenderList.push(object, geometry, material, groupOrder, this._vector4.z, null);
+            this.currentRenderList!.push(object, geometry, material, groupOrder, this._vector4.z, null);
 
           }
 
@@ -1905,7 +1938,7 @@ export class WebGLRenderer {
 
               if (groupMaterial && groupMaterial.visible) {
 
-                this.currentRenderList.push(object, geometry, groupMaterial, groupOrder, this._vector4.z, group);
+                this.currentRenderList!.push(object, geometry, groupMaterial, groupOrder, this._vector4.z, group);
 
               }
 
@@ -1913,7 +1946,7 @@ export class WebGLRenderer {
 
           } else if (material.visible) {
 
-            this.currentRenderList.push(object, geometry, material, groupOrder, this._vector4.z, null);
+            this.currentRenderList!.push(object, geometry, material, groupOrder, this._vector4.z, null);
 
           }
 
@@ -1945,7 +1978,7 @@ export class WebGLRenderer {
     const transmissiveObjects = currentRenderList.transmissive;
     const transparentObjects = currentRenderList.transparent;
 
-    this.currentRenderState.setupLightsView(camera);
+    this.currentRenderState!.setupLightsView(camera);
 
     if (this._clippingEnabled === true) this.clipping.setGlobalState(this.clippingPlanes, camera);
 
@@ -1981,14 +2014,14 @@ export class WebGLRenderer {
 
     }
 
-    if (this.currentRenderState.state.transmissionRenderTarget[camera.id] === undefined) {
+    if (this.currentRenderState!.state.transmissionRenderTarget[camera.id] === undefined) {
 
-      this.currentRenderState.state.transmissionRenderTarget[camera.id] = new WebGLRenderTarget(1, 1, {
+      this.currentRenderState!.state.transmissionRenderTarget[camera.id] = new WebGLRenderTarget(1, 1, {
         generateMipmaps: true,
         type: (this.extensions.has('EXT_color_buffer_half_float') || this.extensions.has('EXT_color_buffer_float')) ? HalfFloatType : UnsignedByteType,
         minFilter: LinearMipmapLinearFilter,
         samples: 4,
-        stencilBuffer: stencil,
+        stencilBuffer: this.stencil,
         resolveDepthBuffer: false,
         resolveStencilBuffer: false,
         colorSpace: this.cm.workingColorSpace,
@@ -2006,7 +2039,7 @@ export class WebGLRenderer {
 
     }
 
-    const transmissionRenderTarget = this.currentRenderState.state.transmissionRenderTarget[camera.id];
+    const transmissionRenderTarget = this.currentRenderState!.state.transmissionRenderTarget[camera.id];
 
     const activeViewport = camera.viewport || this._currentViewport;
     transmissionRenderTarget.setSize(activeViewport.z * this.transmissionResolutionScale, activeViewport.w * this.transmissionResolutionScale);
@@ -2021,7 +2054,7 @@ export class WebGLRenderer {
 
     this.getClearColor(this._currentClearColor);
     this._currentClearAlpha = this.getClearAlpha();
-    if (this._currentClearAlpha < 1) this.setClearColor(0xffffff, 0.5);
+    if (this._currentClearAlpha < 1) this.setClearColor(new Color(0xffffff), 0.5);
 
     this.clear();
 
@@ -2037,7 +2070,7 @@ export class WebGLRenderer {
     const currentCameraViewport = camera.viewport;
     if (camera.viewport !== undefined) camera.viewport = undefined;
 
-    this.currentRenderState.setupLightsView(camera);
+    this.currentRenderState!.setupLightsView(camera);
 
     if (this._clippingEnabled === true) this.clipping.setGlobalState(this.clippingPlanes, camera);
 
@@ -2179,8 +2212,8 @@ export class WebGLRenderer {
 
     const materialProperties = this.properties.get(material);
 
-    const lights = this.currentRenderState.state.lights;
-    const shadowsArray = this.currentRenderState.state.shadowsArray;
+    const lights = this.currentRenderState!.state.lights;
+    const shadowsArray = this.currentRenderState!.state.shadowsArray;
 
     const lightsStateVersion = lights.state.version;
 
@@ -2366,7 +2399,7 @@ export class WebGLRenderer {
     const morphTargetsCount = (morphAttribute !== undefined) ? morphAttribute.length : 0;
 
     const materialProperties = this.properties.get(material);
-    const lights = this.currentRenderState.state.lights;
+    const lights = this.currentRenderState!.state.lights;
 
     if (this._clippingEnabled === true) {
 
@@ -2685,7 +2718,7 @@ export class WebGLRenderer {
 
       }
 
-      this.materials.refreshMaterialUniforms(m_uniforms, material, this._pixelRatio, this._height, this.currentRenderState.state.transmissionRenderTarget[camera.id]);
+      this.materials.refreshMaterialUniforms(m_uniforms, material, this._pixelRatio, this._height, this.currentRenderState!.state.transmissionRenderTarget[camera.id]);
 
       WebGLUniforms.upload(this._gl, this.getUniformList(materialProperties), m_uniforms, this.textures);
 
@@ -3025,7 +3058,7 @@ export class WebGLRenderer {
 
     if (!(renderTarget && renderTarget.isWebGLRenderTarget)) {
 
-      console.error('THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not THREE.WebGLRenderTarget.');
+      console.error('WebGLRenderer.readRenderTargetPixels: renderTarget is not THREE.WebGLRenderTarget.');
       return;
 
     }
@@ -3050,14 +3083,14 @@ export class WebGLRenderer {
 
         if (!this.capabilities.textureFormatReadable(textureFormat)) {
 
-          console.error('THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in RGBA or implementation defined format.');
+          console.error('WebGLRenderer.readRenderTargetPixels: renderTarget is not in RGBA or implementation defined format.');
           return;
 
         }
 
         if (!this.capabilities.textureTypeReadable(textureType)) {
 
-          console.error('THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in UnsignedByteType or implementation defined type.');
+          console.error('WebGLRenderer.readRenderTargetPixels: renderTarget is not in UnsignedByteType or implementation defined type.');
           return;
 
         }
@@ -3070,7 +3103,14 @@ export class WebGLRenderer {
 
           if (renderTarget.textures.length > 1) this._gl.readBuffer(this._gl.COLOR_ATTACHMENT0 + textureIndex);
 
-          this._gl.readPixels(x, y, width, height, this.utils.convert(textureFormat), this.utils.convert(textureType), buffer);
+          const format = this.utils.convert(textureFormat);
+          const type = this.utils.convert(textureType);
+
+          if (format === null || type === null) {
+            throw new Error(`Unsupported texture format/type: ${textureFormat}, ${textureType}`);
+          }
+
+          this._gl.readPixels(x, y, width, height, format, type, buffer);
 
         }
 
@@ -3147,7 +3187,7 @@ export class WebGLRenderer {
 
         if (!this.capabilities.textureTypeReadable(textureType)) {
 
-          throw new Error('THREE.WebGLRenderer.readRenderTargetPixelsAsync: renderTarget is not in UnsignedByteType or implementation defined type.');
+          throw new Error('WebGLRenderer.readRenderTargetPixelsAsync: renderTarget is not in UnsignedByteType or implementation defined type.');
 
         }
 
@@ -3159,7 +3199,14 @@ export class WebGLRenderer {
 
         if (renderTarget.textures.length > 1) this._gl.readBuffer(this._gl.COLOR_ATTACHMENT0 + textureIndex);
 
-        this._gl.readPixels(x, y, width, height, utils.convert(textureFormat), utils.convert(textureType), 0);
+        const format = this.utils.convert(textureFormat);
+        const type = this.utils.convert(textureType);
+
+        if (format === null || type === null) {
+          throw new Error(`Unsupported texture format/type: ${textureFormat}, ${textureType}`);
+        }
+
+        this._gl.readPixels(x, y, width, height, format, type, 0);
 
         // reset the frame buffer to the currently set buffer before waiting
         const currFramebuffer = this._currentRenderTarget !== null ? this.properties.get(this._currentRenderTarget).__webglFramebuffer : null;
@@ -3169,6 +3216,11 @@ export class WebGLRenderer {
         const sync = this._gl.fenceSync(this._gl.SYNC_GPU_COMMANDS_COMPLETE, 0);
 
         this._gl.flush();
+
+
+        if (!sync) {
+          throw new Error("WebGLRenderer: Failed to create WebGLSync");
+        }
 
         await probeAsync(this._gl, sync, 4);
 
@@ -3237,26 +3289,26 @@ export class WebGLRenderer {
     srcRegion: any = null,
     dstPosition: any = null,
     srcLevel = 0,
-    dstLevel = null
+    dstLevel = 0
   ) {
 
     // support the previous signature with just a single dst mipmap level
-    if (dstLevel === null) {
+    // if (dstLevel === null) {
 
-      if (srcLevel !== 0) {
+    //   if (srcLevel !== 0) {
 
-        // @deprecated, r171
-        warnOnce('WebGLRenderer: copyTextureToTexture function signature has changed to support src and dst mipmap levels.');
-        dstLevel = srcLevel;
-        srcLevel = 0;
+    //     // @deprecated, r171
+    //     warnOnce('WebGLRenderer: copyTextureToTexture function signature has changed to support src and dst mipmap levels.');
+    //     dstLevel = srcLevel;
+    //     srcLevel = 0;
 
-      } else {
+    //   } else {
 
-        dstLevel = 0;
+    //     dstLevel = 0;
 
-      }
+    //   }
 
-    }
+    // }
 
     // gather the necessary dimensions to copy
     let width, height, depth, minX, minY, minZ;
@@ -3313,6 +3365,12 @@ export class WebGLRenderer {
     // Set up the destination target
     const glFormat = this.utils.convert(dstTexture.format);
     const glType = this.utils.convert(dstTexture.type);
+
+    if (glFormat === null || glType === null) {
+      console.log('Unsupported gl texture format or type', { glFormat, glType });
+      throw new Error("Unsupported texture format or type for this platform");
+    }
+
     let glTarget;
 
     if (dstTexture.isData3DTexture) {
@@ -3584,9 +3642,11 @@ export class WebGLRenderer {
 
     this._outputColorSpace = colorSpace;
 
-    const gl = this.getContext();
-    gl.drawingBufferColorSpace = ColorManagement._getDrawingBufferColorSpace(colorSpace);
-    gl.unpackColorSpace = ColorManagement._getUnpackColorSpace();
+    const contextName = 'webgl2';
+
+    const gl = this.getContext(contextName);
+    gl.drawingBufferColorSpace = this.cm._getDrawingBufferColorSpace(colorSpace);
+    gl.unpackColorSpace = this.cm._getUnpackColorSpace(colorSpace);
 
   }
 

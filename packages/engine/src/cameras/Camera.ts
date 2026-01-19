@@ -1,8 +1,7 @@
-import type { Node3D } from "../core/Node3D";
 import { CoordinateSystem } from '../constants';
 
 import { WebGLCoordinateSystem } from "../constants";
-import { Node3D as Node3DImpl } from '../core/Node3D';
+import { Node3D } from '../core/Node3D';
 import { Matrix4 } from '../math/Matrix4';
 import { Vector3 } from '../math/Vector3';
 
@@ -15,7 +14,7 @@ import { Vector3 } from '../math/Vector3';
  * @abstract
  * @augments Object3D
  */
-export abstract class Camera extends Node3DImpl {
+export abstract class Camera extends Node3D {
   /**
    * this flag can be used for type testing.
    *

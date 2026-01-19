@@ -1052,15 +1052,18 @@ export class WebGLState {
 
   public setPolygonOffset(
     polygonOffset: boolean,
-    factor: number,
-    units: number
+    factor?: number,
+    units?: number
   ): void {
 
     if (polygonOffset) {
 
       this.enable(this.gl.POLYGON_OFFSET_FILL);
 
-      if (this.currentPolygonOffsetFactor !== factor || this.currentPolygonOffsetUnits !== units) {
+      if (
+        factor !== undefined && units !== undefined &&
+        (this.currentPolygonOffsetFactor !== factor || this.currentPolygonOffsetUnits !== units)
+      ) {
 
         this.gl.polygonOffset(factor, units);
 

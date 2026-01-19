@@ -108,3 +108,8 @@ export class Light extends Node3D {
   }
 
 }
+
+export function isLight(object: Node3D): object is Light {
+  // return "isLight" in object && object.isLight;
+  return (object as any).isLight === true;
+}

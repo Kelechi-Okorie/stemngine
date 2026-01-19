@@ -109,7 +109,6 @@ export class WebGLShadowMap {
     const activeCubeFace = this.renderer.getActiveCubeFace();
     const activeMipmapLevel = this.renderer.getActiveMipmapLevel();
 
-    const _state = this.renderer.state;
 
     // Set GL state for depth map.
     _state.setBlending(NoBlending);

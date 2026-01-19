@@ -8,10 +8,13 @@ import { Material } from "../materials/Material";
 import { BufferGeometry } from "./BufferGeometry";
 import { WebGLRenderer } from "../renderers/WebGLRenderer";
 import { Group } from "../objects/Group";
+import { generateUUID } from "../math/MathUtils";
 
-import { SpatialNode } from "./SpatialNode";
 import { Camera } from "../cameras/Camera";
 import { Raycaster, RaycasterIntersection } from "./Raycaster";
+import { EventDispatcher } from "./EventDispatcher";
+
+let _node3DId = 0;
 
 type UserDataValue = string | number | null | UserDataValue[] | { [key: string]: UserDataValue };
 
@@ -97,7 +100,7 @@ const _zAxis = /*@__PURE__*/ new Vector3(0, 0, 1);
  * Node3D uses WebGL object
  *
  */
-export class Node3D extends SpatialNode {
+export class Node3D extends EventDispatcher {
 
   /**
   * this flag can be used for type testing.
@@ -107,6 +110,28 @@ export class Node3D extends SpatialNode {
   * @defaultValue true
   */
   public readonly isNode3D: boolean = true;
+
+  /**
+ * The ID of the node.
+ *
+ * @name Node#id
+ * @readonly
+*/
+  public readonly id: number;
+
+  /**
+ * The name of the node
+ */
+  public name: string = '';
+
+
+  /**
+   * The UUID of the node
+   *
+   * @readonly
+   */
+  public readonly uuid: string = generateUUID();
+
 
   /**
    * Defines the `up` direction of the 3D Node. which influences the orientation
@@ -286,11 +311,48 @@ export class Node3D extends SpatialNode {
    */
   public userData: { [key: string]: UserDataValue } = {}
 
+
+  /**
+   * A reference to the parent object
+   */
+  public parent: Node3D | null = null;
+
+  /**
+   * An array holding the child objects of this Node instance
+   */
+  public children: Node3D[] = [];
+
+  /**
+   * When set to `true`, this node will be rendered in the scene.
+   *
+   * @remarks
+   * This is a hint for renderers. Some renderers may choose to ignore this
+   * property depending on the use-case.
+   */
+  public visible: boolean = true;
+
+  /**
+   * The type property is used for detecting the object type
+   * in context of serialization/deserialization
+   *
+   * @readonly
+   */
+  public readonly type: string = 'Node3D';
+
+
+
+
+
+
+
+
   /**
    * Constructs a Node3D instance
    */
   constructor() {
     super();
+    this.id = _node3DId++;
+
 
     // private helper functions
     const onRotationChange = () => {
@@ -305,6 +367,256 @@ export class Node3D extends SpatialNode {
     this.rotation._onChange(onRotationChange);
     this.quaternion._onChange(onQuaternionChange);
   }
+
+
+
+  /**
+* Adds the given Node as a child to this node.
+*
+* @fires Node#added
+* @fires Node#childadded
+* @param child - The node to add
+* @returns A reference to this instance
+*/
+  public add(child: Node3D): this {
+    if (child === this) {
+      console.error('Node3D.add: object can\'t be added as a child of itself.', child);
+      return this;
+    }
+
+    if (!child.isNode3D) {
+      console.error('Can only add instances of Node3D');
+      return this;
+    }
+
+    child.removeFromParent();
+
+    child.parent = this;
+    this.children.push(child);
+
+    this.dispatchEvent({ type: 'addedEvent', parent: this });
+    this.dispatchEvent({ type: 'childaddedEvent', child });
+
+    return this;
+  }
+
+  /**
+   * Adds many children at once
+   *
+   * @param children - List of children to add
+   * @returns A reference to this instance
+   */
+  public addChildren(children: Node3D[]): this {
+    const length = children.length;
+    for (let i = 0; i < length; i++) {
+      this.add(children[i]);
+    }
+
+    return this
+  }
+
+  /**
+   * Removes the given Node as child frim this Node
+   *
+   * @fires Node#removed
+   * @fires Node#childremoved
+   * @param Node - The Node to remove
+   * @returns A reference to this instance
+   */
+  public remove(child: Node3D): this {
+    const index = this.children.indexOf(child);
+
+    if (index !== -1) {
+      const parent = child.parent;
+      child.parent = null;
+      this.children.splice(index, 1);
+      child.dispatchEvent({ type: 'removedEvent', parent });
+      this.dispatchEvent({ type: 'childremovedEvent', child });
+    }
+
+    return this;
+  }
+
+  /**
+   * Removes many children at once
+   *
+   * @param children - List of children to remove
+   * @returns A reference to this instance
+   */
+  public removeChildren(children: Node3D[]): this {
+    // iterate over a shallow copy to avoid skipping elements
+    const copy = [...children];
+    for (const child of copy) {
+      this.remove(child);
+    }
+
+    return this
+  }
+
+  /**
+   * Removes this Node from its current parent
+   *
+   * @fires Node3D#removed
+   * @fires Node3D#childremoved
+   * @returns A reference to this instance
+   */
+  public removeFromParent(): this {
+    const parent = this.parent;
+
+    if (!parent) return this;
+
+    parent.remove(this);
+
+    return this;
+  }
+
+  /**
+   * Removes all child objects
+   *
+   * @fires Node3D#removed
+   * @fires Node3D#childremoved
+   * @returns A reference to this instance
+   */
+  public clear(): this {
+    return this.removeChildren(this.children);
+  }
+
+  /**
+   * Searches through the Node3D and its children, starting with this node
+   * itself and returns the first node with a matching ID
+   *
+   * @param id - The id
+   * @returns The first node found with this id or undefined if no node has this id
+   */
+  public getObjectById(id: number): Node3D | undefined {
+    return this.getObjectByProperty('id', id);
+  }
+
+  /**
+   * Searches through the Node3D and its children, starting with this node
+   * itself, and returns the first node with the matching name
+   *
+   * @param name - The name to search with
+   *  @returns The first node found with this name or undefined if none was found
+   */
+  public getObjectByName(name: string): Node3D | undefined {
+    return this.getObjectByProperty('name', name);
+  }
+
+  /**
+   * Search through this node and its children, and returns the first with
+   * the matching property name
+   *
+   * @param name - Name of the property
+   * @param value - Value of the property
+   * @returns The found node or undefined if none found
+   */
+  public getObjectByProperty<K extends keyof Node3D>(
+    name: K,
+    value: Node3D[K]
+  ): Node3D | undefined {
+    if (this[name] === value) return this;
+
+    for (let i = 0, l = this.children.length; i < l; i++) {
+
+      const child = this.children[i];
+      const object = child.getObjectByProperty(name, value);
+
+      if (object !== undefined) {
+
+        return object;
+      }
+    }
+
+    return undefined;
+  }
+
+  /**
+   * Searches through the Node3D object and its children, starting with this Node3D
+   * and returns all Node3D's with a matching property value.
+   *
+   * @param name - The name of the property
+   * @param value - The value
+   * @param result - The method stores the result in this arry
+   * @returns The found Node3Ds
+   */
+  public getObjectsByProperty(
+    name: keyof Node3D,
+    value: any
+    , result: Node3D[] = []
+  ): Node3D[] {
+    if (this[name] == value) result.push(this);
+
+    const children = this.children;
+
+    for (let i = 0, l = children.length; i < l; i++) {
+      children[i].getObjectsByProperty(name, value, result);
+    }
+
+    return result;
+  }
+
+  /**
+   * Executes the callback on this node and all its children
+   *
+   * @remarks
+   * Modifying the scene graph inside the callback can lead to unexpected results
+   * and is discouraged.
+   *
+   * @param callback - The callback to execute
+   */
+  public traverse(callback: (node: Node3D) => void): void {
+    callback(this);
+
+    const children = this.children;
+    for (let i = 0, l = children.length; i < l; i++) {
+      children[i].traverse(callback);
+    }
+  }
+
+  /**
+   * Similar to {@link Node3D.traverse}, but traverses only the visible children,
+   * Descendants of invisible Nodes are not traversed.
+   *
+   * @remarks
+   * Modyfying the scene graph inside the callback can lead to unexpected results
+   * and is discouraged.
+   *
+   * @param callback - The callback to execute
+   */
+  public traverseVisible(callback: (node: Node3D) => void): void {
+    if (!this.visible) return;
+
+    callback(this);
+
+    const children = this.children;
+    for (let i = 0, l = children.length; i < l; i++) {
+      children[i].traverseVisible(callback);
+    }
+  }
+
+  /**
+   * Similar to {@link Node3D.traverse}, but traverses only the ancestors of
+   * this Node.
+   *
+   * @remarks
+   * Modyfying the scene graph inside the callback can lead to unexpected results
+   * and is discouraged.
+   *
+   * @param callback - The callback to execute
+   */
+  public traverseAncestors(callback: (node: Node3D) => void): void {
+    const parent = this.parent;
+    if (parent !== null) {
+      callback(parent);
+      parent.traverseAncestors(callback);
+    }
+  }
+
+
+
+
+
 
   /**
    * A callback that is executed immediately before the Node3D is rendered to a

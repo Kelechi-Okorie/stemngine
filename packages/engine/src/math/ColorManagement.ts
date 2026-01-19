@@ -288,8 +288,13 @@ export class ColorManagement {
    * @param colorSpace
    * @returns
    */
-  private _getDrawingBufferColorSpace(colorSpace: ColorSpace): ColorSpace {
-    return this.spaces[colorSpace]?.outputColorSpaceConfig?.drawingBufferColorSpace ?? SRGBColorSpace;
+  public _getDrawingBufferColorSpace(colorSpace: ColorSpace): /* ColorSpace */ PredefinedColorSpace {
+    // return this.spaces[colorSpace]?.outputColorSpaceConfig?.drawingBufferColorSpace ?? SRGBColorSpace;
+
+    const cs = this.spaces[colorSpace]?.outputColorSpaceConfig?.drawingBufferColorSpace;
+
+    if (cs === "display-p3") return "display-p3";
+    return "srgb"; // default fallback
   }
 
   /**
@@ -303,8 +308,14 @@ export class ColorManagement {
    * @param colorSpace
    * @returns
    */
-  private _getUnpackColorSpace(colorSpace: ColorSpace): ColorSpace {
-    return this.spaces[colorSpace]?.workingColorSpaceConfig?.unpackColorSpace ?? LinearSRGBColorSpace;
+  public _getUnpackColorSpace(colorSpace: ColorSpace): /* ColorSpace */ PredefinedColorSpace {
+    // return this.spaces[colorSpace]?.workingColorSpaceConfig?.unpackColorSpace ?? LinearSRGBColorSpace;
+
+    const cs = this.spaces[colorSpace]?.workingColorSpaceConfig?.unpackColorSpace;
+
+    if (cs === "display-p3") return "display-p3";
+    return "srgb"; // default fallback
+
   }
 
 }
