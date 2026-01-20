@@ -3,6 +3,7 @@ import { Matrix4 } from './Matrix4.js';
 import { Quaternion } from './Quaternion.js';
 import { Vector3 } from './Vector3.js';
 import { BufferAttribute } from '../core/BufferAttribute.js';
+import { InterleavedBufferAttribute } from '../core/InterleavedBufferAttribute.js';
 
 /**
  * Class representing a 4D vector. A 4D vector is an ordered quadruplet of numbers
@@ -1031,7 +1032,7 @@ export class Vector4 {
    * @param {number} index - The index into the attribute.
    * @return {Vector4} A reference to this vector.
    */
-  public fromBufferAttribute(attribute: BufferAttribute, index: number): this {
+  public fromBufferAttribute(attribute: BufferAttribute | InterleavedBufferAttribute, index: number): this {
 
     this.x = attribute.getX(index);
     this.y = attribute.getY(index);

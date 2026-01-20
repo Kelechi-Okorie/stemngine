@@ -225,7 +225,7 @@ export class Triangle {
    * @return {Vector3} The interpolated attribute value.
    */
   public static getInterpolatedAttribute(
-    attr: BufferAttribute,
+    attr: BufferAttribute | InterleavedBufferAttribute,
     i1: number,
     i2: number,
     i3: number,

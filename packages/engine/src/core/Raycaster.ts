@@ -9,6 +9,7 @@ import { isPerspectiveCamera } from '../cameras/PerspectiveCamera.js';
 import { Node3D } from './Node3D.js';
 import { Mesh } from '../objects/Mesh.js';
 import { SpatialNode } from './SpatialNode.js';
+import { BufferAttribute } from './BufferAttribute.js';
 
 const _matrix = /*@__PURE__*/ new Matrix4();
 
@@ -31,8 +32,8 @@ export interface RaycasterIntersection {
     normal: Vector3;
     materialIndex: number
   }
-  uv?: Vector2;
-  uv1?: Vector2;
+  uv?: Vector3;
+  uv1?: Vector3;
   faceIndex?: number;
   normal?: Vector3;
   instanceId?: number;

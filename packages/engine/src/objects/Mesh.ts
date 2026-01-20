@@ -13,6 +13,27 @@ import { Material } from '../materials/Material.js';
 import { BufferAttribute } from '../core/BufferAttribute.js';
 import { InterleavedBufferAttribute } from '../core/InterleavedBufferAttribute.js';
 
+interface BaseIntersection {
+  distance: number;
+  point: Vector3;
+  object: Node3D;
+}
+
+interface GeometryIntersection extends BaseIntersection {
+  uv?: Vector3;
+  uv1?: Vector3;
+  normal?: Vector3;
+  face?: {
+    a: number;
+    b: number;
+    c: number;
+    normal: Vector3;
+    materialIndex: number;
+  };
+  barycoord?: Vector3;
+}
+
+
 const _inverseMatrix = /*@__PURE__*/ new Matrix4();
 const _ray = /*@__PURE__*/ new Ray();
 const _sphere = /*@__PURE__*/ new Sphere();
@@ -491,13 +512,13 @@ function checkGeometryIntersection(
 
   if (uv) {
 
-    intersection.uv = Triangle.getInterpolatedAttribute(uv, a, b, c, barycoord, new Vector2());
+    intersection.uv = Triangle.getInterpolatedAttribute(uv, a, b, c, barycoord, new Vector3());
 
   }
 
   if (uv1) {
 
-    intersection.uv1 = Triangle.getInterpolatedAttribute(uv1, a, b, c, barycoord, new Vector2());
+    intersection.uv1 = Triangle.getInterpolatedAttribute(uv1, a, b, c, barycoord, new Vector3());
 
   }
 
