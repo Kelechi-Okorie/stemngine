@@ -210,19 +210,19 @@ export class CubeCamera extends Node3D {
     renderTarget.texture.generateMipmaps = false;
 
     renderer.setRenderTarget(renderTarget, 0, activeMipmapLevel);
-    renderer.render(scene, cameraPX);
+    renderer.render(scene, cameraPX as PerspectiveCamera);
 
     renderer.setRenderTarget(renderTarget, 1, activeMipmapLevel);
-    renderer.render(scene, cameraNX);
+    renderer.render(scene, cameraNX as PerspectiveCamera);
 
     renderer.setRenderTarget(renderTarget, 2, activeMipmapLevel);
-    renderer.render(scene, cameraPY);
+    renderer.render(scene, cameraPY as PerspectiveCamera);
 
     renderer.setRenderTarget(renderTarget, 3, activeMipmapLevel);
-    renderer.render(scene, cameraNY);
+    renderer.render(scene, cameraNY as PerspectiveCamera);
 
     renderer.setRenderTarget(renderTarget, 4, activeMipmapLevel);
-    renderer.render(scene, cameraPZ);
+    renderer.render(scene, cameraPZ as PerspectiveCamera);
 
     // mipmaps are generated during the last call of render()
     // at this point, all sides of the cube render target are defined
@@ -230,11 +230,11 @@ export class CubeCamera extends Node3D {
     renderTarget.texture.generateMipmaps = generateMipmaps;
 
     renderer.setRenderTarget(renderTarget, 5, activeMipmapLevel);
-    renderer.render(scene, cameraNZ);
+    renderer.render(scene, cameraNZ as PerspectiveCamera);
 
     renderer.setRenderTarget(currentRenderTarget, currentActiveCubeFace, currentActiveMipmapLevel);
 
-    renderer.xr.enabled = currentXrEnabled;
+    // renderer.xr.enabled = currentXrEnabled;
 
     renderTarget.texture.needsPMREMUpdate = true;
 

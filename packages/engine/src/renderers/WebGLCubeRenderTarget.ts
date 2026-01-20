@@ -8,6 +8,7 @@ import { CubeCamera } from '../cameras/CubeCamera';
 import { CubeTexture } from '../textures/CubeTexture';
 import { WebGLRenderer } from './WebGLRenderer.js';
 import { Texture } from '../textures/Texture.js';
+import { Scene } from '../scenes/Scene';
 
 /**
  * A cube render target used in context of {@link WebGLRenderer}.
@@ -143,13 +144,25 @@ export class WebGLCubeRenderTarget extends WebGLRenderTarget {
     // Avoid blurred poles
     if (texture.minFilter === LinearMipmapLinearFilter) texture.minFilter = LinearFilter;
 
+    const tempScene = new Scene();
+    tempScene.add(mesh);
+
     const camera = new CubeCamera(1, 10, this);
-    camera.update(renderer, mesh);
+    camera.update(renderer, tempScene);
 
     texture.minFilter = currentMinFilter;
 
     mesh.geometry.dispose();
-    mesh.material.dispose();
+
+    // mesh.material.dispose();
+
+    if (Array.isArray(mesh.material)) {
+      for (const material of mesh.material) {
+        material.dispose();
+      }
+    } else {
+      mesh.material.dispose();
+    }
 
     return this;
 
