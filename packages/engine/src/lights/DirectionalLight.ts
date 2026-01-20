@@ -42,8 +42,6 @@ export class DirectionalLight extends Light {
 
   public type = 'DirectionalLight';
 
-
-
   /**
    * Constructs a new directional light.
    *
@@ -82,7 +80,9 @@ export class DirectionalLight extends Light {
 
   public dispose() {
 
-    this.shadow.dispose();
+    if (this.shadow) {
+      this.shadow.dispose();
+    }
 
   }
 
@@ -91,7 +91,10 @@ export class DirectionalLight extends Light {
     super.copy(source, true);
 
     this.target = source.target!.clone();
-    this.shadow = source.shadow.clone();
+
+    if (source.shadow) {
+      this.shadow = source.shadow.clone();
+    }
 
     return this;
 
@@ -102,4 +105,3 @@ export class DirectionalLight extends Light {
 export function isDirectionalLight(light: Light): light is DirectionalLight {
   return (light as DirectionalLight).isDirectionalLight === true;
 }
-

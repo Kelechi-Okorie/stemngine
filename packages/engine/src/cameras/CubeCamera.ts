@@ -201,9 +201,9 @@ export class CubeCamera extends Node3D {
     const currentActiveCubeFace = renderer.getActiveCubeFace();
     const currentActiveMipmapLevel = renderer.getActiveMipmapLevel();
 
-    const currentXrEnabled = renderer.xr.enabled;
+    // const currentXrEnabled = renderer.xr.enabled;
 
-    renderer.xr.enabled = false;
+    // renderer.xr.enabled = false;
 
     const generateMipmaps = renderTarget.texture.generateMipmaps;
 

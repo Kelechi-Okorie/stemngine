@@ -2,6 +2,7 @@ import { Vector3 } from "../math/Vector3";
 import { Euler } from "../math/Euler";
 import { Quaternion } from "../math/Quaternion";
 import { Matrix4 } from "../math/Matrix4";
+import { Matrix3 } from "../math/Matrix3";
 import { Layers } from "./Layers";
 import { AnimationClip } from "../animation/AnimationClip";
 import { Material } from "../materials/Material";
@@ -124,6 +125,13 @@ export class Node3D extends EventDispatcher {
  */
   public name: string = '';
 
+    /**
+   * The type property is used for detecting the object type
+   * in context of serialization/deserialization
+   *
+   * @readonly
+   */
+  public readonly type: string = 'Node3D';
 
   /**
    * The UUID of the node
@@ -174,12 +182,6 @@ export class Node3D extends EventDispatcher {
    */
   public scale: Vector3 = new Vector3(1, 1, 1);
 
-  // /**
-  //  * An array holding the child objects of this Node instance
-  //  */
-  // public children: Node3D[] = [];
-
-
   /**
    * Represents the node's transformation matrix in local/model space
    *
@@ -203,7 +205,7 @@ export class Node3D extends EventDispatcher {
    *
    * @name Node3D#normalMatrix
    */
-  public normalMatrix: Matrix4 = new Matrix4();
+  public normalMatrix: Matrix3 = new Matrix3();
 
   /**
    * Represents the node's model-view matrix
@@ -330,21 +332,6 @@ export class Node3D extends EventDispatcher {
    * property depending on the use-case.
    */
   public visible: boolean = true;
-
-  /**
-   * The type property is used for detecting the object type
-   * in context of serialization/deserialization
-   *
-   * @readonly
-   */
-  public readonly type: string = 'Node3D';
-
-
-
-
-
-
-
 
   /**
    * Constructs a Node3D instance

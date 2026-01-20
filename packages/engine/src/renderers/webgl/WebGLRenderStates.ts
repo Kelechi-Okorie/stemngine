@@ -7,7 +7,7 @@ import { Scene } from '../../scenes/Scene';
 
 type WebGLRenderStateType = {
   lightsArray: Light[];
-  shadowsArray: LightShadow[];
+  shadowsArray: Light[];  // Lights that cast shadows
   camera: Camera | null;
   lights: WebGLLights;
   transmissionRenderTarget: Record<string, any>;
@@ -19,7 +19,7 @@ export class WebGLRenderState {
   protected lights: WebGLLights;
 
   protected lightsArray: Light[] = [];
-  protected shadowsArray: LightShadow[] = [];
+  protected shadowsArray: Light[] = [];
 
   public state: WebGLRenderStateType;
 
@@ -40,7 +40,7 @@ export class WebGLRenderState {
   }
 
 
-  public init(camera: Camera) {
+  public init(camera: Camera): void {
 
     this.state.camera = camera;
 
@@ -49,13 +49,13 @@ export class WebGLRenderState {
 
   }
 
-  public pushLight(light: Light) {
+  public pushLight(light: Light): void {
 
     this.lightsArray.push(light);
 
   }
 
-  public pushShadow(shadowLight: LightShadow) {
+  public pushShadow(shadowLight: Light): void {
 
     this.shadowsArray.push(shadowLight);
 
@@ -78,13 +78,13 @@ export class WebGLRenderState {
 export class WebGLRenderStates {
   private readonly extensions: WebGLExtensions;
 
-  protected renderStates = new WeakMap();
+  protected renderStates = new WeakMap<Scene, WebGLRenderState[]>();
 
   constructor(extensions: WebGLExtensions) {
     this.extensions = extensions
   }
 
-  public get(scene: Scene, renderCallDepth = 0) {
+  public get(scene: Scene, renderCallDepth = 0): WebGLRenderState {
 
     const renderStateArray = this.renderStates.get(scene);
     let renderState;
@@ -113,7 +113,7 @@ export class WebGLRenderStates {
 
   }
 
-  public dispose() {
+  public dispose(): void {
 
     this.renderStates = new WeakMap();
 

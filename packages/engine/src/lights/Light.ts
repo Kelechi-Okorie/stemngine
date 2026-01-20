@@ -1,5 +1,6 @@
 import { Node3D } from '../core/Node3D.js';
 import { Color } from '../math/Color.js';
+import { LightShadow } from './LightShadow.js';
 
 /**
  * Abstract base class for lights - all other light types inherit the
@@ -41,7 +42,7 @@ export class Light extends Node3D {
   public angle?: number;
   public decay?: number;
   public penumbra?: number;
-  public shadow?: any; // you can type this more strictly if you have a Shadow class
+  public shadow?: LightShadow;
   public target?: Node3D;
 
 

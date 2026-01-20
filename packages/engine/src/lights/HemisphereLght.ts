@@ -65,3 +65,8 @@ export class HemisphereLight extends Light {
   }
 
 }
+
+export function isHemisphereLight(light: Light): light is HemisphereLight {
+  return (light as HemisphereLight).isHemisphereLight === true;
+}
+

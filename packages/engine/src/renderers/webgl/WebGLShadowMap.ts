@@ -109,6 +109,7 @@ export class WebGLShadowMap {
     const activeCubeFace = this.renderer.getActiveCubeFace();
     const activeMipmapLevel = this.renderer.getActiveMipmapLevel();
 
+    const _state = this.renderer.state;
 
     // Set GL state for depth map.
     _state.setBlending(NoBlending);
@@ -210,7 +211,7 @@ export class WebGLShadowMap {
 
         _state.viewport(this._viewport);
 
-        shadow.updateMatrices(light, vp);
+        shadow.updateMatrices(light/* , vp */);
 
         this._frustum = shadow.getFrustum();
 
@@ -220,7 +221,7 @@ export class WebGLShadowMap {
 
       // do blur pass for VSM
 
-      if (shadow.isPointLightShadow !== true && this.type === VSMShadowMap) {
+      if ('isPointLightShadow' in shadow !== true && this.type === VSMShadowMap) {
 
         this.VSMPass(shadow, camera);
 

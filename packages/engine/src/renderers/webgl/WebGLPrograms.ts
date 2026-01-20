@@ -1,4 +1,4 @@
-import { BackSide, DoubleSide, CubeUVReflectionMapping, ObjectSpaceNormalMap, TangentSpaceNormalMap, NoToneMapping, NormalBlending, LinearSRGBColorSpace, SRGBTransfer, Precision } from '../../constants';
+import { BackSide, DoubleSide, CubeUVReflectionMapping, ObjectSpaceNormalMap, TangentSpaceNormalMap, NoToneMapping, NormalBlending, LinearSRGBColorSpace, SRGBTransfer, Precision, ColorSpace } from '../../constants';
 import { Layers } from '../../core/Layers';
 import { WebGLProgram } from './WebGLProgram';
 import { WebGLShaderCache } from './WebGLShaderCache';
@@ -18,6 +18,187 @@ import { LightShadow } from '../../lights/LightShadow';
 import { Scene } from '../../scenes/Scene';
 import { Node3D } from '../../core/Node3D';
 import { Mesh } from '../../objects/Mesh';
+import { Light } from '../../lights/Light';
+
+// TODO: check and possibly merge with the one in WebGLProgram
+export interface WebGLProgramParameters {
+  shaderID: string | null;
+  shaderType: string;
+  shaderName: string;
+
+  vertexShader: string;
+  fragmentShader: string;
+  defines: Record<string, any> | undefined;
+
+  customVertexShaderID?: string;
+  customFragmentShaderID?: string;
+
+  isRawShaderMaterial: boolean;
+  glslVersion?: string;
+
+  precision: string;
+
+  batching: boolean;
+  batchingColor: boolean;
+  instancing: boolean;
+  instancingColor: boolean;
+  instancingMorph: boolean;
+
+  supportsVertexTextures: boolean;
+  outputColorSpace: ColorSpace;
+  alphaToCoverage: boolean;
+
+  map: boolean;
+  matcap: boolean;
+  envMap: boolean;
+  envMapMode?: number;
+  envMapCubeUVHeight?: number | null;
+  aoMap: boolean;
+  lightMap: boolean;
+  bumpMap: boolean;
+  normalMap: boolean;
+  displacementMap: boolean;
+  emissiveMap: boolean;
+
+  normalMapObjectSpace: boolean;
+  normalMapTangentSpace: boolean;
+
+  metalnessMap: boolean;
+  roughnessMap: boolean;
+
+  anisotropy: boolean;
+  anisotropyMap: boolean;
+
+  clearcoat: boolean;
+  clearcoatMap: boolean;
+  clearcoatNormalMap: boolean;
+  clearcoatRoughnessMap: boolean;
+
+  dispersion: boolean;
+
+  iridescence: boolean;
+  iridescenceMap: boolean;
+  iridescenceThicknessMap: boolean;
+
+  sheen: boolean;
+  sheenColorMap: boolean;
+  sheenRoughnessMap: boolean;
+
+  specularMap: boolean;
+  specularColorMap: boolean;
+  specularIntensityMap: boolean;
+
+  transmission: boolean;
+  transmissionMap: boolean;
+  thicknessMap: boolean;
+
+  gradientMap: boolean;
+
+  opaque: boolean;
+  alphaMap: boolean;
+  alphaTest: boolean;
+  alphaHash: boolean;
+
+  combine: number;
+
+  mapUv?: string | false;
+  aoMapUv?: string | false;
+  lightMapUv?: string | false;
+  bumpMapUv?: string | false;
+  normalMapUv?: string | false;
+  displacementMapUv?: string | false;
+  emissiveMapUv?: string | false;
+
+  metalnessMapUv?: string | false;
+  roughnessMapUv?: string | false;
+  anisotropyMapUv?: string | false;
+  clearcoatMapUv?: string | false;
+  clearcoatNormalMapUv?: string | false;
+  clearcoatRoughnessMapUv?: string | false;
+  iridescenceMapUv?: string | false;
+  iridescenceThicknessMapUv?: string | false;
+  sheenColorMapUv?: string | false;
+  sheenRoughnessMapUv?: string | false;
+  specularMapUv?: string | false;
+  specularColorMapUv?: string | false;
+  specularIntensityMapUv?: string | false;
+  transmissionMapUv?: string | false;
+  thicknessMapUv?: string | false;
+  alphaMapUv?: string | false;
+
+  vertexTangents: boolean;
+  vertexColors: boolean;
+  vertexAlphas: boolean;
+  pointsUvs: boolean;
+
+  fog: boolean;
+  useFog: boolean;
+  fogExp2: boolean;
+
+  flatShading: boolean;
+
+  sizeAttenuation: boolean;
+  logarithmicDepthBuffer: boolean;
+  reversedDepthBuffer: boolean;
+
+  skinning: boolean;
+
+  morphTargets: boolean;
+  morphNormals: boolean;
+  morphColors: boolean;
+  morphTargetsCount: number;
+  morphTextureStride: number;
+
+  numDirLights: number;
+  numPointLights: number;
+  numSpotLights: number;
+  numSpotLightMaps: number;
+  numRectAreaLights: number;
+  numHemiLights: number;
+
+  numDirLightShadows: number;
+  numPointLightShadows: number;
+  numSpotLightShadows: number;
+  numSpotLightShadowsWithMaps: number;
+
+  numLightProbes: number;
+
+  numClippingPlanes: number;
+  numClipIntersection: number;
+
+  dithering: boolean;
+
+  shadowMapEnabled: boolean;
+  shadowMapType: number;
+
+  toneMapping: number;
+
+  decodeVideoTexture: boolean;
+  decodeVideoTextureEmissive: boolean;
+
+  premultipliedAlpha: boolean;
+
+  doubleSided: boolean;
+  flipSided: boolean;
+
+  useDepthPacking: boolean;
+  depthPacking: number;
+
+  index0AttributeName?: string;
+
+  extensionClipCullDistance: boolean;
+  extensionMultiDraw: boolean;
+
+  rendererExtensionParallelShaderCompile: boolean;
+
+  customProgramCacheKey: any;
+
+  // additional fields added later
+  uniforms?: Record<string, any>;
+  vertexUv1s?: boolean;
+  vertexUv2s?: boolean;
+  vertexUv3s?: boolean;
+}
 
 export class WebGLPrograms {
   private readonly renderer: WebGLRenderer;
@@ -96,10 +277,10 @@ export class WebGLPrograms {
   public getParameters(
     material: any,
     lights: any,
-    shadows: LightShadow,
+    shadows: Light[],
     scene: Scene,
     object: any
-  ) {
+  ): WebGLProgramParameters {
 
     const fog = scene.fog;
     const geometry = object.geometry;
@@ -119,7 +300,7 @@ export class WebGLPrograms {
 
       if (this.precision !== material.precision) {
 
-        console.warn('THREE.WebGLProgram.getParameters:', material.precision, 'not supported, using', this.precision, 'instead.');
+        console.warn('WebGLProgram.getParameters:', material.precision, 'not supported, using', this.precision, 'instead.');
 
       }
 
@@ -223,15 +404,17 @@ export class WebGLPrograms {
 
     if (material.toneMapped) {
 
-      if (currentRenderTarget === null || currentRenderTarget.isXRRenderTarget === true) {
+      // if (currentRenderTarget === null || currentRenderTarget.isXRRenderTarget === true) {
 
-        toneMapping = this.renderer.toneMapping;
+      //   toneMapping = this.renderer.toneMapping;
 
-      }
+      // }
+
+      toneMapping = this.renderer.toneMapping;
 
     }
 
-    const parameters = {
+    const parameters: WebGLProgramParameters = {
 
       shaderID: shaderID,
       shaderType: material.type,
@@ -256,7 +439,10 @@ export class WebGLPrograms {
       instancingMorph: IS_INSTANCEDMESH && object.morphTexture !== null,
 
       supportsVertexTextures: this.SUPPORTS_VERTEX_TEXTURES,
-      outputColorSpace: (currentRenderTarget === null) ? this.renderer.outputColorSpace : (currentRenderTarget.isXRRenderTarget === true ? currentRenderTarget.texture.colorSpace : LinearSRGBColorSpace),
+      // outputColorSpace: (currentRenderTarget === null) ? this.renderer.outputColorSpace : (currentRenderTarget.isXRRenderTarget === true ? currentRenderTarget.texture.colorSpace : LinearSRGBColorSpace),
+      outputColorSpace: (currentRenderTarget === null)
+        ? this.renderer.outputColorSpace
+        : LinearSRGBColorSpace,
       alphaToCoverage: !!material.alphaToCoverage,
 
       map: HAS_MAP,
@@ -421,11 +607,11 @@ export class WebGLPrograms {
 
     // the usage of getChannel() determines the active texture channels for this shader
 
-    parameters.vertexUv1s = _activeChannels.has(1);
-    parameters.vertexUv2s = _activeChannels.has(2);
-    parameters.vertexUv3s = _activeChannels.has(3);
+    parameters.vertexUv1s = this._activeChannels.has(1);
+    parameters.vertexUv2s = this._activeChannels.has(2);
+    parameters.vertexUv3s = this._activeChannels.has(3);
 
-    _activeChannels.clear();
+    this._activeChannels.clear();
 
     return parameters;
 

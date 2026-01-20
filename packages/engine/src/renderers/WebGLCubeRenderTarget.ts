@@ -163,7 +163,7 @@ export class WebGLCubeRenderTarget extends WebGLRenderTarget {
    * @param {boolean} [depth=true] - Whether the depth buffer should be cleared or not.
    * @param {boolean} [stencil=true] - Whether the stencil buffer should be cleared or not.
    */
-  public clear(renderer: WebGLRenderer, color = true, depth = true, stencil = true) {
+  public clear(renderer: WebGLRenderer, color = true, depth = true, stencil = true): void {
 
     const currentRenderTarget = renderer.getRenderTarget();
 

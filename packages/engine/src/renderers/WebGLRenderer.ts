@@ -68,6 +68,7 @@ import { isLight } from '../lights/Light';
 import { isLightShadow } from '../lights/LightShadow';
 import { isArrayCamera } from '../cameras/ArrayCamera';
 import { Plane } from '../math/Plane';
+import { Node3D } from '../core/Node3D';
 
 export interface WebGLRendererOptions {
   canvas?: HTMLCanvasElement;
@@ -239,7 +240,7 @@ export class WebGLRenderer {
   private _currentActiveCubeFace = 0;
   private _currentActiveMipmapLevel = 0;
 
-  protected _currentRenderTarget!: WebGLRenderTarget;
+  protected _currentRenderTarget: WebGLRenderTarget | null = null;
 
   private _currentMaterialId = -1;
 
@@ -299,10 +300,10 @@ export class WebGLRenderer {
 
   private extensions!: WebGLExtensions;
   private capabilities!: WebGLCapabilities;
-  private state!: WebGLState;
+  public state!: WebGLState;
   private info!: WebGLInfo;
 
-  private properties!: WebGLProperties;
+  public properties!: WebGLProperties;
   private textures!: WebGLTextures;
   private cubemaps!: WebGLCubeMaps;
   private cubeuvmaps!: WebGLCubeUVMaps;
@@ -315,7 +316,7 @@ export class WebGLRenderer {
   private renderLists!: WebGLRenderLists;
   private renderStates!: WebGLRenderStates;
   private clipping!: WebGLClipping;
-  private shadowMap!: WebGLShadowMap;
+  public shadowMap!: WebGLShadowMap;
 
   private background!: WebGLBackground;
   private morphtargets!: WebGLMorphtargets;
@@ -606,8 +607,8 @@ export class WebGLRenderer {
   *
   * @return {WebGL2RenderingContext} The rendering context.
   */
-  protected getContext(
-    contextName: string,
+  public getContext(
+    contextName: string = 'webgl2',
     contextAttributes?: WebGLContextAttributes
   ): WebGL2RenderingContext {
 
@@ -707,9 +708,9 @@ export class WebGLRenderer {
    * into account, and also sets the viewport to fit that size, starting in (0,
    * 0). Setting `updateStyle` to false prevents any style changes to the output canvas.
    *
-   * @param {number} width - The width in logical pixels.
-   * @param {number} height - The height in logical pixels.
-   * @param {boolean} [updateStyle=true] - Whether to update the `style` attribute of the canvas or not.
+   * @param width - The width in logical pixels.
+   * @param height - The height in logical pixels.
+   * @param updateStyle - Whether to update the `style` attribute of the canvas or not.
    */
   public setSize(width: number, height: number, updateStyle = true): void {
 
@@ -997,7 +998,7 @@ export class WebGLRenderer {
       // or unsigned integer target
       if (isIntegerFormat) {
 
-        const targetType = this._currentRenderTarget.texture.type;
+        const targetType = this._currentRenderTarget!.texture.type;
         const isUnsignedType = targetType === UnsignedByteType ||
           targetType === UnsignedIntType ||
           targetType === UnsignedShortType ||
@@ -1437,23 +1438,19 @@ export class WebGLRenderer {
     this.currentRenderState = this.renderStates.get(targetScene!);
     this.currentRenderState.init(camera);
 
-    this.renderStateStack.push(this.currentRenderState!);
+    this.renderStateStack.push(this.currentRenderState);
 
     // gather lights from both the target scene and the new object that will be added to the scene.
 
     targetScene?.traverseVisible((object) => {
 
-      if ('isLight' in object && object.layers.test(camera.layers)) {
+      if (isLight(object) && object.layers.test(camera.layers)) {
 
-        if (isLight(object)) {
+        this.currentRenderState!.pushLight(object);
 
-          this.currentRenderState?.pushLight(object);
+        if (object.castShadow) {
 
-        }
-
-        if (isLightShadow(object)) {
-
-          this.currentRenderState?.pushShadow(object);
+          this.currentRenderState!.pushShadow(object);
 
         }
 
@@ -1689,7 +1686,7 @@ export class WebGLRenderer {
     // if (scene.isScene === true) scene.onBeforeRender(this, scene, camera, this._currentRenderTarget);
 
     this.currentRenderState = this.renderStates.get(scene, this.renderStateStack.length);
-    this.currentRenderState!.init(camera);
+    this.currentRenderState.init(camera);
 
     this.renderStateStack.push(this.currentRenderState!);
 
@@ -1700,7 +1697,7 @@ export class WebGLRenderer {
     this._clippingEnabled = this.clipping.init(this.clippingPlanes, this._localClippingEnabled);
 
     this.currentRenderList = this.renderLists.get(scene, this.renderListStack.length);
-    this.currentRenderList!.init();
+    this.currentRenderList.init();
 
     this.renderListStack.push(this.currentRenderList!);
 
@@ -1718,11 +1715,11 @@ export class WebGLRenderer {
 
     this.projectObject(scene, camera, 0, this.sortObjects);
 
-    this.currentRenderList?.finish();
+    this.currentRenderList.finish();
 
     if (this.sortObjects === true) {
 
-      this.currentRenderList?.sort(this._opaqueSort, this._transparentSort);
+      this.currentRenderList.sort(this._opaqueSort, this._transparentSort);
 
     }
 
@@ -1739,8 +1736,7 @@ export class WebGLRenderer {
 
     if (this._clippingEnabled === true) this.clipping.beginShadows();
 
-    const shadowsArray = this.currentRenderState?.state.shadowsArray;
-
+    const shadowsArray = this.currentRenderState.state.shadowsArray;
     this.shadowMap.render(shadowsArray, scene, camera);
 
     if (this._clippingEnabled === true) this.clipping.endShadows();
@@ -1778,7 +1774,8 @@ export class WebGLRenderer {
 
         const camera2 = cameras[i];
 
-        this.renderScene(this.currentRenderList, scene, camera2, camera2.viewport);
+        // Cameras don't have a viewport property
+        this.renderScene(this.currentRenderList, scene, camera2, /* camera2.viewport */);
 
       }
 
@@ -2165,9 +2162,9 @@ export class WebGLRenderer {
 
   // TODO: type well
   public renderObject(
-    object: any,
-    scene: any,
-    camera: any,
+    object: Node3D,
+    scene: Scene,
+    camera: Camera,
     geometry: any,
     material: any,
     group: any
@@ -2818,7 +2815,7 @@ export class WebGLRenderer {
    * @return {?WebGLRenderTarget} The active render target. Returns `null` if no render target
    * is currently set.
    */
-  public getRenderTarget(): WebGLRenderTarget {
+  public getRenderTarget(): WebGLRenderTarget | null {
 
     return this._currentRenderTarget;
 
@@ -3472,7 +3469,7 @@ export class WebGLRenderer {
         // copy the data using the fastest function that can achieve the copy
         if (srcLevel !== 0) {
 
-          this._gl.blitFramebuffer(minX, minY, width, height, dstX, dstY, width, height, this._gl.COLOR_BUFFER_BIT, this._gl.NEAREST); this.
+          this._gl.blitFramebuffer(minX, minY, width, height, dstX, dstY, width, height, this._gl.COLOR_BUFFER_BIT, this._gl.NEAREST);
 
         } else if (isDst3D) {
 

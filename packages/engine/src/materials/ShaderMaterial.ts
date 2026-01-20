@@ -412,4 +412,18 @@ export class ShaderMaterial extends Material {
 
   }
 
+    /**
+   * Returns a new material with copied values from this instance.
+   *
+   * @return {ShaderMaterial} A clone of this instance.
+   */
+  public clone(): ShaderMaterial {
+    const Ctor = this.constructor as new () => ShaderMaterial;
+    const instance = new Ctor();
+
+    return instance.copy(this);
+
+  }
+
+
 }

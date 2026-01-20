@@ -8,6 +8,7 @@ import { Matrix3 } from '../../math/Matrix3.js';
 import { WebGLRenderer } from '../WebGLRenderer';
 import { WebGLBindingStates } from './WebGLBindingStates';
 
+// TODO: check and possibly merge with the one in WebGLPrograms
 interface WebGLProgramParameters {
   // === identity ===
   shaderType: string;
@@ -438,9 +439,10 @@ function resolveIncludes(string: string) {
 
 }
 
-const shaderChunkMap = new Map();
+type ShaderChunkKey = keyof typeof ShaderChunk;
+const shaderChunkMap = new Map<string, ShaderChunkKey>();
 
-function includeReplacer(match: string, include: string): string {
+function includeReplacer(match: string, include: ShaderChunkKey): string {
 
   let string = ShaderChunk[include];
 
@@ -451,7 +453,7 @@ function includeReplacer(match: string, include: string): string {
     if (newInclude !== undefined) {
 
       string = ShaderChunk[newInclude];
-      console.warn('THREE.WebGLRenderer: Shader chunk "%s" has been deprecated. Use "%s" instead.', include, newInclude);
+      console.warn('WebGLRenderer: Shader chunk "%s" has been deprecated. Use "%s" instead.', include, newInclude);
 
     } else {
 
@@ -488,7 +490,7 @@ function loopReplacer(
 
     string += snippet
       .replace(/\[\s*i\s*\]/g, '[ ' + i + ' ]')
-      .replace(/UNROLLED_LOOP_INDEX/g, i);
+      .replace(/UNROLLED_LOOP_INDEX/g, i.toString());
 
   }
 

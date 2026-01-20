@@ -197,13 +197,4 @@ export class WebGLGeometries {
 
   }
 
-  // return {
-
-  //   get,
-  //   update,
-
-  //   getWireframeAttribute
-
-  // };
-
 }

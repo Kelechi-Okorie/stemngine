@@ -5,11 +5,13 @@ import { Vector2 } from '../../math/Vector2.js';
 import { WebGLCapabilities } from './WebGLCapabilities.js';
 import { BufferGeometry } from '../../core/BufferGeometry.js';
 import { Node3D } from '../../core/Node3D.js';
+import { WebGLTextures } from './WebGLTextures.js';
 
 export class WebGLMorphtargets {
   private readonly gl: WebGL2RenderingContext;
   private readonly capabilities: WebGLCapabilities;
-  private readonly textures: Record<string, WebGLTexture>;
+  // private readonly textures: Record<string, WebGLTexture>;
+  private readonly textures: WebGLTextures;
 
 
   protected morphTextures = new WeakMap();
@@ -18,7 +20,8 @@ export class WebGLMorphtargets {
   constructor(
     gl: WebGL2RenderingContext,
     capabilities: WebGLCapabilities,
-    textures: Record<string, WebGLTexture>
+    // textures: Record<string, WebGLTexture>
+    textures: WebGLTextures
   ) {
     this.gl = gl;
     this.capabilities = capabilities;
@@ -37,7 +40,7 @@ export class WebGLMorphtargets {
     },
     program: {
       getUniforms(): {
-        setValue(gl: WebGL2RenderingContext, name: string, value: any, textures?: Record<string, WebGLTexture>): void;
+        setValue(gl: WebGL2RenderingContext, name: string, value: any, textures?: /* Record<string, WebGLTexture> */ WebGLTextures): void;
       };
     }
   ) {

@@ -155,7 +155,9 @@ export class SpotLight extends Light {
 
   public dispose(): void {
 
-    this.shadow.dispose();
+    if (this.shadow) {
+      this.shadow.dispose();
+    }
 
   }
 
@@ -170,10 +172,17 @@ export class SpotLight extends Light {
 
     this.target = source.target!.clone();
 
-    this.shadow = source.shadow.clone();
+    if (source.shadow) {
+      this.shadow = source.shadow.clone();
+    }
 
     return this;
 
   }
 
 }
+
+export function isSpotLight(light: Light): light is SpotLight {
+  return (light as SpotLight).isSpotLight === true;
+}
+

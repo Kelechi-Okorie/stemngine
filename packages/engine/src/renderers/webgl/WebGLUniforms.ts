@@ -197,7 +197,7 @@ function copyArray(a: number[], b: number[]) {
 
 // Texture unit allocation
 
-function allocTexUnits(textures: any, n: number) {
+function allocTexUnits(textures: WebGLTextures, n: number) {
 
   let r = arrayCacheI32[n];
 
@@ -730,8 +730,8 @@ function setValueT1(
 function setValueT3D1(
   this: UniformSetterContext,
   gl: WebGL2RenderingContext,
-  v: WebGLTexture | null,
-  textures: any
+  v: Texture | null,
+  textures: WebGLTextures
 ) {
 
   const cache = this.cache;
@@ -776,8 +776,8 @@ function setValueT6(
 function setValueT2DArray1(
   this: UniformSetterContext,
   gl: WebGL2RenderingContext,
-  v: WebGLTexture | null,
-  textures: any
+  v: Texture | null,
+  textures: WebGLTextures
 
 ) {
 

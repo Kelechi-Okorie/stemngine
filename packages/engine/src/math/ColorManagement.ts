@@ -10,6 +10,7 @@ import {
 import { Matrix3 } from './Matrix3.js';
 import { warnOnce } from '../utils.js';
 import { Color } from './Color.js';
+import { Vector3 } from './Vector3.js';
 
 /* ------------------------------------------------------------------------- */
 /* XYZ Conversion Matrices */
@@ -253,7 +254,7 @@ export class ColorManagement {
    * @param colorSpace
    * @returns The target Color populated with luminance coefficients
    */
-  public getLuminanceCoefficients(target: Color, colorSpace: ColorSpace = this.workingColorSpace): Color {
+  public getLuminanceCoefficients(target: Vector3, colorSpace: ColorSpace = this.workingColorSpace): Vector3 {
     return target.fromArray(this.spaces[colorSpace]!.luminanceCoefficients);
   }
 

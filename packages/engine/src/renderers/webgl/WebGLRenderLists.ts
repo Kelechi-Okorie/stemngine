@@ -71,7 +71,7 @@ export class WebGLRenderList {
 
   constructor() {}
 
-  public init() {
+  public init(): void {
 
     this.renderItemsIndex = 0;
 
@@ -134,7 +134,7 @@ export class WebGLRenderList {
     z: number,
     group: any  // TODO: type very well
 
-  ) {
+  ): void {
 
     const renderItem = this.getNextRenderItem(object, geometry, material, groupOrder, z, group);
 
@@ -162,7 +162,7 @@ export class WebGLRenderList {
     z: number,
     group: any  // TODO: type very well
 
-  ) {
+  ): void {
 
     const renderItem = this.getNextRenderItem(object, geometry, material, groupOrder, z, group);
 
@@ -185,7 +185,7 @@ export class WebGLRenderList {
   public sort(
     customOpaqueSort?: (a: RenderItem, b: RenderItem) => number,
     customTransparentSort?: (a: RenderItem, b: RenderItem) => number
-  ) {
+  ): void {
 
     if (this.opaque.length > 1) this.opaque.sort(customOpaqueSort || painterSortStable);
     if (this.transmissive.length > 1) this.transmissive.sort(customTransparentSort || reversePainterSortStable);
@@ -193,7 +193,7 @@ export class WebGLRenderList {
 
   }
 
-  public finish() {
+  public finish(): void {
 
     // Clear references from inactive renderItems in the list
 
@@ -217,11 +217,11 @@ export class WebGLRenderList {
 
 export class WebGLRenderLists {
 
-  protected lists = new WeakMap();
+  protected lists = new WeakMap<Scene, WebGLRenderList[]>();
 
   constructor() {}
 
-  public get(scene: Scene, renderCallDepth: number) {
+  public get(scene: Scene, renderCallDepth: number): WebGLRenderList {
 
     const listArray = this.lists.get(scene);
     let list;
@@ -250,7 +250,7 @@ export class WebGLRenderLists {
 
   }
 
-  public dispose() {
+  public dispose(): void {
 
     this.lists = new WeakMap();
 

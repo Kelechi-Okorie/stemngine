@@ -7,6 +7,7 @@ import { UnsignedByteType } from '../constants';
 import { Camera } from '../cameras/Camera.js';
 import { Light } from './Light';
 import { RenderTarget } from '../core/RenderTarget';
+import { OrthographicCamera, PerspectiveCamera } from '../engine';
 
 interface LightShadowJSON {
   intensity?: number;
@@ -33,7 +34,7 @@ export class LightShadow {
    *
    * @type {Camera}
    */
-  public camera: Camera;
+  public camera: OrthographicCamera | PerspectiveCamera;
 
   /**
    * The intensity of the shadow. The default is `1`.
@@ -170,7 +171,7 @@ export class LightShadow {
    *
    * @param {Camera} camera - The light's view of the world.
    */
-  constructor(camera: Camera) {
+  constructor(camera: OrthographicCamera | PerspectiveCamera) {
 
     this.camera = camera;
   }

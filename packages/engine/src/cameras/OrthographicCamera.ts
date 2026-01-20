@@ -267,7 +267,7 @@ export class OrthographicCamera extends Camera {
   }
 
 
-  public copy(source: OrthographicCamera, recursive: boolean): this {
+  public copy(source: OrthographicCamera, recursive?: boolean): this {
     super.copy(source, recursive);
 
     this.left = source.left;
@@ -286,6 +286,16 @@ export class OrthographicCamera extends Camera {
 
     return this;
   }
+
+    /**
+   * Returns a new vector with copied values from this instance.
+   *
+   * @returns A clone of this instance
+   */
+  public clone(): this {
+    return new OrthographicCamera().copy(this) as this;
+  }
+
 }
 
 export function isOrthographicCamera(
