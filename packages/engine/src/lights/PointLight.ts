@@ -99,7 +99,7 @@ export class PointLight extends Light {
 
   public dispose() {
 
-    this.shadow.dispose();
+    this.shadow!.dispose();
 
   }
 
@@ -110,7 +110,7 @@ export class PointLight extends Light {
     this.distance = source.distance;
     this.decay = source.decay;
 
-    this.shadow = source.shadow.clone();
+    this.shadow = source.shadow!.clone();
 
     return this;
 

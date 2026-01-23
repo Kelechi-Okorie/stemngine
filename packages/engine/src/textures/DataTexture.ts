@@ -49,7 +49,7 @@ export class DataTexture extends Texture {
     wrapT: TextureWrapping = ClampToEdgeWrapping,
     magFilter: TextureMagFilter = NearestFilter,
     minFilter: TextureMinFilter = NearestFilter,
-    anisotropy: number,
+    anisotropy: number = Texture.DEFAULT_ANISOTROPY,
     colorSpace: ColorSpace = 'NoColorSpace'
   ) {
 

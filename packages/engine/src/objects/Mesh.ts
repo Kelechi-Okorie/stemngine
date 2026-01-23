@@ -126,7 +126,6 @@ export class Mesh extends Node3D {
    */
   constructor(
     geometry: BufferGeometry = new BufferGeometry(),
-    // material: MeshBasicMaterial | MeshBasicMaterial[] = new MeshBasicMaterial()
     material: Material | Material[] = new MeshBasicMaterial()
   ) {
 
@@ -139,7 +138,7 @@ export class Mesh extends Node3D {
 
   }
 
-  public copy(source: Node3D, recursive: boolean): this {
+  public copy(source: Node3D, recursive: boolean = true): this {
 
     super.copy(source, recursive);
 
@@ -550,3 +549,8 @@ function checkGeometryIntersection(
   return intersection;
 
 }
+
+export function isMesh(mesh: Mesh): mesh is Mesh {
+  return (mesh as Mesh).isMesh === true;
+}
+

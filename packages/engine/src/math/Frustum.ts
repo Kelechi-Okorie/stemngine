@@ -167,7 +167,7 @@ export class Frustum {
    * @param {Object3D} object - The 3D object to test.
    * @return {boolean} Whether the 3D object's bounding sphere is intersecting this frustum or not.
    */
-  public intersectsObject(object: Node3D | Mesh): boolean {
+  public intersectsObject(object: any): boolean {
 
     // Check if the object has its own boundingSphere
     if ('boundingSphere' in object && object.boundingSphere !== undefined) {

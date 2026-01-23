@@ -52,6 +52,11 @@ interface ConstantsInterpolationSamplingMode {
   EITHER: string;
 }
 
+export interface WritableArrayLike<T> {
+  readonly length: number;
+  [index: number]: T;
+}
+
 export type CoordinateSystem = typeof WebGLCoordinateSystem | typeof WebGPUCoordinateSystem;
 
 export type BufferUsage = typeof StaticDrawUsage | typeof DynamicDrawUsage | typeof StreamDrawUsage | typeof StaticReadUsage | typeof DynamicReadUsage | typeof StreamReadUsage | typeof StaticCopyUsage | typeof DynamicCopyUsage | typeof StreamCopyUsage;

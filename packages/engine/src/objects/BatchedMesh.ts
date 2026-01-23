@@ -1,44 +1,85 @@
-import { BufferAttribute } from '../core/BufferAttribute.js';
-import { BufferGeometry } from '../core/BufferGeometry.js';
-import { DataTexture } from '../textures/DataTexture.js';
-import { FloatType, RedIntegerFormat, UnsignedIntType, RGBAFormat, AnyTypedArray } from '../constants.js';
-import { Matrix4 } from '../math/Matrix4.js';
-import { Mesh } from './Mesh.js';
-import { ColorManagement } from '../math/ColorManagement.js';
-import { Box3 } from '../math/Box3.js';
-import { Sphere } from '../math/Sphere.js';
-import { Frustum } from '../math/Frustum.js';
-import { Vector3 } from '../math/Vector3.js';
-import { Color } from '../math/Color.js';
-import { FrustumArray } from '../math/FrustumArray.js';
-import { InterleavedBufferAttribute, isInterleavedBufferAttribute } from '../core/InterleavedBufferAttribute.js';
-import { Material } from '../materials/Material.js';
+import { BufferAttribute } from '../core/BufferAttribute';
+import { BufferGeometry } from '../core/BufferGeometry';
+import { DataTexture } from '../textures/DataTexture';
+import { FloatType, RedIntegerFormat, UnsignedIntType, RGBAFormat, AnyTypedArray } from '../constants';
+import { Matrix4 } from '../math/Matrix4';
+import { Mesh } from './Mesh';
+import { ColorManagement } from '../math/ColorManagement';
+import { Box3 } from '../math/Box3';
+import { Sphere } from '../math/Sphere';
+import { Frustum } from '../math/Frustum';
+import { Vector3 } from '../math/Vector3';
+import { Color } from '../math/Color';
+import { FrustumArray } from '../math/FrustumArray';
+import { InterleavedBufferAttribute, isInterleavedBufferAttribute } from '../core/InterleavedBufferAttribute';
+import { Material } from '../materials/Material';
+import { RenderItem } from '../renderers/webgl/WebGLRenderLists';
+import { Raycaster, RaycasterIntersection } from '../core/Raycaster';
+import { Camera } from '../cameras/Camera';
+import { WebGLRenderer } from '../renderers/WebGLRenderer';
+import { Scene } from '../scenes/Scene';
+import { ArrayCamera } from '../cameras/ArrayCamera';
 
-function ascIdSort(a, b) {
-
-  return a - b;
-
-}
-
-function sortOpaque(a, b) {
-
-  return a.z - b.z;
-
-}
-
-function sortTransparent(a, b) {
-
-  return b.z - a.z;
-
-}
-
-interface DrawItem {
+export interface DrawItem {
   start: number;
   count: number;
   z: number;
   index: number;
 }
 
+interface InstanceInfo {
+  visible: boolean;
+  active: boolean;
+  geometryIndex: number;
+}
+
+interface GeometryInfo {
+  // geometry information
+  vertexStart: number;
+  vertexCount: number;
+  reservedVertexCount: number;
+
+  indexStart: number;
+  indexCount: number;
+  reservedIndexCount: number;
+
+  // draw range information
+  start: number;
+  count: number;
+
+  // state
+  boundingBox: Box3 | null;
+  boundingSphere: Sphere | null;
+  active: boolean;
+};
+
+interface BatchedIntersection extends RaycasterIntersection {
+  batchId: number;
+  instanceId: number;
+  drawId: number;
+}
+
+export interface BatchedRaycasterIntersection extends RaycasterIntersection {
+  batchId: number;
+}
+
+function ascIdSort(a: number, b: number) {
+
+  return a - b;
+
+}
+
+function sortOpaque(a: DrawItem, b: DrawItem) {
+
+  return a.z - b.z;
+
+}
+
+function sortTransparent(a: DrawItem, b: DrawItem) {
+
+  return b.z - a.z;
+
+}
 
 class MultiDrawRenderList {
 
@@ -98,12 +139,12 @@ const _forward = /*@__PURE__*/ new Vector3();
 const _temp = /*@__PURE__*/ new Vector3();
 const _renderList = /*@__PURE__*/ new MultiDrawRenderList();
 const _mesh = /*@__PURE__*/ new Mesh();
-const _batchIntersects = [];
+const _batchIntersects: BatchedRaycasterIntersection[] = [];
 
 // copies data from attribute "src" into "target" starting at "targetOffset"
 function copyAttributeData(
   src: BufferAttribute | InterleavedBufferAttribute,
-  target: BufferAttribute,
+  target: BufferAttribute | InterleavedBufferAttribute,
   targetOffset = 0
 ) {
 
@@ -199,88 +240,88 @@ function copyArrayContents<T extends AnyTypedArray>(
  */
 export class BatchedMesh extends Mesh {
 
-      /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    public readonly isBatchedMesh = true;
+  /**
+ * This flag can be used for type testing.
+ *
+ * @readonly
+ * @default true
+ */
+  public readonly isBatchedMesh = true;
 
-    /**
-     * When set ot `true`, the individual objects of a batch are frustum culled.
-     *
-     * @default true
-     */
-    public perObjectFrustumCulled = true;
+  /**
+   * When set ot `true`, the individual objects of a batch are frustum culled.
+   *
+   * @default true
+   */
+  public perObjectFrustumCulled = true;
 
-    /**
-     * When set to `true`, the individual objects of a batch are sorted to improve overdraw-related artifacts.
-     * If the material is marked as "transparent" objects are rendered back to front and if not then they are
-     * rendered front to back.
-     *
-     * @default true
-     */
-    public sortObjects = true;
+  /**
+   * When set to `true`, the individual objects of a batch are sorted to improve overdraw-related artifacts.
+   * If the material is marked as "transparent" objects are rendered back to front and if not then they are
+   * rendered front to back.
+   *
+   * @default true
+   */
+  public sortObjects = true;
 
-    /**
-     * The bounding box of the batched mesh. Can be computed via {@link BatchedMesh#computeBoundingBox}.
-     *
-     * @default null
-     */
-    public boundingBox: Box3 | null = null;
+  /**
+   * The bounding box of the batched mesh. Can be computed via {@link BatchedMesh#computeBoundingBox}.
+   *
+   * @default null
+   */
+  public boundingBox: Box3 | null = null;
 
-    /**
-     * The bounding sphere of the batched mesh. Can be computed via {@link BatchedMesh#computeBoundingSphere}.
-     *
-     * @default null
-     */
-    public boundingSphere: Sphere | null = null;
+  /**
+   * The bounding sphere of the batched mesh. Can be computed via {@link BatchedMesh#computeBoundingSphere}.
+   *
+   * @default null
+   */
+  public boundingSphere: Sphere | null = null;
 
-        /**
-     * Takes a sort a function that is run before render. The function takes a list of instances to
-     * sort and a camera. The objects in the list include a "z" field to perform a depth-ordered
-     * sort with.
-     *
-     * @type {?Function}
-     * @default null
-     */
-    public customSort = null;
+  /**
+   * Takes a sort a function that is run before render. The function takes a list of instances to
+   * sort and a camera. The objects in the list include a "z" field to perform a depth-ordered
+   * sort with.
+   *
+   * @type {?Function}
+   * @default null
+   */
+  public customSort: ((instances: { z: number }[], camera: Camera) => void) | null = null;
 
-    // stores visible, active, and geometry id per instance and reserved buffer ranges for geometries
-    private _instanceInfo = [];
-    private _geometryInfo = [];
+  // stores visible, active, and geometry id per instance and reserved buffer ranges for geometries
+  private _instanceInfo: InstanceInfo[] = [];
+  private _geometryInfo: GeometryInfo[] = [];
 
-    // instance, geometry ids that have been set as inactive, and are available to be overwritten
-    private _availableInstanceIds = [];
-    private _availableGeometryIds = [];
+  // instance, geometry ids that have been set as inactive, and are available to be overwritten
+  private _availableInstanceIds: number[] = [];
+  private _availableGeometryIds: number[] = [];
 
-    // used to track where the next point is that geometry should be inserted
-    private _nextIndexStart = 0;
-    private _nextVertexStart = 0;
-    private _geometryCount = 0;
+  // used to track where the next point is that geometry should be inserted
+  private _nextIndexStart = 0;
+  private _nextVertexStart = 0;
+  private _geometryCount = 0;
 
-    // flags
-    private _visibilityChanged = true;
-    private _geometryInitialized = false;
+  // flags
+  private _visibilityChanged = true;
+  private _geometryInitialized = false;
 
-    // cached user options
-    private _maxInstanceCount: number;
-    private _maxVertexCount: number;
-    private _maxIndexCount: number;
+  // cached user options
+  private _maxInstanceCount: number;
+  private _maxVertexCount: number;
+  private _maxIndexCount: number;
 
-    // buffers for multi draw
-    private _multiDrawCounts: Int32Array;
-    private _multiDrawStarts: Int32Array;
-    private _multiDrawCount = 0;
-    private _multiDrawInstances = null;
+  // buffers for multi draw
+  private _multiDrawCounts: Int32Array;
+  private _multiDrawStarts: Int32Array;
+  private _multiDrawCount = 0;
+  private _multiDrawInstances = null;
 
-    // Local matrix per geometry by using data texture
-    private _matricesTexture = null;
-    private _indirectTexture: DataTexture | null = null;
-    private _colorsTexture: DataTexture | null = null;
+  // Local matrix per geometry by using data texture
+  private _matricesTexture: DataTexture | null = null;
+  private _indirectTexture: DataTexture | null = null;
+  private _colorsTexture: DataTexture | null = null;
 
-    private cm = ColorManagement.instance;
+  private cm = ColorManagement.instance;
 
 
 
@@ -301,7 +342,7 @@ export class BatchedMesh extends Mesh {
 
     super(new BufferGeometry(), material);
 
-        // cached user options
+    // cached user options
     this._maxInstanceCount = maxInstanceCount;
     this._maxVertexCount = maxVertexCount;
     this._maxIndexCount = maxIndexCount;
@@ -364,7 +405,7 @@ export class BatchedMesh extends Mesh {
 
   }
 
-  private _initMatricesTexture() {
+  private _initMatricesTexture(): void {
 
     // layout (1 matrix = 4 pixels)
     //      RGBA RGBA RGBA RGBA (=> column1, column2, column3, column4)
@@ -384,7 +425,7 @@ export class BatchedMesh extends Mesh {
 
   }
 
-  private _initIndirectTexture() {
+  private _initIndirectTexture(): void {
 
     let size = Math.sqrt(this._maxInstanceCount);
     size = Math.ceil(size);
@@ -396,7 +437,7 @@ export class BatchedMesh extends Mesh {
 
   }
 
-  private _initColorsTexture() {
+  private _initColorsTexture(): void {
 
     let size = Math.sqrt(this._maxInstanceCount);
     size = Math.ceil(size);
@@ -410,7 +451,7 @@ export class BatchedMesh extends Mesh {
 
   }
 
-  public _initializeGeometry(reference: any) {
+  public _initializeGeometry(reference: any): void {
 
     const geometry = this.geometry;
     const maxVertexCount = this._maxVertexCount;
@@ -447,7 +488,7 @@ export class BatchedMesh extends Mesh {
   }
 
   // Make sure the geometry is compatible with the existing combined geometry attributes
-  private _validateGeometry(geometry: any) {
+  private _validateGeometry(geometry: BufferGeometry): void {
 
     // check to ensure the geometries are using consistent attributes and indices
     const batchGeometry = this.geometry;
@@ -467,6 +508,11 @@ export class BatchedMesh extends Mesh {
 
       const srcAttribute = geometry.getAttribute(attributeName);
       const dstAttribute = batchGeometry.getAttribute(attributeName);
+
+      if (srcAttribute === undefined || dstAttribute === undefined) {
+        throw new Error('srcAttribute and/or dstAttribute is undefined');
+      }
+
       if (srcAttribute.itemSize !== dstAttribute.itemSize || srcAttribute.normalized !== dstAttribute.normalized) {
 
         throw new Error('BatchedMesh: All attributes must have a consistent itemSize and normalized value.');
@@ -482,7 +528,7 @@ export class BatchedMesh extends Mesh {
    *
    * @param {number} instanceId - The instance to validate.
    */
-  private validateInstanceId(instanceId: number) {
+  private validateInstanceId(instanceId: number): void {
 
     const instanceInfo = this._instanceInfo;
     if (instanceId < 0 || instanceId >= instanceInfo.length || instanceInfo[instanceId].active === false) {
@@ -498,12 +544,12 @@ export class BatchedMesh extends Mesh {
    *
    * @param {number} geometryId - The geometry to validate.
    */
-  private validateGeometryId(geometryId: number) {
+  private validateGeometryId(geometryId: number): void {
 
     const geometryInfoList = this._geometryInfo;
     if (geometryId < 0 || geometryId >= geometryInfoList.length || geometryInfoList[geometryId].active === false) {
 
-      throw new Error(`THREE.BatchedMesh: Invalid geometryId ${geometryId}. Geometry is either out of range or has been deleted.`);
+      throw new Error(`BatchedMesh: Invalid geometryId ${geometryId}. Geometry is either out of range or has been deleted.`);
 
     }
 
@@ -516,7 +562,7 @@ export class BatchedMesh extends Mesh {
    * @param {Function} func - The custom sort function.
    * @return {BatchedMesh} A reference to this batched mesh.
    */
-  public setCustomSort(func) {
+  public setCustomSort(func: any) {
 
     this.customSort = func;
     return this;
@@ -528,7 +574,7 @@ export class BatchedMesh extends Mesh {
    * Bounding boxes aren't computed by default. They need to be explicitly computed,
    * otherwise they are `null`.
    */
-  public computeBoundingBox() {
+  public computeBoundingBox(): void {
 
     if (this.boundingBox === null) {
 
@@ -546,8 +592,13 @@ export class BatchedMesh extends Mesh {
 
       const geometryId = instanceInfo[i].geometryIndex;
       this.getMatrixAt(i, _matrix);
-      this.getBoundingBoxAt(geometryId, _box).applyMatrix4(_matrix);
-      boundingBox.union(_box);
+
+      const box = this.getBoundingBoxAt(geometryId, _box);
+
+      if (box !== null) {
+        box.applyMatrix4(_matrix);
+        boundingBox.union(_box);
+      }
 
     }
 
@@ -558,7 +609,7 @@ export class BatchedMesh extends Mesh {
    * Bounding spheres aren't computed by default. They need to be explicitly computed,
    * otherwise they are `null`.
    */
-  public computeBoundingSphere() {
+  public computeBoundingSphere(): void {
 
     if (this.boundingSphere === null) {
 
@@ -576,8 +627,13 @@ export class BatchedMesh extends Mesh {
 
       const geometryId = instanceInfo[i].geometryIndex;
       this.getMatrixAt(i, _matrix);
-      this.getBoundingSphereAt(geometryId, _sphere).applyMatrix4(_matrix);
-      boundingSphere.union(_sphere);
+
+      const sphere = this.getBoundingSphereAt(geometryId, _sphere);
+
+      if (sphere !== null) {
+        sphere.applyMatrix4(_matrix);
+        boundingSphere.union(_sphere);
+      }
 
     }
 
@@ -615,6 +671,11 @@ export class BatchedMesh extends Mesh {
       this._availableInstanceIds.sort(ascIdSort);
 
       drawId = this._availableInstanceIds.shift();
+
+      if (drawId === undefined) {
+        throw new Error('Invariant violation: availableInstanceIds was non-empty.');
+      }
+
       this._instanceInfo[drawId] = instanceInfo;
 
     } else {
@@ -625,6 +686,11 @@ export class BatchedMesh extends Mesh {
     }
 
     const matricesTexture = this._matricesTexture;
+
+    if (matricesTexture === null) {
+      throw new Error('BatchedMesh: matricesTexture has not been initialized.');
+    }
+
     _matrix.identity().toArray(matricesTexture.image.data, drawId * 16);
     matricesTexture.needsUpdate = true;
 
@@ -656,7 +722,11 @@ export class BatchedMesh extends Mesh {
    * the length of the given geometry index buffer.
    * @return {number} The geometry ID.
    */
-  public addGeometry(geometry, reservedVertexCount = - 1, reservedIndexCount = - 1) {
+  public addGeometry(
+    geometry: BufferGeometry,
+    reservedVertexCount = - 1,
+    reservedIndexCount = - 1
+  ): number {
 
     this._initializeGeometry(geometry);
 
@@ -684,7 +754,13 @@ export class BatchedMesh extends Mesh {
 
     const geometryInfoList = this._geometryInfo;
     geometryInfo.vertexStart = this._nextVertexStart;
-    geometryInfo.reservedVertexCount = reservedVertexCount === - 1 ? geometry.getAttribute('position').count : reservedVertexCount;
+
+    const position = geometry.getAttribute('position');
+    if (!position) {
+      throw new Error('BatchedMesh: Geometry must have a position attribute.');
+    }
+
+    geometryInfo.reservedVertexCount = reservedVertexCount === - 1 ? position.count : reservedVertexCount;
 
     const index = geometry.getIndex();
     const hasIndex = index !== null;
@@ -701,7 +777,7 @@ export class BatchedMesh extends Mesh {
       geometryInfo.vertexStart + geometryInfo.reservedVertexCount > this._maxVertexCount
     ) {
 
-      throw new Error('THREE.BatchedMesh: Reserved space request exceeds the maximum buffer size.');
+      throw new Error('BatchedMesh: Reserved space request exceeds the maximum buffer size.');
 
     }
 
@@ -712,6 +788,11 @@ export class BatchedMesh extends Mesh {
       this._availableGeometryIds.sort(ascIdSort);
 
       geometryId = this._availableGeometryIds.shift();
+
+      if (geometryId === undefined) {
+        throw new Error('Invariant violation: availableInstanceIds was non-empty.');
+      }
+
       geometryInfoList[geometryId] = geometryInfo;
 
 
@@ -747,7 +828,7 @@ export class BatchedMesh extends Mesh {
 
     if (geometryId >= this._geometryCount) {
 
-      throw new Error('THREE.BatchedMesh: Maximum geometry count reached.');
+      throw new Error('BatchedMesh: Maximum geometry count reached.');
 
     }
 
@@ -757,6 +838,11 @@ export class BatchedMesh extends Mesh {
     const hasIndex = batchGeometry.getIndex() !== null;
     const dstIndex = batchGeometry.getIndex();
     const srcIndex = geometry.getIndex();
+
+    if (srcIndex === null || dstIndex === null) {
+      throw new Error('BatchedMesh: srcIndex or dstIndex cannot be null');
+    }
+
     const geometryInfo = this._geometryInfo[geometryId];
     if (
       hasIndex &&
@@ -764,20 +850,33 @@ export class BatchedMesh extends Mesh {
       geometry.attributes.position.count > geometryInfo.reservedVertexCount
     ) {
 
-      throw new Error('THREE.BatchedMesh: Reserved space not large enough for provided geometry.');
+      throw new Error('BatchedMesh: Reserved space not large enough for provided geometry.');
 
     }
 
     // copy geometry buffer data over
     const vertexStart = geometryInfo.vertexStart;
     const reservedVertexCount = geometryInfo.reservedVertexCount;
-    geometryInfo.vertexCount = geometry.getAttribute('position').count;
+
+    const position = geometry.getAttribute('position');
+
+    if (!position) {
+      throw new Error('BatchedMesh: Geometry must have a position attribute.');
+    }
+
+    geometryInfo.vertexCount = position.count;
 
     for (const attributeName in batchGeometry.attributes) {
 
       // copy attribute data
       const srcAttribute = geometry.getAttribute(attributeName);
       const dstAttribute = batchGeometry.getAttribute(attributeName);
+
+      if (!srcAttribute || !dstAttribute) {
+        throw new Error(
+          `BatchedMesh: Geometry is missing required attribute '${attributeName}'.`
+        );
+      }
       copyAttributeData(srcAttribute, dstAttribute, vertexStart);
 
       // fill the rest in with zeroes
@@ -794,6 +893,16 @@ export class BatchedMesh extends Mesh {
       }
 
       dstAttribute.needsUpdate = true;
+
+      if (srcAttribute instanceof InterleavedBufferAttribute ||
+        dstAttribute instanceof InterleavedBufferAttribute) {
+
+        throw new Error(
+          'BatchedMesh: InterleavedBufferAttribute is not supported.'
+        );
+
+      }
+
       dstAttribute.addUpdateRange(vertexStart * itemSize, reservedVertexCount * itemSize);
 
     }
@@ -803,7 +912,14 @@ export class BatchedMesh extends Mesh {
 
       const indexStart = geometryInfo.indexStart;
       const reservedIndexCount = geometryInfo.reservedIndexCount;
-      geometryInfo.indexCount = geometry.getIndex().count;
+
+      const index = geometry.getIndex();
+
+      if (index === null) {
+        throw new Error('BatchedMesh: geometry must have an index buffer');
+      }
+
+      geometryInfo.indexCount = index.count;
 
       // copy index data over
       for (let i = 0; i < srcIndex.count; i++) {
@@ -855,7 +971,7 @@ export class BatchedMesh extends Mesh {
    * @param {number} geometryId - The ID of the geometry to remove from the batch.
    * @return {BatchedMesh} A reference to this batched mesh.
    */
-  public deleteGeometry(geometryId) {
+  public deleteGeometry(geometryId: number): this {
 
     const geometryInfoList = this._geometryInfo;
     if (geometryId >= geometryInfoList.length || geometryInfoList[geometryId].active === false) {
@@ -909,7 +1025,7 @@ export class BatchedMesh extends Mesh {
    * @param {number} instanceId - The ID of the instance to remove from the batch.
    * @return {BatchedMesh} A reference to this batched mesh.
    */
-  public optimize() {
+  public optimize(): this {
 
     // track the next indices to copy data to
     let nextVertexStart = 0;
@@ -977,6 +1093,13 @@ export class BatchedMesh extends Mesh {
           const attribute = attributes[key];
           const { array, itemSize } = attribute;
           array.copyWithin(nextVertexStart * itemSize, vertexStart * itemSize, (vertexStart + reservedVertexCount) * itemSize);
+
+          if (attribute instanceof InterleavedBufferAttribute) {
+            throw new Error(
+              'BatchedMesh: InterleavedBufferAttribute is not supported.'
+            );
+          }
+
           attribute.addUpdateRange(nextVertexStart * itemSize, reservedVertexCount * itemSize);
 
         }
@@ -1005,7 +1128,7 @@ export class BatchedMesh extends Mesh {
    * @param {Box3} target - The target object that is used to store the method's result.
    * @return {?Box3} The geometry's bounding box. Returns `null` if no geometry has been found for the given ID.
    */
-  public getBoundingBoxAt(geometryId: number, target: Box3) {
+  public getBoundingBoxAt(geometryId: number, target: Box3): Box3 | null {
 
     if (geometryId >= this._geometryCount) {
 
@@ -1050,7 +1173,7 @@ export class BatchedMesh extends Mesh {
    * @param {Sphere} target - The target object that is used to store the method's result.
    * @return {?Sphere} The geometry's bounding sphere. Returns `null` if no geometry has been found for the given ID.
    */
-  getBoundingSphereAt(geometryId, target) {
+  public getBoundingSphereAt(geometryId: number, target: Sphere): Sphere | null {
 
     if (geometryId >= this._geometryCount) {
 
@@ -1103,9 +1226,13 @@ export class BatchedMesh extends Mesh {
    * @param {Matrix4} matrix - A 4x4 matrix representing the local transformation of a single instance.
    * @return {BatchedMesh} A reference to this batched mesh.
    */
-  setMatrixAt(instanceId, matrix) {
+  public setMatrixAt(instanceId: number, matrix: Matrix4): this {
 
     this.validateInstanceId(instanceId);
+
+    if (this._matricesTexture === null) {
+      throw new Error("BatchedMesh: matrices texture has not been initialized.");
+    }
 
     const matricesTexture = this._matricesTexture;
     const matricesArray = this._matricesTexture.image.data;
@@ -1123,9 +1250,13 @@ export class BatchedMesh extends Mesh {
    * @param {Matrix4} matrix - The target object that is used to store the method's result.
    * @return {Matrix4} The instance's local transformation matrix.
    */
-  getMatrixAt(instanceId, matrix) {
+  public getMatrixAt(instanceId: number, matrix: Matrix4): Matrix4 {
 
     this.validateInstanceId(instanceId);
+
+    if (this._matricesTexture === null) {
+      throw new Error("BatchedMesh: matrices texture has not been initialized.");
+    }
     return matrix.fromArray(this._matricesTexture.image.data, instanceId * 16);
 
   }
@@ -1137,7 +1268,7 @@ export class BatchedMesh extends Mesh {
    * @param {Color} color - The color to set the instance to.
    * @return {BatchedMesh} A reference to this batched mesh.
    */
-  setColorAt(instanceId, color) {
+  public setColorAt(instanceId: number, color: Color): this {
 
     this.validateInstanceId(instanceId);
 
@@ -1147,8 +1278,8 @@ export class BatchedMesh extends Mesh {
 
     }
 
-    color.toArray(this._colorsTexture.image.data, instanceId * 4);
-    this._colorsTexture.needsUpdate = true;
+    color.toArray(this._colorsTexture!.image.data, instanceId * 4);
+    this._colorsTexture!.needsUpdate = true;
 
     return this;
 
@@ -1161,9 +1292,14 @@ export class BatchedMesh extends Mesh {
    * @param {Color} color - The target object that is used to store the method's result.
    * @return {Color} The instance's color.
    */
-  getColorAt(instanceId, color) {
+  public getColorAt(instanceId: number, color: Color): Color {
 
     this.validateInstanceId(instanceId);
+
+    if (this._colorsTexture === null) {
+      throw new Error("BatchedMesh: matrices texture has not been initialized.");
+    }
+
     return color.fromArray(this._colorsTexture.image.data, instanceId * 4);
 
   }
@@ -1175,7 +1311,7 @@ export class BatchedMesh extends Mesh {
    * @param {boolean} visible - Whether the instance is visible or not.
    * @return {BatchedMesh} A reference to this batched mesh.
    */
-  setVisibleAt(instanceId, visible) {
+  public setVisibleAt(instanceId: number, visible: boolean): this {
 
     this.validateInstanceId(instanceId);
 
@@ -1198,7 +1334,7 @@ export class BatchedMesh extends Mesh {
    * @param {number} instanceId - The ID of an instance to get the visibility state of.
    * @return {boolean} Whether the instance is visible or not.
    */
-  getVisibleAt(instanceId) {
+  public getVisibleAt(instanceId: number): boolean {
 
     this.validateInstanceId(instanceId);
 
@@ -1213,7 +1349,7 @@ export class BatchedMesh extends Mesh {
    * @param {number} geometryId - The geometry ID to be use by the instance.
    * @return {BatchedMesh} A reference to this batched mesh.
    */
-  setGeometryIdAt(instanceId, geometryId) {
+  public setGeometryIdAt(instanceId: number, geometryId: number): this {
 
     this.validateInstanceId(instanceId);
     this.validateGeometryId(geometryId);
@@ -1230,7 +1366,7 @@ export class BatchedMesh extends Mesh {
    * @param {number} instanceId - The ID of an instance to get the geometry ID of.
    * @return {number} The instance's geometry ID.
    */
-  getGeometryIdAt(instanceId) {
+  public getGeometryIdAt(instanceId: number): number {
 
     this.validateInstanceId(instanceId);
 
@@ -1250,9 +1386,32 @@ export class BatchedMesh extends Mesh {
    * 	start:number,count:number
    * }} The result object with range data.
    */
-  getGeometryRangeAt(geometryId, target = {}) {
+  public getGeometryRangeAt(geometryId: number, target?: GeometryInfo): GeometryInfo {
 
     this.validateGeometryId(geometryId);
+
+    if (target === undefined) {
+      target = {
+        // geometry information
+        vertexStart: - 1,
+        vertexCount: - 1,
+        reservedVertexCount: - 1,
+
+        indexStart: - 1,
+        indexCount: - 1,
+        reservedIndexCount: - 1,
+
+        // draw range information
+        start: - 1,
+        count: - 1,
+
+        // state
+        boundingBox: null,
+        boundingSphere: null,
+        active: true,
+      };
+
+    }
 
     const geometryInfo = this._geometryInfo[geometryId];
     target.vertexStart = geometryInfo.vertexStart;
@@ -1277,7 +1436,7 @@ export class BatchedMesh extends Mesh {
    *
    * @param {number} maxInstanceCount - The max number of individual instances that can be added and rendered by the batch.
   */
-  setInstanceCount(maxInstanceCount) {
+  public setInstanceCount(maxInstanceCount: number) {
 
     // shrink the available instances as much as possible
     const availableInstanceIds = this._availableInstanceIds;
@@ -1308,23 +1467,28 @@ export class BatchedMesh extends Mesh {
     this._maxInstanceCount = maxInstanceCount;
 
     // update texture data for instance sampling
-    const indirectTexture = this._indirectTexture;
-    const matricesTexture = this._matricesTexture;
-    const colorsTexture = this._colorsTexture;
+    // const indirectTexture = this._indirectTexture;
+    // const matricesTexture = this._matricesTexture;
+    // const colorsTexture = this._colorsTexture;
+
+    // update texture data for instance sampling
+    const indirectTexture = this.requireIndirectTexture();
+    const matricesTexture = this.requireMatricesTexture();
+    const colorsTexture = this._colorsTexture; // optional feature
 
     indirectTexture.dispose();
     this._initIndirectTexture();
-    copyArrayContents(indirectTexture.image.data, this._indirectTexture.image.data);
+    copyArrayContents(indirectTexture.image.data, this._indirectTexture!.image.data);
 
     matricesTexture.dispose();
     this._initMatricesTexture();
-    copyArrayContents(matricesTexture.image.data, this._matricesTexture.image.data);
+    copyArrayContents(matricesTexture.image.data, this._matricesTexture!.image.data);
 
     if (colorsTexture) {
 
       colorsTexture.dispose();
       this._initColorsTexture();
-      copyArrayContents(colorsTexture.image.data, this._colorsTexture.image.data);
+      copyArrayContents(colorsTexture.image.data, this._colorsTexture!.image.data);
 
     }
 
@@ -1338,7 +1502,7 @@ export class BatchedMesh extends Mesh {
    * @param {number} maxVertexCount - The maximum number of vertices to be used by all unique geometries to resize to.
    * @param {number} maxIndexCount - The maximum number of indices to be used by all unique geometries to resize to.
   */
-  setGeometrySize(maxVertexCount, maxIndexCount) {
+  public setGeometrySize(maxVertexCount: number, maxIndexCount: number): void {
 
     // Check if we can shrink to the requested vertex attribute size
     const validRanges = [...this._geometryInfo].filter(info => info.active);
@@ -1361,8 +1525,6 @@ export class BatchedMesh extends Mesh {
 
     }
 
-    //
-
     // dispose of the previous geometry
     const oldGeometry = this.geometry;
     oldGeometry.dispose();
@@ -1381,6 +1543,9 @@ export class BatchedMesh extends Mesh {
 
     // copy data from the previous geometry
     const geometry = this.geometry;
+    if (geometry.index === null) {
+      throw new Error('BatchedMesh: geometry cannot be null');
+    }
     if (oldGeometry.index) {
 
       copyArrayContents(oldGeometry.index.array, geometry.index.array);
@@ -1395,7 +1560,7 @@ export class BatchedMesh extends Mesh {
 
   }
 
-  raycast(raycaster, intersects) {
+  public raycast(raycaster: Raycaster, intersects: BatchedRaycasterIntersection[]) {
 
     const instanceInfo = this._instanceInfo;
     const geometryInfoList = this._geometryInfo;
@@ -1450,14 +1615,15 @@ export class BatchedMesh extends Mesh {
 
     }
 
-    _mesh.material = null;
+    // TODO: check if to uncomment
+    // _mesh.material = null;
     _mesh.geometry.index = null;
     _mesh.geometry.attributes = {};
     _mesh.geometry.setDrawRange(0, Infinity);
 
   }
 
-  copy(source) {
+  public copy(source: any) {
 
     super.copy(source);
 
@@ -1467,13 +1633,13 @@ export class BatchedMesh extends Mesh {
     this.boundingBox = source.boundingBox !== null ? source.boundingBox.clone() : null;
     this.boundingSphere = source.boundingSphere !== null ? source.boundingSphere.clone() : null;
 
-    this._geometryInfo = source._geometryInfo.map(info => ({
+    this._geometryInfo = source._geometryInfo.map((info: GeometryInfo) => ({
       ...info,
 
       boundingBox: info.boundingBox !== null ? info.boundingBox.clone() : null,
       boundingSphere: info.boundingSphere !== null ? info.boundingSphere.clone() : null,
     }));
-    this._instanceInfo = source._instanceInfo.map(info => ({ ...info }));
+    this._instanceInfo = source._instanceInfo.map((info: GeometryInfo) => ({ ...info }));
 
     this._availableInstanceIds = source._availableInstanceIds.slice();
     this._availableGeometryIds = source._availableGeometryIds.slice();
@@ -1491,15 +1657,24 @@ export class BatchedMesh extends Mesh {
     this._multiDrawStarts = source._multiDrawStarts.slice();
 
     this._indirectTexture = source._indirectTexture.clone();
-    this._indirectTexture.image.data = this._indirectTexture.image.data.slice();
+
+    if (this._indirectTexture) {
+      this._indirectTexture.image.data = this._indirectTexture.image.data.slice();
+    }
 
     this._matricesTexture = source._matricesTexture.clone();
-    this._matricesTexture.image.data = this._matricesTexture.image.data.slice();
+
+    if (this._matricesTexture) {
+      this._matricesTexture.image.data = this._matricesTexture.image.data.slice();
+    }
 
     if (this._colorsTexture !== null) {
 
       this._colorsTexture = source._colorsTexture.clone();
-      this._colorsTexture.image.data = this._colorsTexture.image.data.slice();
+
+      if (this._colorsTexture) {
+        this._colorsTexture.image.data = this._colorsTexture.image.data.slice();
+      }
 
     }
 
@@ -1511,15 +1686,19 @@ export class BatchedMesh extends Mesh {
    * Frees the GPU-related resources allocated by this instance. Call this
    * method whenever this instance is no longer used in your app.
    */
-  dispose() {
+  public dispose() {
 
     // Assuming the geometry is not shared with other meshes
     this.geometry.dispose();
 
-    this._matricesTexture.dispose();
+    if (this._matricesTexture) {
+      this._matricesTexture.dispose();
+    }
     this._matricesTexture = null;
 
-    this._indirectTexture.dispose();
+    if (this._indirectTexture) {
+      this._indirectTexture.dispose();
+    }
     this._indirectTexture = null;
 
     if (this._colorsTexture !== null) {
@@ -1531,7 +1710,14 @@ export class BatchedMesh extends Mesh {
 
   }
 
-  onBeforeRender(renderer, scene, camera, geometry, material/*, _group*/) {
+  public onBeforeRender(
+    renderer: WebGLRenderer,
+    scene: Scene,
+    camera: Camera,
+    geometry: any,
+    material: any
+    /*, _group*/
+  ) {
 
     // if visibility has not changed and frustum culling and object sorting is not required
     // then skip iterating over all items
@@ -1552,11 +1738,11 @@ export class BatchedMesh extends Mesh {
     const geometryInfoList = this._geometryInfo;
     const perObjectFrustumCulled = this.perObjectFrustumCulled;
     const indirectTexture = this._indirectTexture;
-    const indirectArray = indirectTexture.image.data;
+    const indirectArray = indirectTexture?.image.data;
 
-    const frustum = camera.isArrayCamera ? _frustumArray : _frustum;
+    const frustum = 'isArrayCamera' in camera ? _frustumArray : _frustum;
     // prepare the frustum in the local frame
-    if (perObjectFrustumCulled && !camera.isArrayCamera) {
+    if (perObjectFrustumCulled && !('isArrayCamera' in camera)) {
 
       _matrix
         .multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse)
@@ -1586,13 +1772,19 @@ export class BatchedMesh extends Mesh {
 
           // get the bounds in world space
           this.getMatrixAt(i, _matrix);
-          this.getBoundingSphereAt(geometryId, _sphere).applyMatrix4(_matrix);
+          // this.getBoundingSphereAt(geometryId, _sphere).applyMatrix4(_matrix);
+
+          const sphere = this.getBoundingSphereAt(geometryId, _sphere);
+
+          if (sphere !== null) {
+            sphere.applyMatrix4(_matrix);
+          }
 
           // determine whether the batched geometry is within the frustum
           let culled = false;
           if (perObjectFrustumCulled) {
 
-            culled = !frustum.intersectsSphere(_sphere, camera);
+            culled = !frustum.intersectsSphere(_sphere, camera as ArrayCamera);
 
           }
 
@@ -1648,8 +1840,13 @@ export class BatchedMesh extends Mesh {
 
             // get the bounds in world space
             this.getMatrixAt(i, _matrix);
-            this.getBoundingSphereAt(geometryId, _sphere).applyMatrix4(_matrix);
-            culled = !frustum.intersectsSphere(_sphere, camera);
+            // this.getBoundingSphereAt(geometryId, _sphere).applyMatrix4(_matrix);
+
+            const sphere = this.getBoundingSphereAt(geometryId, _sphere);
+            if (sphere !== null) {
+              sphere.applyMatrix4(_matrix);
+            }
+            culled = !frustum.intersectsSphere(_sphere, camera as ArrayCamera);
 
           }
 
@@ -1669,16 +1866,51 @@ export class BatchedMesh extends Mesh {
 
     }
 
-    indirectTexture.needsUpdate = true;
+    if (indirectTexture) {
+      indirectTexture.needsUpdate = true;
+    }
     this._multiDrawCount = multiDrawCount;
     this._visibilityChanged = false;
 
   }
 
-  onBeforeShadow(renderer, object, camera, shadowCamera, geometry, depthMaterial/* , group */) {
+  onBeforeShadow(
+    renderer: WebGLRenderer,
+    object: any,
+    camera: Camera,
+    shadowCamera: Camera,
+    geometry: any,
+    depthMaterial: any
+    /* , group */
+  ) {
 
-    this.onBeforeRender(renderer, null, shadowCamera, geometry, depthMaterial);
+    this.onBeforeRender(renderer, /* null */ new Scene(), shadowCamera, geometry, depthMaterial);
 
+  }
+
+
+
+
+  // helpers
+  private requireIndirectTexture(): DataTexture {
+    if (this._indirectTexture === null) {
+      throw new Error("BatchedMesh: indirect texture not initialized.");
+    }
+    return this._indirectTexture;
+  }
+
+  private requireMatricesTexture(): DataTexture {
+    if (this._matricesTexture === null) {
+      throw new Error("BatchedMesh: matrices texture not initialized.");
+    }
+    return this._matricesTexture;
+  }
+
+  private requireColorsTexture(): DataTexture {
+    if (this._colorsTexture === null) {
+      throw new Error("BatchedMesh: colors texture not initialized.");
+    }
+    return this._colorsTexture;
   }
 
 }

@@ -5,6 +5,8 @@ import { Sphere } from './Sphere.js';
 import { Plane } from './Plane.js';
 import { Triangle } from './Triangle.js';
 import { Matrix4 } from './Matrix4.js';
+import { InterleavedBufferAttribute } from '../core/InterleavedBufferAttribute.js';
+import { Mesh } from '../objects/Mesh.js';
 
 /**
  * Represents an axis-aligned bounding box (AABB) in 3D space.
@@ -98,7 +100,7 @@ export class Box3 {
    * @param {BufferAttribute} attribute - A buffer attribute holding 3D position data.
    * @return {Box3} A reference to this bounding box.
    */
-  public setFromBufferAttribute(attribute: BufferAttribute): this {
+  public setFromBufferAttribute(attribute: BufferAttribute | InterleavedBufferAttribute): this {
 
     this.makeEmpty();
 
@@ -310,7 +312,7 @@ export class Box3 {
    * as little as necessary at the expense of more computation.
    * @return {Box3} A reference to this bounding box.
    */
-  public expandByObject(object: Node3D, precise: boolean = false): this {
+  public expandByObject(object: any, precise: boolean = false): this {
 
     // Computes the world-axis-aligned bounding box of an object (including its children),
     // accounting for both the object's, and children's, world transforms
@@ -330,7 +332,7 @@ export class Box3 {
 
         for (let i = 0, l = positionAttribute.count; i < l; i++) {
 
-          if (object.isMesh === true) {
+          if ('isMesh' in object === true) {
 
             object.getVertexPosition(i, _vector);
 

@@ -1,4 +1,4 @@
-import { CoordinateSystem, WebGLCoordinateSystem, WebGPUCoordinateSystem } from "../constants";
+import { CoordinateSystem, WebGLCoordinateSystem, WebGPUCoordinateSystem, WritableArrayLike } from "../constants";
 import { Vector3 } from "./Vector3";
 import type { Matrix3 } from "./Matrix3";
 import type { Euler } from "./Euler";
@@ -1461,7 +1461,7 @@ export class Matrix4 {
    * @param offset - An optional offset into the array where the elements start. Default is 0.
    * @returns A reference to this matrix
    */
-  public fromArray(array: number[], offset: number = 0): this {
+  public fromArray(array: number[] | ArrayLike<number>, offset: number = 0): this {
     for (let i = 0; i < 16; i++) {
       this.elements[i] = array[i + offset];
     }
@@ -1477,7 +1477,7 @@ export class Matrix4 {
    * @param offset - Index of the element in the array to start writing
    * @return The the array containing matrix elements in column-major order
    */
-  public toArray(array: number[], offset: number = 0): number[] {
+  public toArray(array: WritableArrayLike<number>, offset: number = 0): WritableArrayLike<number> {
     const te = this.elements;
 
     array[offset] = te[0];

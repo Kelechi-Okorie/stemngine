@@ -1,6 +1,6 @@
 import { clamp, euclideanModulo, lerp } from './MathUtils.js';
 import { ColorManagement, SRGBToLinear, LinearToSRGB } from './ColorManagement';
-import { SRGBColorSpace } from '../constants.js';
+import { SRGBColorSpace, WritableArrayLike } from '../constants.js';
 import { Vector3 } from './Vector3.js';
 import { Matrix3 } from './Matrix3.js';
 import { BufferAttribute } from '../core/BufferAttribute.js';
@@ -887,7 +887,7 @@ export class Color {
    * @param {number} [offset=0] - The offset into the array.
    * @return {Color} A reference to this color.
    */
-  public fromArray(array: number[], offset: number = 0): this {
+  public fromArray(array: number[] | ArrayLike<number>, offset: number = 0): this {
 
     this.r = array[offset];
     this.g = array[offset + 1];
@@ -905,7 +905,7 @@ export class Color {
    * @param {number} [offset=0] - Index of the first element in the array.
    * @return {Array<number>} The color components.
    */
-  public toArray(array: number[] = [], offset: number = 0): Array<number> {
+  public toArray(array: WritableArrayLike<number> = [], offset: number = 0): WritableArrayLike<number> {
 
     array[offset] = this.r;
     array[offset + 1] = this.g;
