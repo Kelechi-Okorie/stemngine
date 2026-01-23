@@ -95,11 +95,11 @@ export function getUnlitUniformColorSpace( renderer: WebGLRenderer ): string {
 	}
 
 	// https://github.com/mrdoob/three.js/issues/27868
-	if ( currentRenderTarget.isXRRenderTarget === true ) {
+	// if ( currentRenderTarget.isXRRenderTarget === true ) {
 
-		return currentRenderTarget.texture.colorSpace;
+	// 	return currentRenderTarget.texture.colorSpace;
 
-	}
+	// }
 
   const cm = ColorManagement.instance;
 	return cm.workingColorSpace;

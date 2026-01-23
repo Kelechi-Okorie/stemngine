@@ -239,7 +239,7 @@ export class ShaderMaterial extends Material {
 
   /**
    * Can be used to force a uniform update while changing uniforms in
-   * {@link Object3D#onBeforeRender}.
+   * {@link Node3D#onBeforeRender}.
    *
    * @type {boolean}
    * @default false
