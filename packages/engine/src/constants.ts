@@ -324,7 +324,7 @@ export type WebGLInternalFormatName =
     WebGL2RenderingContext[K] extends number ? K : never
   }[keyof WebGL2RenderingContext]
 
-export const REVISION = '180dev';
+export const REVISION = '0.1.0-dev';
 
 /**
  * Represents mouse buttons and interaction types in context of controls.

@@ -3,7 +3,7 @@ import { cloneUniforms, cloneUniformsGroups } from '../renderers/shaders/Uniform
 
 import default_vertex from '../renderers/shaders/ShaderChunk/default_vertex.glsl';
 import default_fragment from '../renderers/shaders/ShaderChunk/default_fragment.glsl';
-import { UniformsGroup } from '../core/UniformGroup.js';
+import { UniformsGroup } from '../core/UniformsGroup.js';
 
 /**
  * This type represents the fields required to store and run the shader code.

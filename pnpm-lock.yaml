@@ -50,12 +50,17 @@ importers:
 
   packages/engine: {}
 
+  packages/webgl: {}
+
   sandbox:
     dependencies:
       '@stemngine/engine':
         specifier: workspace:*
         version: link:../packages/engine
     devDependencies:
+      tweakpane:
+        specifier: ^4.0.5
+        version: 4.0.5
       vite:
         specifier: ^7.1.7
         version: 7.1.7(@types/node@24.6.1)(terser@5.44.0)
@@ -1401,6 +1406,9 @@ packages:
 
   tunnel-agent@0.6.0:
     resolution: {integrity: sha512-McnNiV1l8RYeY8tBgEpuodCC1mLUdbSN+CYBL7kJsJNInOP8UjDDEwdk6Mw60vdLLrr5NHKZhMAOSrR2NZuQ+w==}
+
+  tweakpane@4.0.5:
+    resolution: {integrity: sha512-rxEXdSI+ArlG1RyO6FghC4ZUX8JkEfz8F3v1JuteXSV0pEtHJzyo07fcDG+NsJfN5L39kSbCYbB9cBGHyuI/tQ==}
 
   type-check@0.3.2:
     resolution: {integrity: sha512-ZCmOJdvOWDBYJlzAoFkC+Q0+bUyEOS1ltgp1MGU03fqHG+dbi9tBFU2Rd9QKiDZFAYrhPh2JUf7rZRIuHRKtOg==}
@@ -2867,6 +2875,8 @@ snapshots:
     dependencies:
       safe-buffer: 5.2.1
     optional: true
+
+  tweakpane@4.0.5: {}
 
   type-check@0.3.2:
     dependencies:

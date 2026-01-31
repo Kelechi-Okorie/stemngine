@@ -15,7 +15,7 @@ import { Box3 } from '../math/Box3';
 import { Sphere } from '../math/Sphere';
 import { Matrix3 } from '../math/Matrix3';
 import { Quaternion } from '../math/Quaternion';
-import { Vector2 } from '../engine';
+import { Vector2 } from '../math/Vector2';
 
 let _id = 0;
 

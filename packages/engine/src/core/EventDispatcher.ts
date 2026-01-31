@@ -66,7 +66,7 @@ export class EventDispatcher<TEvents extends  Record<string, BaseEvent<any>> = a
    */
   removeEventListener<K extends keyof TEvents>(type: K, listener: EventListener<TEvents[K]>): void {
     const listeners = this._listeners;
-    if(listeners == undefined) {
+    if(listeners === undefined) {
       return;
     }
 

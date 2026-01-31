@@ -656,9 +656,9 @@ export class WebGLProgram {
   // TODO Send this event to Three.js DevTools
   // console.log( 'WebGLProgram', cacheKey );
 
-  public renderer: any
+  public renderer: WebGLRenderer
 
-  public gl: any; // TODO: type well
+  public gl: WebGL2RenderingContext; // TODO: type well
 
   public defines: any;
 
@@ -1137,6 +1137,13 @@ export class WebGLProgram {
     const glVertexShader = WebGLShader(this.gl, this.gl.VERTEX_SHADER, vertexGlsl);
     const glFragmentShader = WebGLShader(this.gl, this.gl.FRAGMENT_SHADER, fragmentGlsl);
 
+    this.glVertexShader = glVertexShader;
+    this.glFragmentShader = glFragmentShader;
+
+    if (glVertexShader === null || glFragmentShader === null ) {
+      throw new Error('WebGLProgram: glVertexShader and/or glFragmentShader is null');
+    }
+
     this.gl.attachShader(this.program, glVertexShader);
     this.gl.attachShader(this.program, glFragmentShader);
 
@@ -1157,8 +1164,6 @@ export class WebGLProgram {
 
 
     // set up caching for uniform locations
-
-    let cachedUniforms;
 
   }
 
@@ -1182,7 +1187,7 @@ export class WebGLProgram {
 
         runnable = false;
 
-        if (typeof this.renderer.debug.onShaderError === 'function') {
+        if (this.renderer.debug.onShaderError !== null) {
 
           this.renderer.debug.onShaderError(this.gl, this.program, this.glVertexShader, this.glFragmentShader);
 
@@ -1194,7 +1199,7 @@ export class WebGLProgram {
           const fragmentErrors = getShaderErrors(this.gl, this.glFragmentShader!, 'fragment');
 
           console.error(
-            'THREE.WebGLProgram: Shader Error ' + this.gl.getError() + ' - ' +
+            'WebGLProgram: Shader Error ' + this.gl.getError() + ' - ' +
             'VALIDATE_STATUS ' + this.gl.getProgramParameter(this.program, this.gl.VALIDATE_STATUS) + '\n\n' +
             'Material Name: ' + this.name + '\n' +
             'Material Type: ' + this.type + '\n\n' +
@@ -1276,7 +1281,7 @@ export class WebGLProgram {
 
   public getUniforms() {
 
-    if (this.cachedUniforms === undefined) {
+    if (!this.cachedUniforms/*  === undefined */) {
 
       // Populates cachedUniforms and cachedAttributes
       this.onFirstUse();

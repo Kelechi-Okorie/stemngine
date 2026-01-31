@@ -108,7 +108,7 @@ export class CubeCamera extends Node3D {
   /**
    * Must be called when the coordinate system of the cube camera is changed.
    */
-  updateCoordinateSystem() {
+  public updateCoordinateSystem() {
 
     const coordinateSystem = this.coordinateSystem;
 
@@ -181,7 +181,7 @@ export class CubeCamera extends Node3D {
    * @param {(Renderer|WebGLRenderer)} renderer - The renderer.
    * @param {Scene} scene - The scene to render.
    */
-  update(renderer: WebGLRenderer, scene: Scene) {
+  public update(renderer: WebGLRenderer, scene: Scene) {
 
     if (this.parent === null) this.updateMatrixWorld();
 

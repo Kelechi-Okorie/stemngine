@@ -1,6 +1,6 @@
 import { BaseEvent } from "../../core/EventDispatcher";
 import { Uniform } from "../../core/Uniform";
-import { UniformsGroup } from "../../core/UniformGroup";
+import { UniformsGroup } from "../../core/UniformsGroup";
 import { WebGLCapabilities } from "./WebGLCapabilities";
 import { WebGLInfo } from "./WebGLInfo";
 import { WebGLState } from "./WebGLState";

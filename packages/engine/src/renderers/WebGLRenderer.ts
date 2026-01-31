@@ -84,6 +84,19 @@ export interface WebGLRendererOptions {
   depth?: boolean;
   logarithmicDepthBuffer?: boolean;
   reversedDepthBuffer?: boolean;
+};
+
+export type ShaderErrorCallback = (
+  gl: WebGL2RenderingContext,
+  program: WebGLProgram,
+  vertexShader: string,
+  fragmentShader: string,
+  // error: string
+) => void;
+
+export interface DebugOptions {
+  checkShaderErrors: boolean;
+  onShaderError: ShaderErrorCallback | null;
 }
 
 
@@ -111,7 +124,7 @@ export class WebGLRenderer {
  *
  * @type {DOMElement}
  */
-  public domElement;
+  public domElement: HTMLCanvasElement;
 
   /**
  * A object with debug configuration settings.
@@ -128,7 +141,7 @@ export class WebGLRenderer {
  *
  * @type {Object}
  */
-  public debug = {
+  public debug: DebugOptions = {
 
     /**
      * Enables error checking and reporting when shader programs are being compiled.
@@ -1656,7 +1669,6 @@ export class WebGLRenderer {
    * @param {Camera} camera - The camera.
    */
   public render(scene: Scene, camera: Camera) {
-
     if (camera !== undefined && camera.isCamera !== true) {
 
       console.error('WebGLRenderer.render: camera is not an instance of Camera.');
@@ -1752,7 +1764,7 @@ export class WebGLRenderer {
 
     this.currentRenderState?.setupLights();
 
-    if (/* 'isArrayCamera' in camera */ isArrayCamera(camera)) {
+    if (isArrayCamera(camera)) {
 
       const cameras = camera.cameras;
 

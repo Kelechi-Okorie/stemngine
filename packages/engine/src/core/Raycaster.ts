@@ -1,15 +1,15 @@
-import { Matrix4 } from '../math/Matrix4.js';
+import { Matrix4 } from '../math/Matrix4';
 import { Ray } from '../math/Ray';
 import { Layers } from './Layers';
-import { Vector3 } from '../math/Vector3.js';
-import { Camera } from '../cameras/Camera.js';
-import { Vector2 } from '../engine.js';
-import { isOrthographicCamera } from '../cameras/OrthographicCamera.js';
-import { isPerspectiveCamera } from '../cameras/PerspectiveCamera.js';
-import { Node3D } from './Node3D.js';
-import { Mesh } from '../objects/Mesh.js';
-import { SpatialNode } from './SpatialNode.js';
-import { BufferAttribute } from './BufferAttribute.js';
+import { Vector3 } from '../math/Vector3';
+import { Camera } from '../cameras/Camera';
+import { Vector2 } from '../math/Vector2';
+import { isOrthographicCamera } from '../cameras/OrthographicCamera';
+import { isPerspectiveCamera } from '../cameras/PerspectiveCamera';
+import { Node3D } from './Node3D';
+import { Mesh } from '../objects/Mesh';
+import { SpatialNode } from './SpatialNode';
+import { BufferAttribute } from './BufferAttribute';
 
 const _matrix = /*@__PURE__*/ new Matrix4();
 

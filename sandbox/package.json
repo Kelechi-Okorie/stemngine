@@ -15,6 +15,7 @@
     "@stemngine/engine": "workspace:*"
   },
   "devDependencies": {
+    "tweakpane": "^4.0.5",
     "vite": "^7.1.7"
   }
 }

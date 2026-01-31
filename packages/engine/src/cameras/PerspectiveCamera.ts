@@ -1,13 +1,11 @@
-import type { Vector2 } from "../math/Vector2";
-
 import { Camera } from "./Camera";
 import { RAD2DEG, DEG2RAD } from "../math/MathUtils";
-import { Vector3 as Vector3Impl } from '../math/Vector3';
-import { Vector2 as Vector2Impl } from '../math/Vector2';
+import { Vector3 } from '../math/Vector3';
+import { Vector2 } from "../math/Vector2";
 
-const _v3 = /*@__PURE__*/ new Vector3Impl();
-const _minTarget = /*@__PURE__*/ new Vector2Impl();
-const _maxTarget = /*@__PURE__*/ new Vector2Impl();
+const _v3 = /*@__PURE__*/ new Vector3();
+const _minTarget = /*@__PURE__*/ new Vector2();
+const _maxTarget = /*@__PURE__*/ new Vector2();
 
 interface View {
   enabled: boolean;
@@ -97,7 +95,7 @@ export class PerspectiveCamera extends Camera {
    * Why do engines include a zoom property
    * 1. It lets you animate zoom-ins smoothly
    * 2. It seperates "optics" (fov) from "magnification" (zoom)
-   * 3. It allows dolly zs zoom effects (think Hitchcock's Vertigo)
+   * 3. It allows dolly zoom effects (think Hitchcock's Vertigo)
    */
 
   public zoom: number = 1;
