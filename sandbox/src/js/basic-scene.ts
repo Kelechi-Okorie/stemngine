@@ -1,22 +1,22 @@
-import { OrthographicCamera, Scene } from "@stemngine/engine";
+import { DirectionalLight, MeshPhongMaterial, OrthographicCamera, Scene } from "@stemngine/engine";
 import { PerspectiveCamera } from "@stemngine/engine";
 import { WebGLRenderer } from "@stemngine/engine";
 import { BoxGeometry } from "@stemngine/engine";
 import { MeshBasicMaterial } from "@stemngine/engine";
 import { Mesh } from "@stemngine/engine";
-import { BrowserInputManager } from "@stemngine/engine";
-import { OrbitControls, InputOrbitMapper, Color } from "@stemngine/engine";
+import { OrbitControls, Color } from "@stemngine/engine";
 
 import { Pane } from 'tweakpane';
 
-const geometry = new BoxGeometry( 1, 1, 1 );
-const material = new MeshBasicMaterial( { color: 0x00ff00 } );
-const cube = new Mesh( geometry, material );
+const geometry = new BoxGeometry(1, 1, 1);
+// const material = new MeshBasicMaterial({ color: 0x00ff00 });
+const material = new MeshPhongMaterial({color: 0x00ff00});
+const cube = new Mesh(geometry, material);
 
 const scene = new Scene();
 scene.background = new Color(0xff0000)
 
-const camera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+const camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 // const camera2 = new OrthographicCamera()
 
 const left = -1;
@@ -29,23 +29,28 @@ const far = 50
 // const camera = new OrthographicCamera();
 // camera.zoom = 0.2;
 
-console.log(camera)
+const renderer = new WebGLRenderer({antialias: true});
+renderer.setClearColor(0x000000, 1); // black, fully opaque
+renderer.setSize(window.innerWidth, window.innerHeight);
 
-const renderer = new WebGLRenderer();
-renderer.setClearColor(new Color(0xff0000));
-renderer.setSize( window.innerWidth , window.innerHeight );
+renderer.setAnimationLoop(animate);
 
-const width = renderer.domElement.width;
-const height = renderer.domElement.height
+console.log(renderer.info)
 
-document.body.appendChild( renderer.domElement );
+document.body.appendChild(renderer.domElement);
 
-scene.add( cube );
+scene.add(cube);
 
 camera.position.z = 5;
 camera.position.x = 2;
 
 // console.log({scene})
+
+const color = 0xff0000;
+const intensity = 0.5;
+const light = new DirectionalLight(color, intensity);
+light.position.set(-1, 10, 4);
+// scene.add(light);
 
 renderer.render(scene, camera);
 
@@ -57,25 +62,20 @@ renderer.render(scene, camera);
 
 const orbitControl = new OrbitControls(camera, renderer.domElement);
 
-// orbitInput.onRotate((dx, dy) => orbit.rotate(dx, dy));
-// orbitInput.onZoom(scale => orbit.zoom(scale));
-
-// const mapper = new InputOrbitMapper(renderer.domElement)
-
 const pane = new Pane();
-pane.addButton({title: 'connect'}).on('click', () => {
+pane.addButton({ title: 'connect' }).on('click', () => {
 
   // input.dispose();
   orbitControl.connect();
 
 });
-pane.addButton({title: 'disconnect'}).on('click', () => {
+pane.addButton({ title: 'disconnect' }).on('click', () => {
 
   // input.dispose();
   orbitControl.dispose();
 
 });
-pane.addButton({title: 'move'}).on('click', () => {
+pane.addButton({ title: 'move' }).on('click', () => {
 
   // input.dispose();
   // orbitControl.dispose();
@@ -84,10 +84,11 @@ pane.addButton({title: 'move'}).on('click', () => {
 
 });
 
-function animate(): void {
+function animate(time: number, frame?: any): void {
+
+  // cube.rotation.x = time / 2000;
+  // cube.rotation.y = time / 1000;
+
   renderer.render(scene, camera);
-  requestAnimationFrame(animate);
+
 }
-
-animate();
-

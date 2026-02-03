@@ -265,7 +265,7 @@ export class PerspectiveCamera extends Camera {
    * @param near - The camera's near plane
    * @param far - The camera's far plane
    */
-  constructor(fov: number = 50, aspect: number = 1, near: number = 0.1, far: number = 200) {
+  constructor(fov: number = 50, aspect: number = 1, near: number = 0.1, far: number = 2000) {
     super();
 
     this.fov = fov;

@@ -1,3 +1,16 @@
+
+/**
+ * A controllable requestAnimationFrame pump
+ *
+ * Core responsibilities:
+ * - call a callback (you) once per frame
+ * - gives you a timestep
+ * - keep calling it again
+ * - allow start/stop
+ * - allow swapping the callback
+ *
+ * requestAnimationFrame -> WebGLAnimation -> WebglRenderer.onAnimationFrame -> my engine loop
+ */
 export class WebGLAnimation {
 
   private context: Window | null = null;
@@ -7,6 +20,16 @@ export class WebGLAnimation {
 
   constructor() { }
 
+  /**
+   * schedules one future callback
+   *
+   * canonical RAF loop pattern
+   *
+   * RAF -> onAnimationFrame -> RAF -> onAnimationFrame -> ...
+   *
+   * @param time
+   * @param frame
+   */
   private onAnimationFrame = (time: number, frame?: any) => {
 
     if (this.animationLoop) this.animationLoop(time, frame);
@@ -14,7 +37,6 @@ export class WebGLAnimation {
     if (this.context) this.requestId = this.context.requestAnimationFrame(this.onAnimationFrame);
 
   }
-
 
   public start(): void {
 

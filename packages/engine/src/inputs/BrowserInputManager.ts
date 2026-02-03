@@ -1,5 +1,3 @@
-import { MOUSE } from "../constants";
-
 // input-types.ts
 export type InputEventType =
   | 'pointerdown'
@@ -47,8 +45,6 @@ export class BrowserInputManager {
   }
 
   public emit<T extends Event>(type: InputEventType, event: T): void {
-
-    // console.log(this.listeners)
 
     const list = this.listeners.get(type);
 

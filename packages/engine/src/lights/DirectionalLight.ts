@@ -80,6 +80,8 @@ export class DirectionalLight extends Light {
 
   public dispose() {
 
+    super.dispose();
+
     if (this.shadow) {
       this.shadow.dispose();
     }
@@ -100,7 +102,17 @@ export class DirectionalLight extends Light {
 
   }
 
+  public toJSON(meta: any) {
+    const data = super.toJSON(meta);
+
+    data.object.shadow = this.shadow?.toJSON();
+    data.object.target = this.target?.uuid;
+
+    return data;
+  }
+
 }
+
 
 export function isDirectionalLight(light: Light): light is DirectionalLight {
   return (light as DirectionalLight).isDirectionalLight === true;

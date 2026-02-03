@@ -314,7 +314,7 @@ export class WebGLRenderer {
   private extensions!: WebGLExtensions;
   private capabilities!: WebGLCapabilities;
   public state!: WebGLState;
-  private info!: WebGLInfo;
+  public info!: WebGLInfo;
 
   public properties!: WebGLProperties;
   private textures!: WebGLTextures;
@@ -529,6 +529,7 @@ export class WebGLRenderer {
 
     this.info.programs = this.programCache.programs;
 
+    // TODO: check if this context is lost
     this.animation.setAnimationLoop(this.onAnimationFrame);
 
     if (typeof self !== 'undefined') this.animation.setContext(self);
@@ -954,7 +955,7 @@ export class WebGLRenderer {
    * @param {Color} color - The clear color.
    * @param {number} [alpha=1] - The clear alpha.
    */
-  public setClearColor(color: Color, alpha: number = 1): void {
+  public setClearColor(color: Color | number, alpha: number = 1): void {
 
     this.background.setClearColor(color, alpha);
 
@@ -1622,7 +1623,7 @@ export class WebGLRenderer {
   // Animation Loop
 
 
-  public onAnimationFrame(time: number) {
+  public onAnimationFrame = (time: number) => {
 
     if (this.onAnimationFrameCallback) this.onAnimationFrameCallback(time);
 
@@ -1640,7 +1641,7 @@ export class WebGLRenderer {
 
   // }
 
-  public setAnimationLoop(callback: any) {  // TODO: type very well
+  public setAnimationLoop(callback: (time: number, frame?: any) => void | null) {
 
     this.onAnimationFrameCallback = callback;
     // xr.setAnimationLoop(callback);
