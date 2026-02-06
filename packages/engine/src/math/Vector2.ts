@@ -821,7 +821,7 @@ export class Vector2 {
    * @param offset - Index to the array to start writing
    * @returns Array containing the vector components
    */
-  public toArray(array: number[], offset: number = 0): number[] {
+  public toArray(array: number[] = [], offset: number = 0): number[] {
     array[offset] = this.x;
     array[offset + 1] = this.y;
 
@@ -913,3 +913,10 @@ export class Vector2 {
   }
 
 }
+
+export function isVector2(
+  vector: any
+): vector is Vector2 {
+  return (vector as any).isVector2 === true;
+}
+

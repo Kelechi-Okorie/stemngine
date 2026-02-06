@@ -15,20 +15,20 @@ type BufferCloneData = {
  */
 export class InterleavedBuffer {
   /**
- * this flag can be used for type testing.
- *
- * @type {boolean}
- * @readonly
- * @defaultValue true
-*/
+   * this flag can be used for type testing.
+   *
+   * @type {boolean}
+   * @readonly
+   * @defaultValue true
+  */
   public readonly isInterleavedBuffer: boolean = true;
 
   /**
- * The type property is used for detecting the object type
- * in context of serialization/deserialization
- *
- * @readonly
-*/
+   * The type property is used for detecting the object type
+   * in context of serialization/deserialization
+   *
+   * @readonly
+  */
   public readonly type: string = 'InterleavedBuffer';
 
   /**
@@ -91,6 +91,9 @@ export class InterleavedBuffer {
     this.count = array.length / stride;
   }
 
+  // TODO: check if onUploadCalblack(): void {} is correct or if it should be
+  // public onUploadCallback: (() => void) | null = null; which actually
+  // seems more correct
   /**
    * A callback function that is executed after the renderer has transferred the attribute
    * array data to the GPU
@@ -98,7 +101,7 @@ export class InterleavedBuffer {
   public onUploadCallback(): void { }
 
   /**
-   * Flag to indicate that this attribute has changed and shuld be re-sent to the GPU
+   * Flag to indicate that this attribute has changed and should be re-sent to the GPU
    *
    * @remarks
    * Set this to `true` when you modify the value of the array
@@ -106,7 +109,9 @@ export class InterleavedBuffer {
    * @param value - The new value of the flag
    */
   public set needsUpdate(value: boolean) {
+
     if (value === true) this.version++;
+
   }
 
   /**
@@ -116,8 +121,10 @@ export class InterleavedBuffer {
    * @returns A reference to this interleaved buffer
    */
   public setUsage(value: BufferUsage): this {
+
     this.usage = value;
     return this;
+
   }
 
   /**
@@ -127,14 +134,18 @@ export class InterleavedBuffer {
    * @count - The number of components to be updated
    */
   public addUpdateRange(offset: number, count: number): void {
-    this.updateRanges.push({ offset, count })
+
+    this.updateRanges.push({ offset, count });
+
   }
 
   /**
    * Clears the update ranges array
    */
   public clearUpdateRanges(): void {
+
     this.updateRanges.length = 0;
+
   }
 
   /**
@@ -144,12 +155,14 @@ export class InterleavedBuffer {
    * @returns A reference to this instance
    */
   public copy(source: InterleavedBuffer): this {
+
     this.array = source.array;
     this.stride = source.stride;
     this.count = source.count;
     this.usage = source.usage;
 
     return this;
+
   }
 
   /**
@@ -159,12 +172,13 @@ export class InterleavedBuffer {
    * The start and destination position in the attribute are represented by
    * the given indices
    *
-   * @param index1 - The destination index into this i nterleaved buffer
+   * @param index1 - The destination index into this interleaved buffer
    * @param interleavedBuffer - The source interleaved buffer
    * @param index2 - The source index into the source interleaved buffer
    * @returns A reference to this interleaved buffer
    */
   public copyAt(index1: number, interleavedBuffer: InterleavedBuffer, index2: number): this {
+
     index1 *= this.stride;
     index2 *= interleavedBuffer.stride;
 
@@ -175,6 +189,7 @@ export class InterleavedBuffer {
     }
 
     return this;
+
   }
 
   /**
@@ -185,13 +200,15 @@ export class InterleavedBuffer {
    * @returns A reference to this instance
    */
   public set(value: AnyTypedArray, offset: number = 0): this {
+
     this.array.set(value, offset);
 
     return this;
+
   }
 
   /**
-   * Returns a new interleaved buffer with copied values from thsi instance
+   * Returns a new interleaved buffer with copied values from this instance
    *
    * @remarks
    * This is confusing code because it is not doing a normal clone()
@@ -203,6 +220,7 @@ export class InterleavedBuffer {
    * @returns A clone of this instance
    */
   public clone(data: any): InterleavedBuffer {
+
     if (data.arrayBuffers === undefined) {
 
       data.arrayBuffers = {};
@@ -229,6 +247,7 @@ export class InterleavedBuffer {
     ib.setUsage(this.usage);
 
     return ib;
+
   }
 
   /**
@@ -243,9 +262,11 @@ export class InterleavedBuffer {
    * @returns A reference to this instance
    */
   public onUpload(callback: () => void): this {
+
     this.onUploadCallback = callback;
 
     return this;
+
   }
 
   /**
@@ -255,6 +276,7 @@ export class InterleavedBuffer {
    * @returns A JSON object representing the serialized interleaved buffer
    */
   public toJSON(data: { arrayBuffers?: Record<string, number[]> }): any {
+
     if (data.arrayBuffers === undefined) {
 
       data.arrayBuffers = {};
@@ -281,5 +303,6 @@ export class InterleavedBuffer {
       type: this.array.constructor.name,
       stride: this.stride
     };
+    
   }
 }

@@ -59,25 +59,20 @@ export class BufferGeometry extends EventDispatcher {
   /**
    * this flag can be used for type testing.
    *
-   * @type {boolean}
-   * @readonly
-   * @defaultValue true
  */
   public readonly isBufferGeometry: boolean = true;
 
   /**
- * The ID of the BufferGeometry.
- *
- * @name Node#id
- * @readonly
-*/
+   * The ID of the BufferGeometry.
+   *
+   * @name BufferGeometry#id
+  */
   public readonly id: number;
 
   /**
- * The UUID of the node
- *
- * @readonly
- */
+   * The UUID of the node
+   *
+   */
   public readonly uuid: string = generateUUID();
 
   /**
@@ -89,7 +84,6 @@ export class BufferGeometry extends EventDispatcher {
    * The type property is used for detecting the object type
    * in context of serialization/deserialization
    *
-   * @readonly
    */
   public readonly type: string = 'BufferGeometry';
 
@@ -145,7 +139,7 @@ export class BufferGeometry extends EventDispatcher {
    * Used to control the morph target behaviour
    *
    * @remarks
-   * When set to true, the morph ta rget data is treated as relative offset, rather than as absolute
+   * When set to true, the morph target data is treated as relative offset, rather than as absolute
    * positions/normals
    */
   public morphTargetsRelative: boolean = false;
@@ -156,9 +150,10 @@ export class BufferGeometry extends EventDispatcher {
    *
    * @remarks
    * An array of objects, where each object describes a subset of the geometry.
+   *
    * Why groups exist:
-   * multiple materials on one geometry
-   * effective rendering
+   * - multiple materials on one geometry
+   * - effective rendering
    *
    * This allows an array of materials to be used with the geometry.
    *
@@ -172,16 +167,12 @@ export class BufferGeometry extends EventDispatcher {
   /**
    * Bounding box for the geometry which can be calculated with `computeBoundingBox()`.
    *
-   * @type {?Box3}
-   * @default null
    */
   public boundingBox: Box3 | null = null;
 
   /**
    * Bounding sphere for the geometry which can be calculated with `computeBoundingSphere()`.
    *
-   * @type {?Sphere}
-   * @default null
    */
   public boundingSphere: Sphere | null = null;
 
@@ -189,7 +180,6 @@ export class BufferGeometry extends EventDispatcher {
    * Determines the part of the geometry to render. This should not be set directly,
    * instead use `setDrawRange()`.
    *
-   * @type {{start:number,count:number}}
    */
   public drawRange: { start: number, count: number } = { start: 0, count: Infinity };
 
@@ -210,21 +200,25 @@ export class BufferGeometry extends EventDispatcher {
    * Constructs a new BufferGeometry.
    */
   constructor() {
+
     super();
 
     this.id = _id++;
+
   }
 
   /**
    * Returns the index of this geometry
    *
    * @remarks
-   * Index is a BufferAttribute that stores vertix indices for indexed drawing
+   * Index is a BufferAttribute that stores vertex indices for indexed drawing
    *
    * @returns The index attribute
    */
   public getIndex(): BufferAttribute | null {
+
     return this.index;
+
   }
 
   /**
@@ -234,6 +228,7 @@ export class BufferGeometry extends EventDispatcher {
    * @returns A reference to this instance
    */
   public setIndex(index: number[] | BufferAttribute): this {
+
     if (Array.isArray(index)) {
 
       this.index = new (arrayNeedsUint32(index) ? Uint32BufferAttribute : Uint16BufferAttribute)(index, 1);
@@ -245,6 +240,7 @@ export class BufferGeometry extends EventDispatcher {
     }
 
     return this;
+
   }
 
   /**
@@ -256,7 +252,7 @@ export class BufferGeometry extends EventDispatcher {
    * In modern graphics (WebGPU, WebGL2), indrect drawing lets GPU execute draw calls without
    * CPU intervention for each draw, improving performance for complex scenes.
    *
-   * Normall you call gl.drawElements or gl.drawArrays and specifying counts manually
+   * Normall you call gl.drawElements or gl.drawArrays and specifying counts manually,
    * With indirect drawing, the GPU stores parameters like
    * - vertex count
    * - instance count
@@ -269,9 +265,11 @@ export class BufferGeometry extends EventDispatcher {
    * @returns A reference to this instance
    */
   public setIndirect(indirect: BufferAttribute): this {
+
     this.indirect = indirect;
 
     return this;
+
   }
 
   /**
@@ -280,7 +278,9 @@ export class BufferGeometry extends EventDispatcher {
    * @returns The indirect attribute
    */
   public getIndrect(): BufferAttribute | null {
+
     return this.indirect;
+
   }
 
   /**
@@ -290,7 +290,9 @@ export class BufferGeometry extends EventDispatcher {
    * @returns The buffer attribute
    */
   public getAttribute(name: string): BufferAttribute | InterleavedBufferAttribute | undefined {
+
     return this.attributes[name];
+
   }
 
   /**
@@ -301,21 +303,25 @@ export class BufferGeometry extends EventDispatcher {
    * @returns A reference to this instance
    */
   public setAttribute(name: string, attribute: BufferAttribute | InterleavedBufferAttribute): this {
+
     this.attributes[name] = attribute;
 
     return this;
+
   }
 
   /**
    * Deletes the attribute for the given name
    *
    * @param name - The name of the attribute
-   * @returns true if the attribute existed and was deleted
+   * @returns A reference for this instance
    */
-  public deleteAttribute(name: string): boolean {
+  public deleteAttribute(name: string): BufferGeometry {
+
     delete this.attributes[name];
 
-    return true;
+    return this;
+
   }
 
   /**
@@ -325,7 +331,9 @@ export class BufferGeometry extends EventDispatcher {
    * @returns true if the attribute exists
    */
   public hasAttribute(name: string): boolean {
+
     return this.attributes[name] !== undefined;
+
   }
 
   /**
@@ -338,6 +346,7 @@ export class BufferGeometry extends EventDispatcher {
    * @param materialIndex - The material array index to use
    */
   public addGroup(start: number, count: number, materialIndex: number = 0): void {
+
     this.groups.push({
 
       start: start,
@@ -345,13 +354,16 @@ export class BufferGeometry extends EventDispatcher {
       materialIndex: materialIndex
 
     });
+
   }
 
   /**
    * Clears all groups for this geometry
    */
   public clearGroups(): void {
+
     this.groups = [];
+
   }
 
   /**
@@ -361,8 +373,10 @@ export class BufferGeometry extends EventDispatcher {
    * @param count - The number of indices to be rendered
    */
   public setDrawRange(start: number, count: number): void {
+
     this.drawRange.start = start;
     this.drawRange.count = count;
+
   }
 
   /**
@@ -372,6 +386,7 @@ export class BufferGeometry extends EventDispatcher {
    * @returns A reference to this instance
    */
   public applyMatrix4(matrix: Matrix4): this {
+
     const position = this.attributes.position;
 
     if (position !== undefined) {
@@ -417,6 +432,7 @@ export class BufferGeometry extends EventDispatcher {
     }
 
     return this;
+
   }
 
   /**
@@ -426,11 +442,13 @@ export class BufferGeometry extends EventDispatcher {
    * @returns A reference to this instance
    */
   public applyQuaternion(q: Quaternion): this {
+
     _m1.makeRotationFromQuaternion(q);
 
     this.applyMatrix4(_m1);
 
     return this;
+
   }
 
   /**
@@ -444,11 +462,13 @@ export class BufferGeometry extends EventDispatcher {
    * @returns A reference to this instance
    */
   public rotateX(angle: number): this {
+
     _m1.makeRotationX(angle);
 
     this.applyMatrix4(_m1);
 
     return this;
+
   }
 
   /**
@@ -471,6 +491,7 @@ export class BufferGeometry extends EventDispatcher {
     this.applyMatrix4(_m1);
 
     return this;
+
   }
 
   /**
@@ -493,6 +514,7 @@ export class BufferGeometry extends EventDispatcher {
     this.applyMatrix4(_m1);
 
     return this;
+
   }
 
   /**
@@ -653,6 +675,7 @@ export class BufferGeometry extends EventDispatcher {
    * You may need to recompute the bonding box if the geometry vertices are modified
    */
   public computeBoundingBox(): void {
+
     if (this.boundingBox === null) {
 
       this.boundingBox = new Box3();
@@ -718,6 +741,7 @@ export class BufferGeometry extends EventDispatcher {
       console.error('BufferGeometry.computeBoundingBox(): Computed min/max have NaN values. The "position" attribute is likely to have NaN values.', this);
 
     }
+
   }
 
   /**
@@ -729,6 +753,7 @@ export class BufferGeometry extends EventDispatcher {
    * You may need to recompute the bonding sphere if the geometry vertices are modified
    */
   public computeBoundingSphere(): void {
+
     if (this.boundingSphere === null) {
 
       this.boundingSphere = new Sphere();
@@ -855,10 +880,12 @@ export class BufferGeometry extends EventDispatcher {
     // based on http://www.terathon.com/code/tangent.html
     // (per vertex tangents)
 
-    if (index === null ||
+    if (
+      index === null ||
       attributes.position === undefined ||
       attributes.normal === undefined ||
-      attributes.uv === undefined) {
+      attributes.uv === undefined
+    ) {
 
       console.error('BufferGeometry: .computeTangents() failed. Missing required attributes (index, position, normal or uv)');
       return;
@@ -1135,7 +1162,10 @@ export class BufferGeometry extends EventDispatcher {
    */
   public toNonIndexed() {
 
-    function convertBufferAttribute(attribute: BufferAttribute | InterleavedBufferAttribute, indices: ArrayLike<number>): BufferAttribute {
+    function convertBufferAttribute(
+      attribute: BufferAttribute | InterleavedBufferAttribute,
+      indices: ArrayLike<number>
+    ): BufferAttribute {
 
       const array = attribute.array;
       const itemSize = attribute.itemSize;
@@ -1489,7 +1519,9 @@ export class BufferGeometry extends EventDispatcher {
    * @fires BufferGeometry#dispose
    */
   public dispose(): void {
-    this.dispatchEvent({type: 'dispose'});
+
+    this.dispatchEvent({ type: 'dispose' });
+
   }
 
 }
@@ -1497,5 +1529,7 @@ export class BufferGeometry extends EventDispatcher {
 function isGLBufferAttribute(
   attribute: BufferAttribute | InterleavedBufferAttribute | any
 ): attribute is GLBufferAttribute {
+
   return attribute?.isGLBufferAttribute === true;
+  
 }

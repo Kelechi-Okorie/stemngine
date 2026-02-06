@@ -51,7 +51,7 @@ export function arrayMax(array: ArrayLike<number>): number {
  *
  * Why 65,535:
  * 65535 is the maximum value representable by a 16-bit unsigned integer (Uint16Array)
- * If any index in the arry exceeds the value, you must use a Uint32Array instead
+ * If any index in the array exceeds the value, you must use a Uint32Array instead
  * of Uint16Array (common in WebGL index buffers)
  * The comment references "PRIMITIVE_RESTART_FIXED_INDEX" in WebGL - meaning index
  * 65535 is used specially and must be treated as 32-bit
@@ -130,6 +130,40 @@ export function createCanvasElement(): HTMLCanvasElement {
 }
 
 const _cache: { [key: string]: any } = {};
+
+/**
+ * Custom console function handler for intercepting log, warn, and error
+ * calls.
+ *
+ */
+let _setConsoleFunction: ((level: string, message: string, ...params: unknown[]) => void) | null = null
+
+// TODO: give * a name (perhaps se)
+/**
+ * Logs a warning message with the '*.' prefix
+ *
+ * If a custom console function is set via setConsoleFunction(), it will be used
+ * instead of the native console.warn. The first parameter is treated as the
+ * method name and is automatically prefixed with '*.'.
+ *
+ * @param {...any} params - The message components. The first parameter is
+ * used as the method name and prefixed with '*.'
+ */
+export function warn(...params: any[]) {
+
+  const message = `*. ${params.shift()}`;
+
+  if (_setConsoleFunction) {
+
+    _setConsoleFunction('warn', message, ...params);
+
+  } else {
+
+    console.warn(message, ...params);
+
+  }
+
+}
 
 /**
  * Ensures that a warning message is only logged once, no matter how many times
@@ -244,7 +278,7 @@ export function toNormalizedProjectionMatrix( projectionMatrix: Matrix4 ): void 
  *
  * This is commonly used in modern rendering engines for better depth precision
  * in large scenes
- * 
+ *
  * @param projectionMatrix
  */
 export function toReversedProjectionMatrix( projectionMatrix: Matrix4 ) {

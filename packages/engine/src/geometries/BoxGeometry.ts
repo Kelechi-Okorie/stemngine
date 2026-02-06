@@ -32,7 +32,7 @@ export class BoxGeometry extends BufferGeometry {
    * @remarks
    * any modifications to the geometry after instantiation are not reflected in this property.
    */
-  public parameters?: { [key: string]: number; } | undefined;
+  public parameters: { [key: string]: number; } | undefined;
 
   /**
    * Creates a new BoxGeometry instance.
@@ -61,6 +61,7 @@ export class BoxGeometry extends BufferGeometry {
     public heightSegments: number = 1,
     public depthSegments: number = 1
   ) {
+
     super();
 
     this.parameters = {
@@ -103,8 +104,8 @@ export class BoxGeometry extends BufferGeometry {
      * - numOfVertices tracks how many vertices have been added so far
      * - groupStart tracks the starting index for each group of faces (for multi-materials)
      */
-    let numberOfVertices: number = 0;
-    let groupStart: number = 0;
+    let numberOfVertices: number = 0; // offset into the vertex buffer
+    let groupStart: number = 0; // offset into the index buffer
 
     // build each side of the box geometry
     /**
@@ -175,7 +176,7 @@ export class BoxGeometry extends BufferGeometry {
       // generate vertices, normals and uvs
       /**
        * - Loop over grid points, not just corners (that's why +1)
-       * - vector[u], vector[v], vector[w] -> dynamically pic axes for this face
+       * - vector[u], vector[v], vector[w] -> dynamically pick axes for this face
        * - vertices -> actual 3D coordinates
        * - normals -> perpendicular to the face
        * - uvs -> normalized 0..1 coordinates

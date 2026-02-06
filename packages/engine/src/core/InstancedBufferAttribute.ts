@@ -2,7 +2,7 @@ import { AnyTypedArray } from "../constants";
 import { BufferAttribute } from "./BufferAttribute";
 
 /**
- * An instanced versio of a buffer attribute
+ * An instanced version of a buffer attribute
  *
  * @augments BufferAttribute
  */

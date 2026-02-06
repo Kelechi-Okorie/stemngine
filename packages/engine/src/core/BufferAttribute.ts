@@ -21,8 +21,9 @@ let _id = 0;
  * helper methods on vector, quaternion and color class might be helpful E.g.
  * {@link Vector3#fromBufferAttribute}, {@link Quaternion#fromBufferAttribute}
  *
- * A core low-levvel data structure for storing geometry data / describing vertex data
+ * A core low-level data structure for storing geometry data / describing vertex data
  * for the GPU.
+ *
  * It:
  * wraps a typed array
  * defines how that array is structured (itemSize, normalized)
@@ -51,10 +52,9 @@ export class BufferAttribute {
   /**
    * This flag can be used for type testing
    *
-   * @readonly
    * @default true
    */
-  public isBufferAttribute: boolean = true;
+  public readonly isBufferAttribute: boolean = true;
 
   /**
    * The ID of the buffer attribute.
@@ -143,13 +143,14 @@ export class BufferAttribute {
   public version: number = 0;
 
   /**
-   * Constructs a new buffer attribure
+   * Constructs a new buffer attribute
    *
    * @param array - The array holding the attribute data
    * @param itemSize - The size of the item
    * @param normalized - Whether the data are normalized or not
    */
   constructor(array: AnyTypedArray, itemSize: number, normalized: boolean = false) {
+
     if (Array.isArray(array)) {
       throw new TypeError('BufferAttribute: array should be a Typed Array');
     }
@@ -166,17 +167,19 @@ export class BufferAttribute {
   }
 
   /**
-   * Sets the given array data in the buffer attribure.
+   * Sets the given array data in the buffer attribute.
    *
    * @param value - The array to set
    * @param offset - The offset in this buffer attribute's array.
    * @returns A reference to this instance
    */
   public set(value: AnyTypedArray, offset: number = 0): this {
+
     // Matching the BufferAttribute constructor, do not normalize the array
     this.array.set(value, offset);
 
     return this;
+
   }
 
   /**
@@ -187,11 +190,13 @@ export class BufferAttribute {
    * @returns The value of the component
    */
   public getComponent(index: number, component: number): number {
+
     let value = this.array[index * this.itemSize + component];
 
     if (this.normalized) value = denormalize(value, this.array);
 
     return value;
+
   }
 
   /**
@@ -203,11 +208,13 @@ export class BufferAttribute {
    * @returns A reference to this instance
    */
   public setComponent(index: number, component: number, value: number): this {
+
     if (this.normalized) value = normalize(value, this.array);
 
     this.array[index * this.itemSize + component] = value;
 
     return this;
+
   }
 
   /**
@@ -217,11 +224,13 @@ export class BufferAttribute {
    * @returns The x component
    */
   public getX(index: number): number {
+
     let x = this.array[index * this.itemSize];
 
     if (this.normalized) x = denormalize(x, this.array);
 
     return x;
+
   }
 
   /**
@@ -232,11 +241,13 @@ export class BufferAttribute {
    * @returns A reference to this instance
    */
   public setX(index: number, x: number): this {
+
     if (this.normalized) x = normalize(x, this.array);
 
     this.array[index * this.itemSize] = x;
 
     return this;
+
   }
 
   /**
@@ -246,10 +257,13 @@ export class BufferAttribute {
    * @returns The y component
    */
   public getY(index: number): number {
+
     let y = this.array[index * this.itemSize + 1];
 
     if (this.normalized) y = denormalize(y, this.array);
+
     return y;
+
   }
 
   /**
@@ -260,11 +274,13 @@ export class BufferAttribute {
    * @returns A reference to this instance
    */
   public setY(index: number, y: number): this {
+
     if (this.normalized) y = normalize(y, this.array);
 
     this.array[index * this.itemSize + 1] = y;
 
     return this;
+
   }
 
   /**
@@ -274,11 +290,13 @@ export class BufferAttribute {
    * @returns The z component
    */
   public getZ(index: number): number {
+
     let z = this.array[index * this.itemSize + 2];
 
     if (this.normalized) z = denormalize(z, this.array);
 
     return z;
+
   }
 
   /**
@@ -289,11 +307,13 @@ export class BufferAttribute {
    * @returns A reference to this instance
    */
   public setZ(index: number, z: number): this {
+
     if (this.normalized) z = normalize(z, this.array);
 
     this.array[index * this.itemSize + 2] = z;
 
     return this;
+
   }
 
   /**
@@ -318,11 +338,13 @@ export class BufferAttribute {
    * @returns A reference to this instance
    */
   public setW(index: number, w: number): this {
+
     if (this.normalized) w = normalize(w, this.array);
 
     this.array[index * this.itemSize + 3] = w;
 
     return this;
+
   }
 
   /**
@@ -334,6 +356,7 @@ export class BufferAttribute {
    * @returns A reference to this instance
    */
   public setXY(index: number, x: number, y: number): this {
+
     index *= this.itemSize;
 
     if (this.normalized) {
@@ -359,6 +382,7 @@ export class BufferAttribute {
    * @returns A reference to this instance
    */
   public setXYZ(index: number, x: number, y: number, z: number): this {
+
     index *= this.itemSize;
 
     if (this.normalized) {
@@ -374,6 +398,7 @@ export class BufferAttribute {
     this.array[index + 2] = z;
 
     return this;
+
   }
 
   /**
@@ -387,6 +412,7 @@ export class BufferAttribute {
    * @returns A reference to this instance
    */
   public setXYZW(index: number, x: number, y: number, z: number, w: number): this {
+
     index *= this.itemSize;
 
     if (this.normalized) {
@@ -404,6 +430,7 @@ export class BufferAttribute {
     this.array[index + 3] = w;
 
     return this;
+
   }
 
   /**
@@ -413,7 +440,9 @@ export class BufferAttribute {
    * Set this to true when you modify the value of the array
    */
   public set needsUpdate(value: boolean) {
+
     if (value === true) this.version++;
+
   }
 
   /**
@@ -423,8 +452,11 @@ export class BufferAttribute {
    * @returns A reference to this attribute
    */
   public setUsage(value: BufferUsage): this {
+
     this.usage = value;
+
     return this;
+
   }
 
   /**
@@ -434,14 +466,18 @@ export class BufferAttribute {
    * @param count - The number of components to update
    */
   public addUpdateRange(start: number, count: number): void {
+
     this.updateRanges.push({ start, count });
+
   }
 
   /**
    * Clears the update ranges array
    */
   public clearUpdateRanges(): void {
+
     this.updateRanges.length = 0;
+
   }
 
   /**
@@ -451,6 +487,7 @@ export class BufferAttribute {
    * @returns A reference to this instance
    */
   public copy(source: BufferAttribute): this {
+
     this.name = source.name;
     // this.array = new source.array.constructor(source.array);
     this.array = source.array;
@@ -478,6 +515,7 @@ export class BufferAttribute {
    * @returns A reference to this buffer attribute
    */
   public copyAt(index1: number, attribute: BufferAttribute, index2: number): this {
+
     index1 *= this.itemSize;
     index2 *= attribute.itemSize;
 
@@ -488,6 +526,7 @@ export class BufferAttribute {
     }
 
     return this;
+
   }
 
   /**
@@ -497,9 +536,11 @@ export class BufferAttribute {
    * @returns A reference to this instance
    */
   public copyArray(array: AnyTypedArray): this {
+
     this.array.set(array);
 
     return this;
+
   }
 
   /**
@@ -512,6 +553,7 @@ export class BufferAttribute {
    * @returns A reference to this instance
    */
   public applyMatrix3(m: Matrix3): this {
+
     if (this.itemSize === 2) {
 
       for (let i = 0, l = this.count; i < l; i++) {
@@ -537,6 +579,7 @@ export class BufferAttribute {
     }
 
     return this;
+
   }
 
   /**
@@ -546,6 +589,7 @@ export class BufferAttribute {
    * @returns A reference to this instance
    */
   public applyMatrix4(m: Matrix4): this {
+
     for (let i = 0, l = this.count; i < l; i++) {
 
       _vector.fromBufferAttribute(this, i);
@@ -557,6 +601,7 @@ export class BufferAttribute {
     }
 
     return this;
+
   }
 
   /**
@@ -566,6 +611,7 @@ export class BufferAttribute {
    * @returns A reference to this instance
    */
   public applyNormalMatrix(m: Matrix3): this {
+
     for (let i = 0, l = this.count; i < l; i++) {
 
       _vector.fromBufferAttribute(this, i);
@@ -577,6 +623,7 @@ export class BufferAttribute {
     }
 
     return this;
+
   }
 
   /**
@@ -589,6 +636,7 @@ export class BufferAttribute {
    * @returns A reference to this instance
    */
   public transformDirection(m: Matrix4): this {
+
     for (let i = 0, l = this.count; i < l; i++) {
 
       _vector.fromBufferAttribute(this, i);
@@ -600,6 +648,7 @@ export class BufferAttribute {
     }
 
     return this;
+
   }
 
   /**
@@ -614,12 +663,16 @@ export class BufferAttribute {
    * @returns A reference to this instance
    */
   public onUpload(callback: () => void): this {
+
     this.onUploadCallback = callback;
 
     return this;
+
   }
 
-
+  // TODO: check if onUploadCalblack(): void {} is correct or if it should be
+  // public onUploadCallback: (() => void) | null = null; which actually
+  // seems more correct
   /**
    * A callback function that is executed after the renderer has transfered the attribute
    * array data to the GPU
@@ -632,7 +685,9 @@ export class BufferAttribute {
    * @returns A clone of this instance
    */
   public clone(): BufferAttribute {
-    return new BufferAttribute(this.array, this.itemSize).copy(this)
+
+    return new BufferAttribute(this.array, this.itemSize).copy(this);
+
   }
 
   /**
@@ -641,6 +696,7 @@ export class BufferAttribute {
    * @returns The serialized buffer attribute
    */
   public toJSON(): any {
+
     type SerializedBufferAttribute = {
       itemSize: number;
       type: string;
@@ -661,26 +717,31 @@ export class BufferAttribute {
     if (this.usage !== StaticDrawUsage) data.usage = this.usage;
 
     return data;
+
   }
+
 }
 
 /**
- * Convenient class that can be used when creating a Int3 buffer attribute
+ * Convenient class that can be used when creating a Int8 buffer attribute
  * with a plain Array instance
  *
  * @augments BufferAttribute
  */
 export class Int8BufferAttribute extends BufferAttribute {
   /**
-   * Contructs a new Int8 buffer attribure
+   * Contructs a new Int8 buffer attribute
    *
    * @param array - The array holding the attribute data
    * @param itemSize - The item size
    * @param normalized - Whether the data is normalized or not
    */
   constructor(array: number[] | Int8Array, itemSize: number, normalized: boolean = false) {
+
     super(new Int8Array(array), itemSize, normalized);
+
   }
+
 }
 
 /**
@@ -698,8 +759,11 @@ export class Uint8BufferAttribute extends BufferAttribute {
    * @param normalized - Whether the data is normalized or not
    */
   constructor(array: number[] | Uint8Array, itemSize: number, normalized: boolean = false) {
+
     super(new Uint8Array(array), itemSize, normalized);
+
   }
+
 }
 
 /**
@@ -717,8 +781,11 @@ export class Uint8ClampedBufferAttribute extends BufferAttribute {
    * @param normalized - Whether the data is normalized or not
    */
   constructor(array: number[] | Uint8ClampedArray, itemSize: number, normalized: boolean = false) {
+
     super(new Uint8ClampedArray(array), itemSize, normalized);
+
   }
+
 }
 
 /**
@@ -736,8 +803,11 @@ export class Int16BufferAttribute extends BufferAttribute {
    * @param normalized - Whether the data is normalized or not
    */
   constructor(array: number[] | Int16Array, itemSize: number, normalized: boolean = false) {
+
     super(new Int16Array(array), itemSize, normalized);
+
   }
+
 }
 
 /**
@@ -755,8 +825,11 @@ export class Uint16BufferAttribute extends BufferAttribute {
    * @param normalized - Whether the data is normalized or not
    */
   constructor(array: number[] | Uint16Array, itemSize: number, normalized: boolean = false) {
+
     super(new Uint16Array(array), itemSize, normalized);
+
   }
+
 }
 
 /**
@@ -774,8 +847,11 @@ export class Int32BufferAttribute extends BufferAttribute {
    * @param normalized - Whether the data is normalized or not
    */
   constructor(array: number[] | Int32Array, itemSize: number, normalized: boolean = false) {
+
     super(new Int32Array(array), itemSize, normalized);
+
   }
+
 }
 
 /**
@@ -793,8 +869,11 @@ export class Uint32BufferAttribute extends BufferAttribute {
    * @param normalized - Whether the data is normalized or not
    */
   constructor(array: number[] | Uint32Array, itemSize: number, normalized: boolean = false) {
+
     super(new Uint32Array(array), itemSize, normalized);
+
   }
+
 }
 
 /**
@@ -812,7 +891,9 @@ export class Float16BufferAttribute extends BufferAttribute {
    * @param normalized - Whether the data is normalized or not
    */
   constructor(array: number[] | Uint16Array, itemSize: number, normalized: boolean = false) {
+
     super(new Uint16Array(array), itemSize, normalized);
+
   }
 
   public getX(index: number): number {
@@ -954,6 +1035,7 @@ export class Float16BufferAttribute extends BufferAttribute {
     return this;
 
   }
+
 }
 
 /**
@@ -971,6 +1053,9 @@ export class Float32BufferAttribute extends BufferAttribute {
    * @param normalized - Whether the data is normalized or not
    */
   constructor(array: number[] | Float32Array, itemSize: number, normalized: boolean = false) {
+
     super(new Float32Array(array), itemSize, normalized);
+
   }
+
 }
