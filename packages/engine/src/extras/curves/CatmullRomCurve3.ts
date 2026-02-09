@@ -113,7 +113,7 @@ const pz = /*@__PURE__*/ new CubicPoly();
  *
  * @augments Curve
  */
-export class CatmullRomCurve3 extends Curve {
+export class CatmullRomCurve3 extends Curve<Vector3> {
 
   /**
    * This flag can be used for type testing.
@@ -337,3 +337,8 @@ export class CatmullRomCurve3 extends Curve {
   }
 
 }
+
+export function isCatmullRomCurve3(curve: Curve<Vector3>): curve is CatmullRomCurve3 {
+  return (curve as any).isCatmullRomCurve3 === true;
+}
+

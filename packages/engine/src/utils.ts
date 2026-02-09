@@ -166,6 +166,31 @@ export function warn(...params: any[]) {
 }
 
 /**
+ * Logs an error message with the '*.' prefix.
+ *
+ * If a custom console function is set via setConsoleFunction(), it will be used
+ * instead of the native console.error. The first parameter is treated as the
+ * method name and is automatically prefixed with '*.'.
+ *
+ * @param {...any} params - The message components. The first param is used as
+ *                          the method name and prefixed with '*.'.
+ */
+export function error(...params: any[]) {
+
+  const message = `. ${params.shift()}`;
+
+  if (_setConsoleFunction) {
+
+    _setConsoleFunction('error', message, ...params);
+
+  } else {
+
+    console.error(message, ...params);
+    
+  }
+}
+
+/**
  * Ensures that a warning message is only logged once, no matter how many times
  * you call it
  *

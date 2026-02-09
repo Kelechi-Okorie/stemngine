@@ -63,10 +63,10 @@ export class TorusKnotGeometry extends BufferGeometry {
 
     // buffers
 
-    const indices = [];
-    const vertices = [];
-    const normals = [];
-    const uvs = [];
+    const indices: number[] = [];
+    const vertices: number[] = [];
+    const normals: number[] = [];
+    const uvs: number[] = [];
 
     // helper variables
 
@@ -170,7 +170,13 @@ export class TorusKnotGeometry extends BufferGeometry {
 
     // this function calculates the current position on the torus curve
 
-    function calculatePositionOnCurve(u, p, q, radius, position) {
+    function calculatePositionOnCurve(
+      u: number,
+      p: number,
+      q: number,
+      radius: number,
+      position: Vector3
+    ) {
 
       const cu = Math.cos(u);
       const su = Math.sin(u);
@@ -202,7 +208,7 @@ export class TorusKnotGeometry extends BufferGeometry {
    * @param {Object} data - A JSON object representing the serialized geometry.
    * @return {TorusKnotGeometry} A new instance.
    */
-  public static fromJSON(data: any) {
+  public static fromJSON(data: any): TorusKnotGeometry {
 
     return new TorusKnotGeometry(data.radius, data.tube, data.tubularSegments, data.radialSegments, data.p, data.q);
 

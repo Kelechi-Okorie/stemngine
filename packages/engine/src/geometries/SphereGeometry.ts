@@ -30,7 +30,15 @@ export class SphereGeometry extends BufferGeometry {
    * @param {number} [thetaStart=0] - The vertical starting angle in radians.
    * @param {number} [thetaLength=Math.PI] - The vertical sweep angle size.
    */
-  constructor(radius = 1, widthSegments = 32, heightSegments = 16, phiStart = 0, phiLength = Math.PI * 2, thetaStart = 0, thetaLength = Math.PI) {
+  constructor(
+    radius: number = 1,
+    widthSegments: number = 32,
+    heightSegments: number = 16,
+    phiStart: number = 0,
+    phiLength: number = Math.PI * 2,
+    thetaStart: number = 0,
+    thetaLength: number = Math.PI
+  ) {
 
     super();
 

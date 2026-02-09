@@ -160,7 +160,7 @@ export class RingGeometry extends BufferGeometry {
    * @param {Object} data - A JSON object representing the serialized geometry.
    * @return {RingGeometry} A new instance.
    */
-  public static fromJSON(data: any) {
+  public static fromJSON(data: any): RingGeometry {
 
     return new RingGeometry(data.innerRadius, data.outerRadius, data.thetaSegments, data.phiSegments, data.thetaStart, data.thetaLength);
 

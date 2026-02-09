@@ -3,6 +3,7 @@ import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import * as Curves from '../extras/curves/Curves.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Vector3 } from '../math/Vector3.js';
+import { TorusGeometry } from './TorusGeometry.js';
 
 /**
  * Creates a tube that extrudes along a 3D curve.
@@ -35,6 +36,12 @@ export class TubeGeometry extends BufferGeometry {
 
   public type = 'TubeGeometry';
 
+      // expose internals
+
+    public tangents: Vector3[];
+    public normals: Vector3[];
+    public binormals: Vector3[];
+
   /**
    * Constructs a new tube geometry.
    *
@@ -45,11 +52,15 @@ export class TubeGeometry extends BufferGeometry {
    * @param {boolean} [closed=false] - Whether the tube is closed or not.
    */
   constructor(
-    path = new Curves['QuadraticBezierCurve3'](new Vector3(- 1, - 1, 0), new Vector3(- 1, 1, 0), new Vector3(1, 1, 0)),
-    tubularSegments = 64,
-    radius = 1,
-    radialSegments = 8,
-    closed = false
+    path: Curves.QuadraticBezierCurve3 = new Curves['QuadraticBezierCurve3'](
+      new Vector3(- 1, - 1, 0),
+      new Vector3(- 1, 1, 0),
+      new Vector3(1, 1, 0)
+    ),
+    tubularSegments: number = 64,
+    radius: number = 1,
+    radialSegments: number = 8,
+    closed: boolean = false
   ) {
 
     super();
@@ -86,10 +97,10 @@ export class TubeGeometry extends BufferGeometry {
 
     // buffer
 
-    const vertices = [];
-    const normals = [];
-    const uvs = [];
-    const indices = [];
+    const vertices: number[] = [];
+    const normals: number[] = [];
+    const uvs: number[] = [];
+    const indices: number[] = [];
 
     // create buffer data
 
@@ -130,7 +141,7 @@ export class TubeGeometry extends BufferGeometry {
 
     }
 
-    function generateSegment(i) {
+    function generateSegment(i: number) {
 
       // we use getPointAt to sample evenly distributed points from the given path
 
@@ -239,12 +250,14 @@ export class TubeGeometry extends BufferGeometry {
    * @param {Object} data - A JSON object representing the serialized geometry.
    * @return {TubeGeometry} A new instance.
    */
-  public static fromJSON(data: any) {
+  public static fromJSON(data: any): TorusGeometry {
 
     // This only works for built-in curves (e.g. CatmullRomCurve3).
     // User defined curves or instances of CurvePath will not be deserialized.
     return new TubeGeometry(
-      new Curves[data.path.type]().fromJSON(data.path),
+      // new Curves[data.path.type]().fromJSON(data.path),
+      // TODO: check if theres a better way
+      new (Curves as Record<string, any>)[data.path.type]().fromJSON(data.path),
       data.tubularSegments,
       data.radius,
       data.radialSegments,

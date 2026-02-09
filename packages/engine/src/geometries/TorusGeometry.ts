@@ -30,7 +30,15 @@ export class TorusGeometry extends BufferGeometry {
    * @param {number} [thetaStart=0] - Start of the tubular sweep in radians.
    * @param {number} [thetaLength=Math.PI*2] - Length of the tubular sweep in radians.
    */
-  constructor(radius = 1, tube = 0.4, radialSegments = 12, tubularSegments = 48, arc = Math.PI * 2, thetaStart = 0, thetaLength = Math.PI * 2) {
+  constructor(
+    radius: number = 1,
+    tube: number = 0.4,
+    radialSegments: number = 12,
+    tubularSegments: number = 48,
+    arc: number = Math.PI * 2,
+    thetaStart: number = 0,
+    thetaLength: number = Math.PI * 2
+  ) {
 
     super();
 
@@ -56,10 +64,10 @@ export class TorusGeometry extends BufferGeometry {
 
     // buffers
 
-    const indices = [];
-    const vertices = [];
-    const normals = [];
-    const uvs = [];
+    const indices: number[] = [];
+    const vertices: number[] = [];
+    const normals: number[] = [];
+    const uvs: number[] = [];
 
     // helper variables
 
@@ -150,7 +158,7 @@ export class TorusGeometry extends BufferGeometry {
    * @param {Object} data - A JSON object representing the serialized geometry.
    * @return {TorusGeometry} A new instance.
    */
-  public static fromJSON(data: any) {
+  public static fromJSON(data: any): TorusGeometry {
 
     return new TorusGeometry(data.radius, data.tube, data.radialSegments, data.tubularSegments, data.arc);
 

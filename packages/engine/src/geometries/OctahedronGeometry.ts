@@ -59,7 +59,7 @@ export class OctahedronGeometry extends PolyhedronGeometry {
 	 * @param {Object} data - A JSON object representing the serialized geometry.
 	 * @return {OctahedronGeometry} A new instance.
 	 */
-	static fromJSON( data ) {
+	public static fromJSON( data: any ): OctahedronGeometry {
 
 		return new OctahedronGeometry( data.radius, data.detail );
 

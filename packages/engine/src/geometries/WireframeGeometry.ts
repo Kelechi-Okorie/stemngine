@@ -50,8 +50,8 @@ export class WireframeGeometry extends BufferGeometry {
 
       // buffer
 
-      const vertices = [];
-      const edges = new Set();
+      const vertices: number[] = [];
+      const edges = new Set<string>();
 
       // helper variables
 
@@ -156,7 +156,7 @@ export class WireframeGeometry extends BufferGeometry {
 
 }
 
-function isUniqueEdge(start, end, edges) {
+function isUniqueEdge(start: Vector3, end: Vector3, edges: Set<string>) {
 
   const hash1 = `${start.x},${start.y},${start.z}-${end.x},${end.y},${end.z}`;
   const hash2 = `${end.x},${end.y},${end.z}-${start.x},${start.y},${start.z}`; // coincident edge

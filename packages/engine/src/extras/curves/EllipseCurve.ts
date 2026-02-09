@@ -24,7 +24,7 @@ import { Vector2 } from '../../math/Vector2';
  *
  * @augments Curve
  */
-export class EllipseCurve extends Curve {
+export class EllipseCurve extends Curve<Vector2> {
 
   /**
  * This flag can be used for type testing.
@@ -260,4 +260,8 @@ export class EllipseCurve extends Curve {
 
   }
 
+}
+
+export function isEllipseCurve(curve: Curve<any>): curve is EllipseCurve {
+  return (curve as any).isEllipseCurve === true;
 }

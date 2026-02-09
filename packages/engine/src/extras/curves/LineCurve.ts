@@ -6,7 +6,7 @@ import { Curve } from '../core/Curve';
  *
  * @augments Curve
  */
-export class LineCurve extends Curve {
+export class LineCurve extends Curve<Vector2> {
 
   /**
    * This flag can be used for type testing.
@@ -122,4 +122,8 @@ export class LineCurve extends Curve {
 
   }
 
+}
+
+export function isLineCurve(curve: Curve<any>): curve is LineCurve {
+  return (curve as any).isLineCurve === true;
 }

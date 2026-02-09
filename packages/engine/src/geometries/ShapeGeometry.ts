@@ -32,7 +32,7 @@ export class ShapeGeometry extends BufferGeometry {
    * @param {number} [curveSegments=12] - Number of segments per shape.
    */
   constructor(
-    shapes = new Shape([
+    shapes: Shape | Shape[] = new Shape([
       new Vector2(0, 0.5),
       new Vector2(- 0.5, - 0.5),
       new Vector2(0.5, - 0.5)
@@ -56,10 +56,10 @@ export class ShapeGeometry extends BufferGeometry {
 
     // buffers
 
-    const indices = [];
-    const vertices = [];
-    const normals = [];
-    const uvs = [];
+    const indices: number[] = [];
+    const vertices: number[] = [];
+    const normals: number[] = [];
+    const uvs: number[] = [];
 
     // helper variables
 
@@ -97,7 +97,7 @@ export class ShapeGeometry extends BufferGeometry {
 
     // helper functions
 
-    function addShape(shape) {
+    function addShape(shape: Shape) {
 
       const indexOffset = vertices.length / 3;
       const points = shape.extractPoints(curveSegments);
@@ -195,9 +195,9 @@ export class ShapeGeometry extends BufferGeometry {
    * @param {Array<Shape>} shapes - An array of shapes.
    * @return {ShapeGeometry} A new instance.
    */
-  public static fromJSON(data, shapes) {
+  public static fromJSON(data: any, shapes: Shape[]) {
 
-    const geometryShapes = [];
+    const geometryShapes: Shape[] = [];
 
     for (let j = 0, jl = data.shapes.length; j < jl; j++) {
 
@@ -213,7 +213,7 @@ export class ShapeGeometry extends BufferGeometry {
 
 }
 
-function toJSON(shapes, data) {
+function toJSON(shapes: Shape | Shape[], data: any) {
 
   data.shapes = [];
 

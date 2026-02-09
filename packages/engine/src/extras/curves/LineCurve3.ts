@@ -1,12 +1,12 @@
-import { Vector3 } from '../../math/Vector3.js';
-import { Curve } from '../core/Curve.js';
+import { Vector3 } from '../../math/Vector3';
+import { Curve } from '../core/Curve';
 
 /**
  * A curve representing a 3D line segment.
  *
  * @augments Curve
  */
-export class LineCurve3 extends Curve {
+export class LineCurve3 extends Curve<Vector3> {
 
   /**
    * This flag can be used for type testing.
@@ -124,4 +124,8 @@ export class LineCurve3 extends Curve {
 
   }
 
+}
+
+export function isLineCurve3(curve: Curve<any>): curve is LineCurve3 {
+  return (curve as any).isLineCurve3 === true;
 }

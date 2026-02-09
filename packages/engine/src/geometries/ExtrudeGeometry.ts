@@ -5,7 +5,41 @@ import { Vector2 } from '../math/Vector2';
 import { Vector3 } from '../math/Vector3';
 import { Shape } from '../extras/core/Shape';
 import { ShapeUtils } from '../extras/ShapeUtils';
-import { error } from '../utils.js';
+import { error } from '../utils';
+import { Curve } from '../extras/core/Curve';
+import { isCatmullRomCurve3 } from '../extras/curves/CatmullRomCurve3';
+
+type ExtrudeGeometryOptions = {
+  /** Number of points on the curves. Default: 12 */
+  curveSegments?: number;
+
+  /** Number of points used for subdividing segments along the depth of the extruded spline. Default: 1 */
+  steps?: number;
+
+  /** Depth to extrude the shape. Default: 1 */
+  depth?: number;
+
+  /** Whether to beveling to the shape or not. Default: true */
+  bevelEnabled?: boolean;
+
+  /** How deep into the original shape the bevel goes. Default: 0.2 */
+  bevelThickness?: number;
+
+  /** Distance from the shape outline that the bevel extends. Default: bevelThickness - 0.1 */
+  bevelSize?: number;
+
+  /** Distance from the shape outline that the bevel starts. Default: 0 */
+  bevelOffset?: number;
+
+  /** Number of bevel layers. Default: 3 */
+  bevelSegments?: number;
+
+  /** A 3D spline path along which the shape should be extruded. Bevels not supported for path extrusion. Default: null */
+  extrudePath?: Curve<Vector3> | null;
+
+  /** An object that provides UV generator functions for custom UV generation. */
+  UVGenerator?: Record<string, any>; // you can refine this type if you know its exact structure
+};
 
 /**
  * Creates extruded geometry from a path shape.
@@ -31,8 +65,7 @@ import { error } from '../utils.js';
  */
 export class ExtrudeGeometry extends BufferGeometry {
 
-      public type = 'ExtrudeGeometry';
-
+  public type = 'ExtrudeGeometry';
 
   /**
    * Constructs a new extrude geometry.
@@ -41,13 +74,13 @@ export class ExtrudeGeometry extends BufferGeometry {
    * @param {ExtrudeGeometry~Options} [options] - The extrude settings.
    */
   constructor(
-    shapes = new Shape([
+    shapes: Shape | Shape[] = new Shape([
       new Vector2(0.5, 0.5),
       new Vector2(- 0.5, 0.5),
       new Vector2(- 0.5, - 0.5),
       new Vector2(0.5, - 0.5)
     ]),
-    options = {}
+    options: ExtrudeGeometryOptions = {}
   ) {
 
     super();
@@ -68,8 +101,8 @@ export class ExtrudeGeometry extends BufferGeometry {
 
     const scope = this;
 
-    const verticesArray = [];
-    const uvArray = [];
+    const verticesArray: number[] = [];
+    const uvArray: number[] = [];
 
     for (let i = 0, l = shapes.length; i < l; i++) {
 
@@ -87,9 +120,9 @@ export class ExtrudeGeometry extends BufferGeometry {
 
     // functions
 
-    function addShape(shape) {
+    function addShape(shape: Shape) {
 
-      const placeholder = [];
+      const placeholder: number[] = [];
 
       // options
 
@@ -109,8 +142,18 @@ export class ExtrudeGeometry extends BufferGeometry {
 
       //
 
-      let extrudePts, extrudeByPath = false;
-      let splineTube, binormal, normal, position2;
+      let extrudePts: Vector3[] = [];
+      let extrudeByPath = false;
+
+      let splineTube = {
+        tangents: [] as Vector3[],
+        normals: [] as Vector3[],
+        binormals: [] as Vector3[],
+      };
+
+      let binormal = new Vector3();
+      let normal = new Vector3();
+      let position2 = new Vector3();
 
       if (extrudePath) {
 
@@ -121,7 +164,7 @@ export class ExtrudeGeometry extends BufferGeometry {
 
         // SETUP TNB variables
 
-        const isClosed = extrudePath.isCatmullRomCurve3 ? extrudePath.closed : false;
+        const isClosed = isCatmullRomCurve3(extrudePath) ? extrudePath.closed : false;
 
         splineTube = extrudePath.computeFrenetFrames(steps, isClosed);
 
@@ -176,7 +219,7 @@ export class ExtrudeGeometry extends BufferGeometry {
       /**Merges index-adjacent points that are within a threshold distance of each other. Array is modified in-place. Threshold distance is empirical, and scaled based on the magnitude of point coordinates.
        * @param {Array<Vector2>} points
       */
-      function mergeOverlappingPoints(points) {
+      function mergeOverlappingPoints(points: Vector2[]) {
 
         const THRESHOLD = 1e-10;
         const THRESHOLD_SQ = THRESHOLD * THRESHOLD;
@@ -228,7 +271,7 @@ export class ExtrudeGeometry extends BufferGeometry {
       }
 
 
-      function scalePt2(pt, vec, size) {
+      function scalePt2(pt: Vector2, vec: Vector2, size: number): Vector2 {
 
         if (!vec) error('ExtrudeGeometry: vec does not exist');
 
@@ -242,7 +285,11 @@ export class ExtrudeGeometry extends BufferGeometry {
       // Find directions for point movement
 
 
-      function getBevelVec(inPt, inPrev, inNext) {
+      function getBevelVec(
+        inPt: Vector2,
+        inPrev: Vector2,
+        inNext: Vector2
+      ): Vector2 {
 
         // computes for inPt the corresponding point inPt' on a new contour
         //   shifted by 1 unit (length of normalized vector) to the left
@@ -404,7 +451,7 @@ export class ExtrudeGeometry extends BufferGeometry {
 
       }
 
-      let faces;
+      let faces: number[][];
 
       if (bevelSegments === 0) {
 
@@ -661,7 +708,7 @@ export class ExtrudeGeometry extends BufferGeometry {
 
       }
 
-      function sidewalls(contour, layeroffset) {
+      function sidewalls(contour: Vector2[], layeroffset: number) {
 
         let i = contour.length;
 
@@ -691,7 +738,7 @@ export class ExtrudeGeometry extends BufferGeometry {
 
       }
 
-      function v(x, y, z) {
+      function v(x: number, y: number, z: number): void {
 
         placeholder.push(x);
         placeholder.push(y);
@@ -700,7 +747,7 @@ export class ExtrudeGeometry extends BufferGeometry {
       }
 
 
-      function f3(a, b, c) {
+      function f3(a: number, b: number, c: number) {
 
         addVertex(a);
         addVertex(b);
@@ -715,7 +762,7 @@ export class ExtrudeGeometry extends BufferGeometry {
 
       }
 
-      function f4(a, b, c, d) {
+      function f4(a: number, b: number, c: number, d: number): void {
 
         addVertex(a);
         addVertex(b);
@@ -739,7 +786,7 @@ export class ExtrudeGeometry extends BufferGeometry {
 
       }
 
-      function addVertex(index) {
+      function addVertex(index: number) {
 
         verticesArray.push(placeholder[index * 3 + 0]);
         verticesArray.push(placeholder[index * 3 + 1]);
@@ -748,7 +795,7 @@ export class ExtrudeGeometry extends BufferGeometry {
       }
 
 
-      function addUV(vector2) {
+      function addUV(vector2: Vector2) {
 
         uvArray.push(vector2.x);
         uvArray.push(vector2.y);
@@ -759,7 +806,7 @@ export class ExtrudeGeometry extends BufferGeometry {
 
   }
 
-  copy(source) {
+  public copy(source: ExtrudeGeometry) {
 
     super.copy(source);
 
@@ -769,7 +816,7 @@ export class ExtrudeGeometry extends BufferGeometry {
 
   }
 
-  toJSON() {
+  public toJSON() {
 
     const data = super.toJSON();
 
@@ -788,7 +835,7 @@ export class ExtrudeGeometry extends BufferGeometry {
    * @param {Array<Shape>} shapes - An array of shapes.
    * @return {ExtrudeGeometry} A new instance.
    */
-  static fromJSON(data, shapes) {
+  public static fromJSON(data: any, shapes: Shape[]) {
 
     const geometryShapes = [];
 
@@ -804,7 +851,10 @@ export class ExtrudeGeometry extends BufferGeometry {
 
     if (extrudePath !== undefined) {
 
-      data.options.extrudePath = new Curves[extrudePath.type]().fromJSON(extrudePath);
+      // data.options.extrudePath = new Curves[extrudePath.type]().fromJSON(extrudePath);
+
+      // TODO: check if there's a better way
+      data.options.extrudePath = new (Curve as Record<string, any>)[extrudePath.type]().fromJSON(extrudePath);
 
     }
 
@@ -816,7 +866,13 @@ export class ExtrudeGeometry extends BufferGeometry {
 
 const WorldUVGenerator = {
 
-  generateTopUV: function (geometry, vertices, indexA, indexB, indexC) {
+  generateTopUV: function (
+    geometry: any,
+    vertices: number[],
+    indexA: number,
+    indexB: number,
+    indexC: number
+  ) {
 
     const a_x = vertices[indexA * 3];
     const a_y = vertices[indexA * 3 + 1];
@@ -833,7 +889,14 @@ const WorldUVGenerator = {
 
   },
 
-  generateSideWallUV: function (geometry, vertices, indexA, indexB, indexC, indexD) {
+  generateSideWallUV: function (
+    geometry: any,
+    vertices: number[],
+    indexA: number,
+    indexB: number,
+    indexC: number,
+    indexD: number
+  ) {
 
     const a_x = vertices[indexA * 3];
     const a_y = vertices[indexA * 3 + 1];
@@ -872,7 +935,11 @@ const WorldUVGenerator = {
 
 };
 
-function toJSON(shapes, options, data) {
+function toJSON(
+  shapes: Shape | Shape[],
+  options: ExtrudeGeometryOptions,
+  data: any
+) {
 
   data.shapes = [];
 
@@ -894,7 +961,11 @@ function toJSON(shapes, options, data) {
 
   data.options = Object.assign({}, options);
 
-  if (options.extrudePath !== undefined) data.options.extrudePath = options.extrudePath.toJSON();
+  if (options.extrudePath != null) {
+
+    data.options.extrudePath = options.extrudePath.toJSON();
+
+  }
 
   return data;
 

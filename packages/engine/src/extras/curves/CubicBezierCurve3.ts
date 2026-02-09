@@ -7,7 +7,7 @@ import { Vector3 } from '../../math/Vector3';
  *
  * @augments Curve
  */
-export class CubicBezierCurve3 extends Curve {
+export class CubicBezierCurve3 extends Curve<Vector3> {
 
   /**
    * This flag can be used for type testing.

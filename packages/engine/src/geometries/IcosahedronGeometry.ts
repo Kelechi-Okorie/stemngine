@@ -21,7 +21,7 @@ export class IcosahedronGeometry extends PolyhedronGeometry {
 	 * @param {number} [radius=1] - Radius of the icosahedron.
 	 * @param {number} [detail=0] - Setting this to a value greater than `0` adds vertices making it no longer a icosahedron.
 	 */
-	constructor( radius = 1, detail = 0 ) {
+	constructor( radius: number = 1, detail: number = 0 ) {
 
 		const t = ( 1 + Math.sqrt( 5 ) ) / 2;
 
@@ -63,7 +63,7 @@ export class IcosahedronGeometry extends PolyhedronGeometry {
 	 * @param {Object} data - A JSON object representing the serialized geometry.
 	 * @return {IcosahedronGeometry} A new instance.
 	 */
-	public static fromJSON( data: any ) {
+	public static fromJSON( data: any ): IcosahedronGeometry {
 
 		return new IcosahedronGeometry( data.radius, data.detail );
 

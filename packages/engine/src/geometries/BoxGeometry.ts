@@ -32,7 +32,7 @@ export class BoxGeometry extends BufferGeometry {
    * @remarks
    * any modifications to the geometry after instantiation are not reflected in this property.
    */
-  public parameters: { [key: string]: number; } | undefined;
+  // public parameters: { [key: string]: number; };
 
   /**
    * Creates a new BoxGeometry instance.

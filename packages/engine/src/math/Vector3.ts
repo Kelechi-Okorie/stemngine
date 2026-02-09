@@ -1115,4 +1115,10 @@ export class Vector3 {
   }
 }
 
+export function isVector3(
+  vector: any
+): vector is Vector3 {
+  return (vector as any).isVector3 === true;
+}
+
 const _vector = /*@__PURE__*/ new Vector3();

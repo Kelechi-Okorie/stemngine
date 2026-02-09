@@ -4,9 +4,9 @@ import { PolyhedronGeometry } from './PolyhedronGeometry.js';
  * A geometry class for representing an tetrahedron.
  *
  * ```js
- * const geometry = new THREE.TetrahedronGeometry();
- * const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
- * const tetrahedron = new THREE.Mesh( geometry, material );
+ * const geometry = new TetrahedronGeometry();
+ * const material = new MeshBasicMaterial( { color: 0xffff00 } );
+ * const tetrahedron = new Mesh( geometry, material );
  * scene.add( tetrahedron );
  * ```
  *
@@ -21,7 +21,7 @@ export class TetrahedronGeometry extends PolyhedronGeometry {
 	 * @param {number} [radius=1] - Radius of the tetrahedron.
 	 * @param {number} [detail=0] - Setting this to a value greater than `0` adds vertices making it no longer a tetrahedron.
 	 */
-	constructor( radius = 1, detail = 0 ) {
+	constructor( radius: number = 1, detail: number = 0 ) {
 
 		const vertices = [
 			1, 1, 1, 	- 1, - 1, 1, 	- 1, 1, - 1, 	1, - 1, - 1
@@ -56,7 +56,7 @@ export class TetrahedronGeometry extends PolyhedronGeometry {
 	 * @param {Object} data - A JSON object representing the serialized geometry.
 	 * @return {TetrahedronGeometry} A new instance.
 	 */
-	public static fromJSON( data: any ) {
+	public static fromJSON( data: any ): TetrahedronGeometry {
 
 		return new TetrahedronGeometry( data.radius, data.detail );
 

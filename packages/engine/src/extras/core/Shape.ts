@@ -1,5 +1,6 @@
-import { Path } from './Path.js';
-import { generateUUID } from '../../math/MathUtils.js';
+import { Path } from './Path';
+import { generateUUID } from '../../math/MathUtils';
+import { Vector2 } from '../../math/Vector2';
 
 /**
  * Defines an arbitrary 2d shape plane using paths with optional holes. It
@@ -7,7 +8,7 @@ import { generateUUID } from '../../math/MathUtils.js';
  * points, or to get triangulated faces.
  *
  * ```js
- * const heartShape = new THREE.Shape();
+ * const heartShape = new Shape();
  *
  * heartShape.moveTo( 25, 25 );
  * heartShape.bezierCurveTo( 25, 25, 20, 0, 0, 0 );
@@ -26,140 +27,139 @@ import { generateUUID } from '../../math/MathUtils.js';
  * 	bevelThickness: 1
  * };
  *
- * const geometry = new THREE.ExtrudeGeometry( heartShape, extrudeSettings );
- * const mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial() );
+ * const geometry = new ExtrudeGeometry( heartShape, extrudeSettings );
+ * const mesh = new Mesh( geometry, new MeshBasicMaterial() );
  * ```
  *
  * @augments Path
  */
 export class Shape extends Path {
 
-	/**
-	 * Constructs a new shape.
-	 *
-	 * @param {Array<Vector2>} [points] - An array of 2D points defining the shape.
-	 */
-	constructor( points ) {
+  /**
+   * The UUID of the shape.
+   *
+   * @type {string}
+   * @readonly
+   */
+  public uuid: string = generateUUID();
 
-		super( points );
+  /**
+   * Defines the holes in the shape. Hole definitions must use the
+   * opposite winding order (CW/CCW) than the outer shape.
+   *
+   * @type {Array<Path>}
+   * @readonly
+   */
+  public holes: Path[] = [];
 
-		/**
-		 * The UUID of the shape.
-		 *
-		 * @type {string}
-		 * @readonly
-		 */
-		this.uuid = generateUUID();
+  /**
+   * Constructs a new shape.
+   *
+   * @param {Array<Vector2>} [points] - An array of 2D points defining the shape.
+   */
+  constructor(points: Vector2[]) {
 
-		this.type = 'Shape';
+    super(points);
 
-		/**
-		 * Defines the holes in the shape. Hole definitions must use the
-		 * opposite winding order (CW/CCW) than the outer shape.
-		 *
-		 * @type {Array<Path>}
-		 * @readonly
-		 */
-		this.holes = [];
+    this.type = 'Shape';
 
-	}
+  }
 
-	/**
-	 * Returns an array representing each contour of the holes
-	 * as a list of 2D points.
-	 *
-	 * @param {number} divisions - The fineness of the result.
-	 * @return {Array<Array<Vector2>>} The holes as a series of 2D points.
-	 */
-	getPointsHoles( divisions ) {
+  /**
+   * Returns an array representing each contour of the holes
+   * as a list of 2D points.
+   *
+   * @param {number} divisions - The fineness of the result.
+   * @return {Array<Array<Vector2>>} The holes as a series of 2D points.
+   */
+  public getPointsHoles(divisions: number): Vector2[][] {
 
-		const holesPts = [];
+    const holesPts = [];
 
-		for ( let i = 0, l = this.holes.length; i < l; i ++ ) {
+    for (let i = 0, l = this.holes.length; i < l; i++) {
 
-			holesPts[ i ] = this.holes[ i ].getPoints( divisions );
+      holesPts[i] = this.holes[i].getPoints(divisions);
 
-		}
+    }
 
-		return holesPts;
+    return holesPts;
 
-	}
+  }
 
-	// get points of shape and holes (keypoints based on segments parameter)
+  // get points of shape and holes (keypoints based on segments parameter)
 
-	/**
-	 * Returns an object that holds contour data for the shape and its holes as
-	 * arrays of 2D points.
-	 *
-	 * @param {number} divisions - The fineness of the result.
-	 * @return {{shape:Array<Vector2>,holes:Array<Array<Vector2>>}} An object with contour data.
-	 */
-	extractPoints( divisions ) {
+  /**
+   * Returns an object that holds contour data for the shape and its holes as
+   * arrays of 2D points.
+   *
+   * @param {number} divisions - The fineness of the result.
+   * @return {{shape:Array<Vector2>,holes:Array<Array<Vector2>>}} An object with contour data.
+   */
+  public extractPoints(divisions: number) {
 
-		return {
+    return {
 
-			shape: this.getPoints( divisions ),
-			holes: this.getPointsHoles( divisions )
+      shape: this.getPoints(divisions),
+      holes: this.getPointsHoles(divisions)
 
-		};
+    };
 
-	}
+  }
 
-	copy( source ) {
+  public copy(source: Shape) {
 
-		super.copy( source );
+    super.copy(source);
 
-		this.holes = [];
+    this.holes = [];
 
-		for ( let i = 0, l = source.holes.length; i < l; i ++ ) {
+    for (let i = 0, l = source.holes.length; i < l; i++) {
 
-			const hole = source.holes[ i ];
+      const hole = source.holes[i];
 
-			this.holes.push( hole.clone() );
+      // TODO: check if it's better to override clone instead
+      // of casting to Path
+      this.holes.push(hole.clone() as Path);
 
-		}
+    }
 
-		return this;
+    return this;
 
-	}
+  }
 
-	toJSON() {
+  public toJSON() {
 
-		const data = super.toJSON();
+    const data = super.toJSON();
 
-		data.uuid = this.uuid;
-		data.holes = [];
+    data.uuid = this.uuid;
+    data.holes = [];
 
-		for ( let i = 0, l = this.holes.length; i < l; i ++ ) {
+    for (let i = 0, l = this.holes.length; i < l; i++) {
 
-			const hole = this.holes[ i ];
-			data.holes.push( hole.toJSON() );
+      const hole = this.holes[i];
+      data.holes.push(hole.toJSON());
 
-		}
+    }
 
-		return data;
+    return data;
 
-	}
+  }
 
-	fromJSON( json ) {
+  public fromJSON(json: any): this {
 
-		super.fromJSON( json );
+    super.fromJSON(json);
 
-		this.uuid = json.uuid;
-		this.holes = [];
+    this.uuid = json.uuid;
+    this.holes = [];
 
-		for ( let i = 0, l = json.holes.length; i < l; i ++ ) {
+    for (let i = 0, l = json.holes.length; i < l; i++) {
 
-			const hole = json.holes[ i ];
-			this.holes.push( new Path().fromJSON( hole ) );
+      const hole = json.holes[i];
+      this.holes.push(new Path().fromJSON(hole));
 
-		}
+    }
 
-		return this;
+    return this;
 
-	}
+  }
 
 }
-
-
-export { Shape };

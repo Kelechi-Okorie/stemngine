@@ -58,11 +58,14 @@ export class Curve<T extends Vector2 | Vector3> {
    * @param {(Vector2|Vector3)} [optionalTarget] - The optional target vector the result is written to.
    * @return {(Vector2|Vector3)} The position on the curve. It can be a 2D or 3D vector depending on the curve definition.
    */
-  public getPoint(t: number, optionalTarget?: Vector2 | Vector3) {
+  public getPoint(t: number, optionalTarget?: T): T {
 
     warn('Curve: .getPoint() not implemented.');
 
-    return optionalTarget ?? new Vector2();
+    // return optionalTarget;
+
+    // fallback only if undefined
+    return optionalTarget ?? (isVector2(new Vector2()) ? new Vector2() as T : new Vector3() as T);
 
   }
 
@@ -75,7 +78,7 @@ export class Curve<T extends Vector2 | Vector3> {
    * @param {(Vector2|Vector3)} [optionalTarget] - The optional target vector the result is written to.
    * @return {(Vector2|Vector3)} The position on the curve. It can be a 2D or 3D vector depending on the curve definition.
    */
-  public getPointAt(u: number, optionalTarget?: Vector2 | Vector3) {
+  public getPointAt(u: number, optionalTarget?: T): T {
 
     const t = this.getUtoTmapping(u);
     return this.getPoint(t, optionalTarget);
@@ -89,7 +92,7 @@ export class Curve<T extends Vector2 | Vector3> {
    * @param {number} [divisions=5] - The number of divisions.
    * @return {Array<(Vector2|Vector3)>} An array holding the sampled curve values. The number of points is `divisions + 1`.
    */
-  public getPoints(divisions = 5) {
+  public getPoints(divisions: number = 5): T[] {
 
     const points = [];
 
@@ -113,7 +116,7 @@ export class Curve<T extends Vector2 | Vector3> {
    * @param {number} [divisions=5] - The number of divisions.
    * @return {Array<(Vector2|Vector3)>} An array holding the sampled curve values. The number of points is `divisions + 1`.
    */
-  public getSpacedPoints(divisions = 5) {
+  public getSpacedPoints(divisions: number = 5): Array<T> {
 
     const points = [];
 
@@ -158,7 +161,7 @@ export class Curve<T extends Vector2 | Vector3> {
     this.needsUpdate = false;
 
     const cache: number[] = [];
-    let current: Vector2 | Vector3, last = this.getPoint(0);
+    let current: T, last: T = this.getPoint(0);
     let sum = 0;
 
     cache.push(0);
@@ -294,14 +297,14 @@ export class Curve<T extends Vector2 | Vector3> {
   /**
    * Returns a unit vector tangent for the given interpolation factor.
    * If the derived curve does not implement its tangent derivation,
-   * two points a small delta apart will be used to find its gradient
+   * two points, a small delta apart, will be used to find its gradient
    * which seems to give a reasonable approximation.
    *
    * @param {number} t - The interpolation factor.
    * @param {(Vector2|Vector3)} [optionalTarget] - The optional target vector the result is written to.
    * @return {(Vector2|Vector3)} The tangent vector.
    */
-  public getTangent(t: number, optionalTarget?: Vector2 | Vector3): Vector2 | Vector3 {
+  public getTangent(t: number, optionalTarget?: T): T {
 
     const delta = 0.0001;
     let t1 = t - delta;
@@ -312,10 +315,13 @@ export class Curve<T extends Vector2 | Vector3> {
     if (t1 < 0) t1 = 0;
     if (t2 > 1) t2 = 1;
 
-    const pt1 = this.getPoint(t1);
-    const pt2 = this.getPoint(t2);
+    const pt1: T = this.getPoint(t1);
+    const pt2: T = this.getPoint(t2);
 
-    const tangent = optionalTarget || ((isVector2(pt1)) ? new Vector2() : new Vector3());
+    // const tangent = optionalTarget || ((isVector2(pt1)) ? new Vector2() : new Vector3());
+
+    // use the passed target, or fallback to pt1.clone() for the correct type
+    const tangent: T = optionalTarget ?? pt1.clone() as T;
 
     // tangent.copy(pt2).sub(pt1).normalize();
 
@@ -345,7 +351,7 @@ export class Curve<T extends Vector2 | Vector3> {
    * @return {(Vector2|Vector3)} The tangent vector.
    * @see {@link Curve#getPointAt}
    */
-  public getTangentAt(u: number, optionalTarget?: Vector2 | Vector3) {
+  public getTangentAt(u: number, optionalTarget?: T): T {
 
     const t = this.getUtoTmapping(u);
     return this.getTangent(t, optionalTarget);
@@ -379,7 +385,8 @@ export class Curve<T extends Vector2 | Vector3> {
 
       const u = i / segments;
 
-      tangents[i] = this.getTangentAt(u, new Vector3()) as Vector3;
+      // tangents[i] = this.getTangentAt(u, new Vector3());
+      tangents[i] = this.getTangent(u) as Vector3;
 
     }
 
@@ -479,10 +486,10 @@ export class Curve<T extends Vector2 | Vector3> {
    *
    * @return {Curve} A clone of this instance.
    */
-  public clone(): Curve {
+  public clone(): Curve<T> {
 
     // return new this.constructor().copy( this );
-    return new Curve().copy(this);
+    return new Curve<T>().copy(this);
 
   }
 
@@ -492,7 +499,7 @@ export class Curve<T extends Vector2 | Vector3> {
    * @param {Curve} source - The curve to copy.
    * @return {Curve} A reference to this curve.
    */
-  public copy(source: Curve): this {
+  public copy(source: Curve<T>): this {
 
     this.arcLengthDivisions = source.arcLengthDivisions;
 

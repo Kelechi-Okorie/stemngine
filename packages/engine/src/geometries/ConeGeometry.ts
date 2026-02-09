@@ -17,7 +17,6 @@ export class ConeGeometry extends CylinderGeometry {
 
   public type = 'ConeGeometry';
 
-
   /**
    * Constructs a new cone geometry.
    *

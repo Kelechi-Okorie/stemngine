@@ -192,9 +192,12 @@ export class BufferGeometry extends EventDispatcher {
   public userData: Record<string, any> = {};
 
   /**
-   * To keep typescript happy
+   * Holds the constructor parameters that have been used to generate this geometry.
+   *
+   * @remarks
+   * any modifications to the geometry after instantiation are not reflected in this property.
    */
-  public parameters?: { [key: string]: any };
+  public parameters!: { [key: string]: any };
 
   /**
    * Constructs a new BufferGeometry.
@@ -1531,5 +1534,5 @@ function isGLBufferAttribute(
 ): attribute is GLBufferAttribute {
 
   return attribute?.isGLBufferAttribute === true;
-  
+
 }

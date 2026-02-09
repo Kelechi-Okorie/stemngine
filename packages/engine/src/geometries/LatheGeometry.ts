@@ -35,7 +35,16 @@ export class LatheGeometry extends BufferGeometry {
    * @param {number} [phiLength=Math.PI*2] - The radian (0 to 2PI) range of the lathed section 2PI is a
    * closed lathe, less than 2PI is a portion.
    */
-  constructor(points = [new Vector2(0, - 0.5), new Vector2(0.5, 0), new Vector2(0, 0.5)], segments = 12, phiStart = 0, phiLength = Math.PI * 2) {
+  constructor(
+    points: Vector2[] = [
+      new Vector2(0, - 0.5),
+      new Vector2(0.5, 0),
+      new Vector2(0, 0.5)
+    ],
+    segments: number = 12,
+    phiStart: number = 0,
+    phiLength: number = Math.PI * 2
+  ) {
 
     super();
 
