@@ -1,3 +1,4 @@
+import { InterpolationMode } from '../../constants';
 import { KeyframeTrack } from '../KeyframeTrack';
 
 /**
@@ -7,6 +8,17 @@ import { KeyframeTrack } from '../KeyframeTrack';
  */
 export class NumberKeyframeTrack extends KeyframeTrack {
 
+
+	/**
+	 * The value type name.
+	 *
+	 * @type {string}
+	 * @default 'number'
+	 */
+	public ValueTypeName: string = 'number';
+	// ValueBufferType is inherited
+	// DefaultInterpolation is inherited
+
 	/**
 	 * Constructs a new number keyframe track.
 	 *
@@ -15,20 +27,15 @@ export class NumberKeyframeTrack extends KeyframeTrack {
 	 * @param {Array<number>} values - A list of keyframe values.
 	 * @param {(InterpolateLinear|InterpolateDiscrete|InterpolateSmooth)} [interpolation] - The interpolation type.
 	 */
-	constructor( name, times, values, interpolation ) {
+	constructor(
+		name: string,
+		times: number[],
+		values: number[],
+		interpolation: InterpolationMode
+	) {
 
-		super( name, times, values, interpolation );
+		super(name, times, values, interpolation);
 
 	}
 
 }
-
-/**
- * The value type name.
- *
- * @type {string}
- * @default 'number'
- */
-NumberKeyframeTrack.prototype.ValueTypeName = 'number';
-// ValueBufferType is inherited
-// DefaultInterpolation is inherited

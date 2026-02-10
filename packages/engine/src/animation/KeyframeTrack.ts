@@ -2,7 +2,10 @@ import {
   InterpolateLinear,
   InterpolateSmooth,
   InterpolateDiscrete,
-  InterpolateBezier
+  InterpolateBezier,
+  InterpolationMode,
+  AnyTypedArray,
+  TypedArrayConstructor
 } from '../constants.js';
 import { CubicInterpolant } from '../math/interpolants/CubicInterpolant';
 import { LinearInterpolant } from '../math/interpolants/LinearInterpolant';
@@ -10,6 +13,21 @@ import { DiscreteInterpolant } from '../math/interpolants/DiscreteInterpolant';
 import { BezierInterpolant } from '../math/interpolants/BezierInterpolant';
 import * as AnimationUtils from './AnimationUtils';
 import { warn, error } from '../utils';
+import { BezierSettings } from '../math/interpolants/BezierInterpolant';
+
+interface KeyframeTrackJSON {
+  name: string;
+  times: number[],
+  values: number[],
+  interpolation?: InterpolationMode;
+  type: string;
+}
+
+export type InterpolantFactory = (result: AnyTypedArray) =>
+  | DiscreteInterpolant
+  | LinearInterpolant
+  | CubicInterpolant
+  | BezierInterpolant;
 
 /**
  * Represents a timed sequence of keyframes, which are composed of lists of
@@ -19,6 +37,67 @@ import { warn, error } from '../utils';
 export class KeyframeTrack {
 
   /**
+   * The track's name can refer to morph targets or bones or
+   * possibly other values within an animated object. See {@link PropertyBinding#parseTrackName}
+   * for the forms of strings that can be parsed for property binding.
+   *
+   * @type {string}
+   */
+  public name: string;
+
+  /**
+   * The keyframe times.
+   *
+   * @type {Float32Array}
+   */
+  public times: Float32Array;
+
+  /**
+   * The keyframe values.
+   *
+   * @type {Float32Array}
+   */
+  public values: Float32Array;
+
+  /**
+   * The value type name.
+   *
+   * @type {string}
+   * @default ''
+   */
+  public ValueTypeName: string = '';
+
+  /**
+   * The time buffer type of this keyframe track.
+   *
+   * @type {TypedArray|Array}
+   * @default Float32Array.constructor
+   */
+  public TimeBufferType: TypedArrayConstructor<Float32Array> = Float32Array;
+
+  /**
+   * The value buffer type of this keyframe track.
+   *
+   * @type {TypedArray|Array}
+   * @default Float32Array.constructor
+   */
+  public ValueBufferType: ArrayConstructor | TypedArrayConstructor<Float32Array> = Float32Array;
+
+  /**
+   * The default interpolation type of this keyframe track.
+   *
+   * @type {(InterpolateLinear|InterpolateDiscrete|InterpolateSmooth|InterpolateBezier)}
+   * @default InterpolateLinear
+   */
+  public DefaultInterpolation: InterpolationMode = InterpolateLinear;
+
+  // to make TS happy
+  public settings?: BezierSettings;
+
+  // to make TS happy
+  public createInterpolant!: InterpolantFactory;
+
+  /**
    * Constructs a new keyframe track.
    *
    * @param {string} name - The keyframe track's name.
@@ -26,37 +105,20 @@ export class KeyframeTrack {
    * @param {Array<number|string|boolean>} values - A list of keyframe values.
    * @param {(InterpolateLinear|InterpolateDiscrete|InterpolateSmooth|InterpolateBezier)} [interpolation] - The interpolation type.
    */
-  export constructor(
-    name,
-    times,
-    values,
-    interpolation
+  constructor(
+    name: string,
+    times: number[],
+    values: number[] | string[] | boolean[],
+    interpolation: InterpolationMode = this.DefaultInterpolation
   ) {
 
-    if (name === undefined) throw new Error('THREE.KeyframeTrack: track name is undefined');
-    if (times === undefined || times.length === 0) throw new Error('THREE.KeyframeTrack: no keyframes in track named ' + name);
+    if (name === undefined) throw new Error('KeyframeTrack: track name is undefined');
+    if (times === undefined || times.length === 0) throw new Error('KeyframeTrack: no keyframes in track named ' + name);
 
-    /**
-     * The track's name can refer to morph targets or bones or
-     * possibly other values within an animated object. See {@link PropertyBinding#parseTrackName}
-     * for the forms of strings that can be parsed for property binding.
-     *
-     * @type {string}
-     */
     this.name = name;
 
-    /**
-     * The keyframe times.
-     *
-     * @type {Float32Array}
-     */
     this.times = AnimationUtils.convertArray(times, this.TimeBufferType);
 
-    /**
-     * The keyframe values.
-     *
-     * @type {Float32Array}
-     */
     this.values = AnimationUtils.convertArray(values, this.ValueBufferType);
 
     this.setInterpolation(interpolation || this.DefaultInterpolation);
@@ -70,11 +132,11 @@ export class KeyframeTrack {
    * @param {KeyframeTrack} track - The keyframe track to serialize.
    * @return {Object} The serialized keyframe track as JSON.
    */
-  static toJSON(track) {
+  public static toJSON(track: any): any {  // TODO: check type
 
     const trackType = track.constructor;
 
-    let json;
+    let json = {} as KeyframeTrackJSON;
 
     // derived classes can define a static toJSON method
     if (trackType.toJSON !== this.toJSON) {
@@ -84,13 +146,17 @@ export class KeyframeTrack {
     } else {
 
       // by default, we assume the data can be serialized as-is
-      json = {
+      // json = {
 
-        'name': track.name,
-        'times': AnimationUtils.convertArray(track.times, Array),
-        'values': AnimationUtils.convertArray(track.values, Array)
+      //   'name': track.name,
+      //   'times': AnimationUtils.convertArray(track.times, Array),
+      //   'values': AnimationUtils.convertArray(track.values, Array),
 
-      };
+      // };
+
+      json.name = track.name;
+      json.times = AnimationUtils.convertArray(track.times, Array);
+      json.values = AnimationUtils.convertArray(track.values, Array);
 
       const interpolation = track.getInterpolation();
 
@@ -115,7 +181,7 @@ export class KeyframeTrack {
    * @param {TypedArray} [result] - The result buffer.
    * @return {DiscreteInterpolant} The new interpolant.
    */
-  InterpolantFactoryMethodDiscrete(result) {
+  public InterpolantFactoryMethodDiscrete(result: AnyTypedArray): DiscreteInterpolant {
 
     return new DiscreteInterpolant(this.times, this.values, this.getValueSize(), result);
 
@@ -128,7 +194,7 @@ export class KeyframeTrack {
    * @param {TypedArray} [result] - The result buffer.
    * @return {LinearInterpolant} The new interpolant.
    */
-  InterpolantFactoryMethodLinear(result) {
+  public InterpolantFactoryMethodLinear(result: AnyTypedArray): LinearInterpolant {
 
     return new LinearInterpolant(this.times, this.values, this.getValueSize(), result);
 
@@ -141,7 +207,7 @@ export class KeyframeTrack {
    * @param {TypedArray} [result] - The result buffer.
    * @return {CubicInterpolant} The new interpolant.
    */
-  InterpolantFactoryMethodSmooth(result) {
+  public InterpolantFactoryMethodSmooth(result: AnyTypedArray): CubicInterpolant {
 
     return new CubicInterpolant(this.times, this.values, this.getValueSize(), result);
 
@@ -159,7 +225,7 @@ export class KeyframeTrack {
    * @param {TypedArray} [result] - The result buffer.
    * @return {BezierInterpolant} The new interpolant.
    */
-  InterpolantFactoryMethodBezier(result) {
+  public InterpolantFactoryMethodBezier(result: AnyTypedArray): BezierInterpolant {
 
     const interpolant = new BezierInterpolant(this.times, this.values, this.getValueSize(), result);
 
@@ -180,7 +246,7 @@ export class KeyframeTrack {
    * @param {(InterpolateLinear|InterpolateDiscrete|InterpolateSmooth|InterpolateBezier)} interpolation - The interpolation type.
    * @return {KeyframeTrack} A reference to this keyframe track.
    */
-  setInterpolation(interpolation) {
+  public setInterpolation(interpolation: InterpolationMode): this {
 
     let factoryMethod;
 
@@ -248,7 +314,7 @@ export class KeyframeTrack {
    *
    * @return {(InterpolateLinear|InterpolateDiscrete|InterpolateSmooth|InterpolateBezier)} The interpolation type.
    */
-  getInterpolation() {
+  public getInterpolation(): InterpolationMode {
 
     switch (this.createInterpolant) {
 
@@ -270,6 +336,8 @@ export class KeyframeTrack {
 
     }
 
+    return this.DefaultInterpolation;
+
   }
 
   /**
@@ -277,7 +345,7 @@ export class KeyframeTrack {
    *
    * @return {number} The value size.
    */
-  getValueSize() {
+  public getValueSize(): number {
 
     return this.values.length / this.times.length;
 
@@ -289,7 +357,7 @@ export class KeyframeTrack {
    * @param {number} timeOffset - The offset to move the time values.
    * @return {KeyframeTrack} A reference to this keyframe track.
    */
-  shift(timeOffset) {
+  public shift(timeOffset: number): this {
 
     if (timeOffset !== 0.0) {
 
@@ -313,7 +381,7 @@ export class KeyframeTrack {
    * @param {number} timeScale - The time scale.
    * @return {KeyframeTrack} A reference to this keyframe track.
    */
-  scale(timeScale) {
+  public scale(timeScale: number): this {
 
     if (timeScale !== 1.0) {
 
@@ -341,7 +409,7 @@ export class KeyframeTrack {
    * @param {number} endTime - The end time.
    * @return {KeyframeTrack} A reference to this keyframe track.
    */
-  trim(startTime, endTime) {
+  public trim(startTime: number, endTime: number): this {
 
     const times = this.times,
       nKeys = times.length;
@@ -389,7 +457,7 @@ export class KeyframeTrack {
    *
    * @return {boolean} Whether the keyframes are valid or not.
    */
-  validate() {
+  public validate(): boolean {
 
     let valid = true;
 
@@ -471,7 +539,7 @@ export class KeyframeTrack {
    *
    * @return {KeyframeTrack} A reference to this keyframe track.
    */
-  optimize() {
+  public optimize(): this {
 
     // (0,0,0,0,1,1,1,0,0,0,0,0,0,0) --> (0,0,1,1,0,0)
 
@@ -589,13 +657,23 @@ export class KeyframeTrack {
    *
    * @return {KeyframeTrack} A clone of this instance.
    */
-  clone() {
+  public clone(): KeyframeTrack {
 
-    const times = this.times.slice();
-    const values = this.values.slice();
+    const times = Array.from(this.times.slice());
+    const values = Array.from(this.values.slice());
 
-    const TypedKeyframeTrack = this.constructor;
+    // const TypedKeyframeTrack = this.constructor;
+
+    const TypedKeyframeTrack = this.constructor as new (
+      name: string,
+      times: number[],
+      values: number[] | string[] | boolean[],
+      interpolation?: InterpolationMode
+    ) => KeyframeTrack;
+
     const track = new TypedKeyframeTrack(this.name, times, values);
+
+    // const track2 = new KeyframeTrack(this.name, times, values, this.DefaultInterpolation);
 
     // Interpolant argument to constructor is not saved, so copy the factory method directly.
     track.createInterpolant = this.createInterpolant;
@@ -605,35 +683,3 @@ export class KeyframeTrack {
   }
 
 }
-
-/**
- * The value type name.
- *
- * @type {string}
- * @default ''
- */
-KeyframeTrack.prototype.ValueTypeName = '';
-
-/**
- * The time buffer type of this keyframe track.
- *
- * @type {TypedArray|Array}
- * @default Float32Array.constructor
- */
-KeyframeTrack.prototype.TimeBufferType = Float32Array;
-
-/**
- * The value buffer type of this keyframe track.
- *
- * @type {TypedArray|Array}
- * @default Float32Array.constructor
- */
-KeyframeTrack.prototype.ValueBufferType = Float32Array;
-
-/**
- * The default interpolation type of this keyframe track.
- *
- * @type {(InterpolateLinear|InterpolateDiscrete|InterpolateSmooth|InterpolateBezier)}
- * @default InterpolateLinear
- */
-KeyframeTrack.prototype.DefaultInterpolation = InterpolateLinear;

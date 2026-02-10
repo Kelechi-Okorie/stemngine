@@ -95,7 +95,7 @@ export type EulerOrder = 'XYZ' | 'YXZ' | 'ZXY' | 'ZYX' | 'YZX' | 'XZY';
  */
 export const EulerDefaultOrder = 'XYZ';
 
-export type InterpolationMode = typeof InterpolateLinear | typeof InterpolateDiscrete | typeof InterpolateSmooth;
+export type InterpolationMode = typeof InterpolateLinear | typeof InterpolateDiscrete | typeof InterpolateSmooth | typeof InterpolateBezier;
 
 export type AnimationBlendMode = typeof NormalBlending | typeof AdditiveBlending;
 
@@ -1446,6 +1446,17 @@ export const InterpolateLinear: number = 2301;
  * @constant
  */
 export const InterpolateSmooth: number = 2302;
+
+/**
+ * Bezier interpolation mode for keyframe tracks.
+ * 
+ * Uses cubic Bezier curves with explicit 2D controls points.
+ * Requires tangent data to be set on the track.
+ * 
+ * @type {number}
+ * @constant
+ */
+export const InterpolateBezier: number = 2303;
 
 /**
  * Zero curvature ending for animations.

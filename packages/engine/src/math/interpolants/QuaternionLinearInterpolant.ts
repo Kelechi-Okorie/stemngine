@@ -1,3 +1,4 @@
+import { AnyTypedArray } from '../../constants';
 import { Interpolant } from '../Interpolant';
 import { Quaternion } from '../Quaternion';
 
@@ -16,25 +17,35 @@ export class QuaternionLinearInterpolant extends Interpolant {
 	 * @param {number} sampleSize - The sample size
 	 * @param {TypedArray} [resultBuffer] - The result buffer.
 	 */
-	constructor( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
+	constructor(
+		parameterPositions: AnyTypedArray,
+		sampleValues: AnyTypedArray,
+		sampleSize: number,
+		resultBuffer: AnyTypedArray
+	) {
 
-		super( parameterPositions, sampleValues, sampleSize, resultBuffer );
+		super(parameterPositions, sampleValues, sampleSize, resultBuffer);
 
 	}
 
-	interpolate_( i1, t0, t, t1 ) {
+	public interpolate_(i1: number, t0: number, t: number, t1: number): AnyTypedArray {
 
 		const result = this.resultBuffer,
 			values = this.sampleValues,
 			stride = this.valueSize,
 
-			alpha = ( t - t0 ) / ( t1 - t0 );
+			alpha = (t - t0) / (t1 - t0);
 
 		let offset = i1 * stride;
 
-		for ( let end = offset + stride; offset !== end; offset += 4 ) {
+		for (let end = offset + stride; offset !== end; offset += 4) {
 
-			Quaternion.slerpFlat( result, 0, values, offset - stride, values, offset, alpha );
+			const resultArray = Array.from(result);
+			const valuesArray = Array.from(values)
+
+			// Quaternion.slerpFlat(result, 0, values, offset - stride, values, offset, alpha);
+
+			Quaternion.slerpFlat(resultArray, 0, valuesArray, offset - stride, valuesArray, offset, alpha);
 
 		}
 

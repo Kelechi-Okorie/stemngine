@@ -1,5 +1,6 @@
 import { KeyframeTrack } from '../KeyframeTrack';
 import { QuaternionLinearInterpolant } from '../../math/interpolants/QuaternionLinearInterpolant';
+import { AnyTypedArray, InterpolationMode } from '../../constants';
 
 /**
  * A track for Quaternion keyframe values.
@@ -9,6 +10,17 @@ import { QuaternionLinearInterpolant } from '../../math/interpolants/QuaternionL
 export class QuaternionKeyframeTrack extends KeyframeTrack {
 
 	/**
+	 * The value type name.
+	 *
+	 * @type {string}
+	 * @default 'quaternion'
+	 */
+	public ValueTypeName: string = 'quaternion';
+	// ValueBufferType is inherited
+	// DefaultInterpolation is inherited;
+	// public InterpolantFactoryMethodSmooth = undefined;
+
+	/**
 	 * Constructs a new Quaternion keyframe track.
 	 *
 	 * @param {string} name - The keyframe track's name.
@@ -16,9 +28,14 @@ export class QuaternionKeyframeTrack extends KeyframeTrack {
 	 * @param {Array<number>} values - A list of keyframe values.
 	 * @param {(InterpolateLinear|InterpolateDiscrete|InterpolateSmooth)} [interpolation] - The interpolation type.
 	 */
-	constructor( name, times, values, interpolation ) {
+	constructor(
+		name: string, 
+		times: number[], 
+		values: number[], 
+		interpolation: InterpolationMode
+	) {
 
-		super( name, times, values, interpolation );
+		super(name, times, values, interpolation);
 
 	}
 
@@ -29,21 +46,10 @@ export class QuaternionKeyframeTrack extends KeyframeTrack {
 	 * @param {TypedArray} [result] - The result buffer.
 	 * @return {QuaternionLinearInterpolant} The new interpolant.
 	 */
-	InterpolantFactoryMethodLinear( result ) {
+	public InterpolantFactoryMethodLinear(result: AnyTypedArray): QuaternionLinearInterpolant  {
 
-		return new QuaternionLinearInterpolant( this.times, this.values, this.getValueSize(), result );
+		return new QuaternionLinearInterpolant(this.times, this.values, this.getValueSize(), result);
 
 	}
 
 }
-
-/**
- * The value type name.
- *
- * @type {string}
- * @default 'quaternion'
- */
-QuaternionKeyframeTrack.prototype.ValueTypeName = 'quaternion';
-// ValueBufferType is inherited
-// DefaultInterpolation is inherited;
-QuaternionKeyframeTrack.prototype.InterpolantFactoryMethodSmooth = undefined;

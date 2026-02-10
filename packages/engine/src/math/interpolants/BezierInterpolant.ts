@@ -1,4 +1,11 @@
+import { AnyTypedArray } from '../../constants';
 import { Interpolant } from '../Interpolant';
+
+// to make TS happy
+export interface BezierSettings {
+	inTangents: Float32Array;
+	outTangents: Float32Array;
+}
 
 /**
  * A Bezier interpolant using cubic Bezier curves with 2D control points.
@@ -18,9 +25,13 @@ import { Interpolant } from '../Interpolant';
  *
  * @augments Interpolant
  */
-export class BezierInterpolant extends Interpolant {
+export class BezierInterpolant extends Interpolant<BezierSettings> {
 
-	interpolate_( i1, t0, t, t1 ) {
+	// to make TS happy
+	// public settings: Record<string, unknown> = {};
+	public settings: BezierSettings | null = null;
+
+	public interpolate_(i1: number, t0: number, t: number, t1: number): AnyTypedArray {
 
 		const result = this.resultBuffer;
 		const values = this.sampleValues;
@@ -34,14 +45,14 @@ export class BezierInterpolant extends Interpolant {
 		const outTangents = settings.outTangents;
 
 		// If no tangent data, fall back to linear interpolation
-		if ( ! inTangents || ! outTangents ) {
+		if (!inTangents || !outTangents) {
 
-			const weight1 = ( t - t0 ) / ( t1 - t0 );
+			const weight1 = (t - t0) / (t1 - t0);
 			const weight0 = 1 - weight1;
 
-			for ( let i = 0; i !== stride; ++ i ) {
+			for (let i = 0; i !== stride; ++i) {
 
-				result[ i ] = values[ offset0 + i ] * weight0 + values[ offset1 + i ] * weight1;
+				result[i] = values[offset0 + i] * weight0 + values[offset1 + i] * weight1;
 
 			}
 
@@ -52,26 +63,30 @@ export class BezierInterpolant extends Interpolant {
 		const tangentStride = stride * 2;
 		const i0 = i1 - 1;
 
-		for ( let i = 0; i !== stride; ++ i ) {
+		for (let i = 0; i !== stride; ++i) {
 
-			const v0 = values[ offset0 + i ];
-			const v1 = values[ offset1 + i ];
+			const v0 = values[offset0 + i];
+			const v1 = values[offset1 + i];
 
 			// outTangent of previous keyframe (C0)
 			const outTangentOffset = i0 * tangentStride + i * 2;
-			const c0x = outTangents[ outTangentOffset ];
-			const c0y = outTangents[ outTangentOffset + 1 ];
+			const c0x = outTangents[outTangentOffset];
+			const c0y = outTangents[outTangentOffset + 1];
 
 			// inTangent of current keyframe (C1)
 			const inTangentOffset = i1 * tangentStride + i * 2;
-			const c1x = inTangents[ inTangentOffset ];
-			const c1y = inTangents[ inTangentOffset + 1 ];
+			const c1x = inTangents[inTangentOffset];
+			const c1y = inTangents[inTangentOffset + 1];
 
 			// Solve for Bezier parameter s where Bx(s) = t using Newton-Raphson
-			let s = ( t - t0 ) / ( t1 - t0 );
-			let s2, s3, oneMinusS, oneMinusS2, oneMinusS3;
+			let s = (t - t0) / (t1 - t0);
+			let s2: number = 0;
+			let s3: number = 0;
+			let oneMinusS: number = 0;
+			let oneMinusS2: number = 0;
+			let oneMinusS3: number = 0;
 
-			for ( let iter = 0; iter < 8; iter ++ ) {
+			for (let iter = 0; iter < 8; iter++) {
 
 				s2 = s * s;
 				s3 = s2 * s;
@@ -83,19 +98,19 @@ export class BezierInterpolant extends Interpolant {
 				const bx = oneMinusS3 * t0 + 3 * oneMinusS2 * s * c0x + 3 * oneMinusS * s2 * c1x + s3 * t1;
 
 				const error = bx - t;
-				if ( Math.abs( error ) < 1e-10 ) break;
+				if (Math.abs(error) < 1e-10) break;
 
 				// Derivative dX/ds
-				const dbx = 3 * oneMinusS2 * ( c0x - t0 ) + 6 * oneMinusS * s * ( c1x - c0x ) + 3 * s2 * ( t1 - c1x );
-				if ( Math.abs( dbx ) < 1e-10 ) break;
+				const dbx = 3 * oneMinusS2 * (c0x - t0) + 6 * oneMinusS * s * (c1x - c0x) + 3 * s2 * (t1 - c1x);
+				if (Math.abs(dbx) < 1e-10) break;
 
 				s = s - error / dbx;
-				s = Math.max( 0, Math.min( 1, s ) );
+				s = Math.max(0, Math.min(1, s));
 
 			}
 
 			// Evaluate Bezier Y(s)
-			result[ i ] = oneMinusS3 * v0 + 3 * oneMinusS2 * s * c0y + 3 * oneMinusS * s2 * c1y + s3 * v1;
+			result[i] = oneMinusS3 * v0 + 3 * oneMinusS2 * s * c0y + 3 * oneMinusS * s2 * c1y + s3 * v1;
 
 		}
 

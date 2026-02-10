@@ -1,4 +1,4 @@
-import { InterpolateDiscrete } from '../../constants';
+import { InterpolateDiscrete, InterpolationMode } from '../../constants';
 import { KeyframeTrack } from '../KeyframeTrack';
 
 /**
@@ -7,6 +7,32 @@ import { KeyframeTrack } from '../KeyframeTrack';
  * @augments KeyframeTrack
  */
 export class StringKeyframeTrack extends KeyframeTrack {
+
+	/**
+	 * The value type name.
+	 *
+	 * @type {string}
+	 * @default 'string'
+	 */
+	public ValueTypeName: string = 'string';
+
+	/**
+	 * The value buffer type of this keyframe track.
+	 *
+	 * @type {TypedArray|Array}
+	 * @default Array.constructor
+	 */
+	public ValueBufferType = Array;
+
+	/**
+	 * The default interpolation type of this keyframe track.
+	 *
+	 * @type {(InterpolateLinear|InterpolateDiscrete|InterpolateSmooth)}
+	 * @default InterpolateDiscrete
+	 */
+	public DefaultInterpolation: InterpolationMode = InterpolateDiscrete;
+	// public InterpolantFactoryMethodLinear = undefined;
+	// public InterpolantFactoryMethodSmooth = undefined;
 
 	/**
 	 * Constructs a new string keyframe track.
@@ -18,36 +44,10 @@ export class StringKeyframeTrack extends KeyframeTrack {
 	 * @param {Array<number>} times - A list of keyframe times.
 	 * @param {Array<string>} values - A list of keyframe values.
 	 */
-	constructor( name, times, values ) {
+	constructor(name: string, times: number[], values: string[]) {
 
-		super( name, times, values );
+		super(name, times, values);
 
 	}
 
 }
-
-/**
- * The value type name.
- *
- * @type {string}
- * @default 'string'
- */
-StringKeyframeTrack.prototype.ValueTypeName = 'string';
-
-/**
- * The value buffer type of this keyframe track.
- *
- * @type {TypedArray|Array}
- * @default Array.constructor
- */
-StringKeyframeTrack.prototype.ValueBufferType = Array;
-
-/**
- * The default interpolation type of this keyframe track.
- *
- * @type {(InterpolateLinear|InterpolateDiscrete|InterpolateSmooth)}
- * @default InterpolateDiscrete
- */
-StringKeyframeTrack.prototype.DefaultInterpolation = InterpolateDiscrete;
-StringKeyframeTrack.prototype.InterpolantFactoryMethodLinear = undefined;
-StringKeyframeTrack.prototype.InterpolantFactoryMethodSmooth = undefined;

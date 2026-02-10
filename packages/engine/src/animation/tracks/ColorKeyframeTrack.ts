@@ -1,3 +1,4 @@
+import { InterpolationMode } from '../../constants';
 import { KeyframeTrack } from '../KeyframeTrack';
 
 /**
@@ -8,6 +9,16 @@ import { KeyframeTrack } from '../KeyframeTrack';
 export class ColorKeyframeTrack extends KeyframeTrack {
 
 	/**
+	 * The value type name.
+	 *
+	 * @type {string}
+	 * @default 'color'
+	 */
+	public ValueTypeName: string = 'color';
+	// ValueBufferType is inherited
+	// DefaultInterpolation is inherited
+
+	/**
 	 * Constructs a new color keyframe track.
 	 *
 	 * @param {string} name - The keyframe track's name.
@@ -15,20 +26,15 @@ export class ColorKeyframeTrack extends KeyframeTrack {
 	 * @param {Array<number>} values - A list of keyframe values.
 	 * @param {(InterpolateLinear|InterpolateDiscrete|InterpolateSmooth)} [interpolation] - The interpolation type.
 	 */
-	constructor( name, times, values, interpolation ) {
+	constructor(
+		name: string,
+		times: number[],
+		values: number[],
+		interpolation: InterpolationMode
+	) {
 
-		super( name, times, values, interpolation );
+		super(name, times, values, interpolation);
 
 	}
 
 }
-
-/**
- * The value type name.
- *
- * @type {string}
- * @default 'color'
- */
-ColorKeyframeTrack.prototype.ValueTypeName = 'color';
-// ValueBufferType is inherited
-// DefaultInterpolation is inherited

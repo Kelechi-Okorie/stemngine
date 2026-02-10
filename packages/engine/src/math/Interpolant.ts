@@ -1,3 +1,5 @@
+import { AnyTypedArray } from "../constants";
+
 /**
  * Abstract base class of interpolants over parametric samples.
  *
@@ -17,7 +19,59 @@
  *
  * @abstract
  */
-export class Interpolant {
+export class Interpolant<S extends object = {}> {
+
+	/**
+	 * The parameter positions.
+	 *
+	 * @type {TypedArray}
+	 */
+	public parameterPositions: AnyTypedArray;
+
+	/**
+	 * A cache index.
+	 *
+	 * @private
+	 * @type {number}
+	 * @default 0
+	 */
+	public _cachedIndex: number = 0;
+
+	/**
+	 * The result buffer.
+	 *
+	 * @type {TypedArray}
+	 */
+	public resultBuffer: AnyTypedArray;
+
+	/**
+	 * The sample values.
+	 *
+	 * @type {TypedArray}
+	 */
+	public sampleValues: AnyTypedArray;
+
+	/**
+	 * The value size.
+	 *
+	 * @type {number}
+	 */
+	public valueSize: number;
+
+	/**
+	 * The interpolation settings.
+	 *
+	 * @type {?Object}
+	 * @default null
+	 */
+	public settings: S | null = null;
+
+	/**
+	 * The default settings object.
+	 *
+	 * @type {Object}
+	 */
+	public DefaultSettings_: Partial<S> = {};
 
 	/**
 	 * Constructs a new interpolant.
@@ -27,59 +81,28 @@ export class Interpolant {
 	 * @param {number} sampleSize - The sample size
 	 * @param {TypedArray} [resultBuffer] - The result buffer.
 	 */
-	constructor( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
+	constructor(
+		parameterPositions: AnyTypedArray,
+		sampleValues: AnyTypedArray,
+		sampleSize: number,
+		resultBuffer: AnyTypedArray
+	) {
 
-		/**
-		 * The parameter positions.
-		 *
-		 * @type {TypedArray}
-		 */
 		this.parameterPositions = parameterPositions;
 
-		/**
-		 * A cache index.
-		 *
-		 * @private
-		 * @type {number}
-		 * @default 0
-		 */
-		this._cachedIndex = 0;
+		const TypedArrayConstructor = sampleValues.constructor as {
+			new(length: number): AnyTypedArray
+		};
 
-		/**
-		 * The result buffer.
-		 *
-		 * @type {TypedArray}
-		 */
-		this.resultBuffer = resultBuffer !== undefined ? resultBuffer : new sampleValues.constructor( sampleSize );
+		// this.resultBuffer = resultBuffer !== undefined
+		// 	? resultBuffer
+		// 	: new sampleValues.constructor(sampleSize);
 
-		/**
-		 * The sample values.
-		 *
-		 * @type {TypedArray}
-		 */
+		this.resultBuffer = resultBuffer ?? new TypedArrayConstructor(sampleSize);
+
 		this.sampleValues = sampleValues;
 
-		/**
-		 * The value size.
-		 *
-		 * @type {TypedArray}
-		 */
 		this.valueSize = sampleSize;
-
-		/**
-		 * The interpolation settings.
-		 *
-		 * @type {?Object}
-		 * @default null
-		 */
-		this.settings = null;
-
-		/**
-		 * The default settings object.
-		 *
-		 * @type {Object}
-		 */
-		this.DefaultSettings_ = {};
 
 	}
 
@@ -89,12 +112,12 @@ export class Interpolant {
 	 * @param {number} t - The interpolation factor.
 	 * @return {TypedArray} The result buffer.
 	 */
-	evaluate( t ) {
+	public evaluate(t: number): AnyTypedArray {
 
 		const pp = this.parameterPositions;
 		let i1 = this._cachedIndex,
-			t1 = pp[ i1 ],
-			t0 = pp[ i1 - 1 ];
+			t1 = pp[i1],
+			t0 = pp[i1 - 1];
 
 		validate_interval: {
 
@@ -108,28 +131,28 @@ export class Interpolant {
 					//- slower code:
 					//-
 					//- 				if ( t >= t1 || t1 === undefined ) {
-					forward_scan: if ( ! ( t < t1 ) ) {
+					forward_scan: if (!(t < t1)) {
 
-						for ( let giveUpAt = i1 + 2; ; ) {
+						for (let giveUpAt = i1 + 2; ;) {
 
-							if ( t1 === undefined ) {
+							if (t1 === undefined) {
 
-								if ( t < t0 ) break forward_scan;
+								if (t < t0) break forward_scan;
 
 								// after end
 
 								i1 = pp.length;
 								this._cachedIndex = i1;
-								return this.copySampleValue_( i1 - 1 );
+								return this.copySampleValue_(i1 - 1);
 
 							}
 
-							if ( i1 === giveUpAt ) break; // this loop
+							if (i1 === giveUpAt) break; // this loop
 
 							t0 = t1;
-							t1 = pp[ ++ i1 ];
+							t1 = pp[++i1];
 
-							if ( t < t1 ) {
+							if (t < t1) {
 
 								// we have arrived at the sought interval
 								break seek;
@@ -146,13 +169,13 @@ export class Interpolant {
 
 					//- slower code:
 					//-					if ( t < t0 || t0 === undefined ) {
-					if ( ! ( t >= t0 ) ) {
+					if (!(t >= t0)) {
 
 						// looping?
 
-						const t1global = pp[ 1 ];
+						const t1global = pp[1];
 
-						if ( t < t1global ) {
+						if (t < t1global) {
 
 							i1 = 2; // + 1, using the scan for the details
 							t0 = t1global;
@@ -161,23 +184,23 @@ export class Interpolant {
 
 						// linear reverse scan
 
-						for ( let giveUpAt = i1 - 2; ; ) {
+						for (let giveUpAt = i1 - 2; ;) {
 
-							if ( t0 === undefined ) {
+							if (t0 === undefined) {
 
 								// before start
 
 								this._cachedIndex = 0;
-								return this.copySampleValue_( 0 );
+								return this.copySampleValue_(0);
 
 							}
 
-							if ( i1 === giveUpAt ) break; // this loop
+							if (i1 === giveUpAt) break; // this loop
 
 							t1 = t0;
-							t0 = pp[ -- i1 - 1 ];
+							t0 = pp[--i1 - 1];
 
-							if ( t >= t0 ) {
+							if (t >= t0) {
 
 								// we have arrived at the sought interval
 								break seek;
@@ -201,11 +224,11 @@ export class Interpolant {
 
 				// binary search
 
-				while ( i1 < right ) {
+				while (i1 < right) {
 
-					const mid = ( i1 + right ) >>> 1;
+					const mid: number = (i1 + right) >>> 1;
 
-					if ( t < pp[ mid ] ) {
+					if (t < pp[mid]) {
 
 						right = mid;
 
@@ -217,23 +240,23 @@ export class Interpolant {
 
 				}
 
-				t1 = pp[ i1 ];
-				t0 = pp[ i1 - 1 ];
+				t1 = pp[i1];
+				t0 = pp[i1 - 1];
 
 				// check boundary cases, again
 
-				if ( t0 === undefined ) {
+				if (t0 === undefined) {
 
 					this._cachedIndex = 0;
-					return this.copySampleValue_( 0 );
+					return this.copySampleValue_(0);
 
 				}
 
-				if ( t1 === undefined ) {
+				if (t1 === undefined) {
 
 					i1 = pp.length;
 					this._cachedIndex = i1;
-					return this.copySampleValue_( i1 - 1 );
+					return this.copySampleValue_(i1 - 1);
 
 				}
 
@@ -241,11 +264,11 @@ export class Interpolant {
 
 			this._cachedIndex = i1;
 
-			this.intervalChanged_( i1, t0, t1 );
+			this.intervalChanged_(i1, t0, t1);
 
 		} // validate_interval
 
-		return this.interpolate_( i1, t0, t, t1 );
+		return this.interpolate_(i1, t0, t, t1);
 
 	}
 
@@ -254,7 +277,7 @@ export class Interpolant {
 	 *
 	 * @return {Object} The interpolation settings.
 	 */
-	getSettings_() {
+	public getSettings_(): Partial<S> {
 
 		return this.settings || this.DefaultSettings_;
 
@@ -266,7 +289,7 @@ export class Interpolant {
 	 * @param {number} index - An index into the sample value buffer.
 	 * @return {TypedArray} The result buffer.
 	 */
-	copySampleValue_( index ) {
+	public copySampleValue_(index: number): AnyTypedArray {
 
 		// copies a sample value to the result buffer
 
@@ -275,9 +298,9 @@ export class Interpolant {
 			stride = this.valueSize,
 			offset = index * stride;
 
-		for ( let i = 0; i !== stride; ++ i ) {
+		for (let i = 0; i !== stride; ++i) {
 
-			result[ i ] = values[ offset + i ];
+			result[i] = values[offset + i];
 
 		}
 
@@ -295,9 +318,9 @@ export class Interpolant {
 	 * @param {number} t1 - The next interpolation factor.
 	 * @return {TypedArray} The result buffer.
 	 */
-	interpolate_( /* i1, t0, t, t1 */ ) {
+	public interpolate_(i1: number, t0: number, t: number, t1: number): AnyTypedArray {
 
-		throw new Error( 'call to abstract method' );
+		throw new Error('Interpolant: call to abstract method');
 		// implementations shall return this.resultBuffer
 
 	}
@@ -309,8 +332,9 @@ export class Interpolant {
 	 * @param {number} t0 - The previous interpolation factor.
 	 * @param {number} t - The current interpolation factor.
 	 */
-	intervalChanged_( /* i1, t0, t1 */ ) {
+	public intervalChanged_(i1: number, t0: number, t1: number): void {
 
+		throw new Error('Interpolant: call to abstract method')
 		// empty
 
 	}

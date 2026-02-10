@@ -1,3 +1,4 @@
+import { AnyTypedArray } from '../../constants';
 import { Interpolant } from '../Interpolant';
 
 /**
@@ -16,13 +17,18 @@ export class DiscreteInterpolant extends Interpolant {
 	 * @param {number} sampleSize - The sample size
 	 * @param {TypedArray} [resultBuffer] - The result buffer.
 	 */
-	constructor( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
+	constructor( 
+		parameterPositions: AnyTypedArray, 
+		sampleValues: AnyTypedArray, 
+		sampleSize: number, 
+		resultBuffer: AnyTypedArray
+	 ) {
 
 		super( parameterPositions, sampleValues, sampleSize, resultBuffer );
 
 	}
 
-	interpolate_( i1 /*, t0, t, t1 */ ) {
+	public interpolate_( i1: number /*, t0, t, t1 */ ) {
 
 		return this.copySampleValue_( i1 - 1 );
 

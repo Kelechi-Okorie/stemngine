@@ -5,7 +5,7 @@ import { PropertyBinding } from './PropertyBinding';
 import { PropertyMixer } from './PropertyMixer';
 import { AnimationClip } from './AnimationClip';
 import { NormalAnimationBlendMode } from '../constants';
-import { Node3D } from '../engine.core';
+import { Node3D } from '../core/Node3D';
 
 const _controlInterpolantsResultBuffer = new Float32Array( 1 );
 
