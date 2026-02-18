@@ -1,3 +1,4 @@
+import { AnyTypedArray } from "./constants";
 import { Matrix4 } from "./math/Matrix4";
 
 /**
@@ -116,6 +117,17 @@ export function getTypedArray<T extends TypedArrayName>(
 ): InstanceType<(typeof TYPED_ARRAYS)[T]> {
 
   return new TYPED_ARRAYS[type](buffer) as InstanceType<(typeof TYPED_ARRAYS)[T]>;
+}
+
+/**
+ * Returns true if the given object is a typed array.
+ * 
+ * @param array - The object to check
+ * @return true if given object is typed array, false otherwise
+ */
+export function isTypedArray(array: Array<number> | AnyTypedArray): boolean {
+
+  return ArrayBuffer.isView(array) && ! (array instanceof DataView);
 }
 
 /**

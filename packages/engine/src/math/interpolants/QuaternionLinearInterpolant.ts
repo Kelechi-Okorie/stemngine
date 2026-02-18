@@ -21,7 +21,7 @@ export class QuaternionLinearInterpolant extends Interpolant {
 		parameterPositions: AnyTypedArray,
 		sampleValues: AnyTypedArray,
 		sampleSize: number,
-		resultBuffer: AnyTypedArray
+		resultBuffer?: AnyTypedArray
 	) {
 
 		super(parameterPositions, sampleValues, sampleSize, resultBuffer);

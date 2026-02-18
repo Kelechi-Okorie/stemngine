@@ -1,6 +1,12 @@
 import { Quaternion } from '../math/Quaternion.js';
-import { AdditiveAnimationBlendMode } from '../constants.js';
-import { isTypedArray } from '../utils.js';
+import { AdditiveAnimationBlendMode, AnyTypedArray } from '../constants.js';
+import { isTypedArray } from '../utils';
+import { AnimationClip } from './AnimationClip.js';
+
+export type JSONKeyframe = {
+	time: number;
+	[property: string]: any;
+};
 
 /**
  * Converts an array to a specific type.
@@ -9,17 +15,20 @@ import { isTypedArray } from '../utils.js';
  * @param {TypedArray.constructor} type - The constructor of a typed array that defines the new type.
  * @return {TypedArray} The converted array.
  */
-function convertArray( array, type ) {
+function convertArray(
+	array: ArrayLike<any>,
+	type: any	// TODO: type well 
+): any {	// TODO: type well
 
-	if ( ! array || array.constructor === type ) return array;
+	if (!array || array.constructor === type) return array;
 
-	if ( typeof type.BYTES_PER_ELEMENT === 'number' ) {
+	if (typeof type.BYTES_PER_ELEMENT === 'number') {
 
-		return new type( array ); // create typed array
+		return new type(array); // create typed array
 
 	}
 
-	return Array.prototype.slice.call( array ); // create Array
+	return Array.prototype.slice.call(array); // create Array
 
 }
 
@@ -29,19 +38,19 @@ function convertArray( array, type ) {
  * @param {Array<number>} times - The keyframe time values.
  * @return {Array<number>} The array.
  */
-function getKeyframeOrder( times ) {
+function getKeyframeOrder(times: number[]): number[] {
 
-	function compareTime( i, j ) {
+	function compareTime(i: number, j: number): number {
 
-		return times[ i ] - times[ j ];
+		return times[i] - times[j];
 
 	}
 
 	const n = times.length;
-	const result = new Array( n );
-	for ( let i = 0; i !== n; ++ i ) result[ i ] = i;
+	const result = new Array(n);
+	for (let i = 0; i !== n; ++i) result[i] = i;
 
-	result.sort( compareTime );
+	result.sort(compareTime);
 
 	return result;
 
@@ -55,18 +64,23 @@ function getKeyframeOrder( times ) {
  * @param {Array<number>} order - The sort order.
  * @return {Array<number>} The sorted values.
  */
-function sortedArray( values, stride, order ) {
+function sortedArray(
+	values: number[],
+	stride: number,
+	order: number[]
+): number[] {
 
 	const nValues = values.length;
-	const result = new values.constructor( nValues );
+	// const result = new values.constructor( nValues );
+	const result = new (values.constructor as { new(length: number): number[] })(nValues);
 
-	for ( let i = 0, dstOffset = 0; dstOffset !== nValues; ++ i ) {
+	for (let i = 0, dstOffset = 0; dstOffset !== nValues; ++i) {
 
-		const srcOffset = order[ i ] * stride;
+		const srcOffset = order[i] * stride;
 
-		for ( let j = 0; j !== stride; ++ j ) {
+		for (let j = 0; j !== stride; ++j) {
 
-			result[ dstOffset ++ ] = values[ srcOffset + j ];
+			result[dstOffset++] = values[srcOffset + j];
 
 		}
 
@@ -84,56 +98,61 @@ function sortedArray( values, stride, order ) {
  * @param {Array<number>} values - This array will be filled with keyframe values by this function.
  * @param {string} valuePropertyName - The name of the property to use.
  */
-function flattenJSON( jsonKeys, times, values, valuePropertyName ) {
+function flattenJSON(
+	jsonKeys: JSONKeyframe[],
+	times: number[],
+	values: number[],
+	valuePropertyName: string
+): void {
 
-	let i = 1, key = jsonKeys[ 0 ];
+	let i = 1, key = jsonKeys[0];
 
-	while ( key !== undefined && key[ valuePropertyName ] === undefined ) {
+	while (key !== undefined && key[valuePropertyName] === undefined) {
 
-		key = jsonKeys[ i ++ ];
+		key = jsonKeys[i++];
 
 	}
 
-	if ( key === undefined ) return; // no data
+	if (key === undefined) return; // no data
 
-	let value = key[ valuePropertyName ];
-	if ( value === undefined ) return; // no data
+	let value = key[valuePropertyName];
+	if (value === undefined) return; // no data
 
-	if ( Array.isArray( value ) ) {
+	if (Array.isArray(value)) {
 
 		do {
 
-			value = key[ valuePropertyName ];
+			value = key[valuePropertyName];
 
-			if ( value !== undefined ) {
+			if (value !== undefined) {
 
-				times.push( key.time );
-				values.push( ...value ); // push all elements
+				times.push(key.time);
+				values.push(...value); // push all elements
 
 			}
 
-			key = jsonKeys[ i ++ ];
+			key = jsonKeys[i++];
 
-		} while ( key !== undefined );
+		} while (key !== undefined);
 
-	} else if ( value.toArray !== undefined ) {
+	} else if (value.toArray !== undefined) {
 
 		// ...assume THREE.Math-ish
 
 		do {
 
-			value = key[ valuePropertyName ];
+			value = key[valuePropertyName];
 
-			if ( value !== undefined ) {
+			if (value !== undefined) {
 
-				times.push( key.time );
-				value.toArray( values, values.length );
+				times.push(key.time);
+				value.toArray(values, values.length);
 
 			}
 
-			key = jsonKeys[ i ++ ];
+			key = jsonKeys[i++];
 
-		} while ( key !== undefined );
+		} while (key !== undefined);
 
 	} else {
 
@@ -141,18 +160,18 @@ function flattenJSON( jsonKeys, times, values, valuePropertyName ) {
 
 		do {
 
-			value = key[ valuePropertyName ];
+			value = key[valuePropertyName];
 
-			if ( value !== undefined ) {
+			if (value !== undefined) {
 
-				times.push( key.time );
-				values.push( value );
+				times.push(key.time);
+				values.push(value);
 
 			}
 
-			key = jsonKeys[ i ++ ];
+			key = jsonKeys[i++];
 
-		} while ( key !== undefined );
+		} while (key !== undefined);
 
 	}
 
@@ -168,7 +187,13 @@ function flattenJSON( jsonKeys, times, values, valuePropertyName ) {
  * @param {number} [fps=30] - The FPS.
  * @return {AnimationClip} The new sub clip.
  */
-function subclip( sourceClip, name, startFrame, endFrame, fps = 30 ) {
+function subclip(
+	sourceClip: AnimationClip,
+	name: string,
+	startFrame: number,
+	endFrame: number,
+	fps: number = 30
+): AnimationClip {
 
 	const clip = sourceClip.clone();
 
@@ -176,36 +201,36 @@ function subclip( sourceClip, name, startFrame, endFrame, fps = 30 ) {
 
 	const tracks = [];
 
-	for ( let i = 0; i < clip.tracks.length; ++ i ) {
+	for (let i = 0; i < clip.tracks.length; ++i) {
 
-		const track = clip.tracks[ i ];
+		const track = clip.tracks[i];
 		const valueSize = track.getValueSize();
 
 		const times = [];
 		const values = [];
 
-		for ( let j = 0; j < track.times.length; ++ j ) {
+		for (let j = 0; j < track.times.length; ++j) {
 
-			const frame = track.times[ j ] * fps;
+			const frame = track.times[j] * fps;
 
-			if ( frame < startFrame || frame >= endFrame ) continue;
+			if (frame < startFrame || frame >= endFrame) continue;
 
-			times.push( track.times[ j ] );
+			times.push(track.times[j]);
 
-			for ( let k = 0; k < valueSize; ++ k ) {
+			for (let k = 0; k < valueSize; ++k) {
 
-				values.push( track.values[ j * valueSize + k ] );
+				values.push(track.values[j * valueSize + k]);
 
 			}
 
 		}
 
-		if ( times.length === 0 ) continue;
+		if (times.length === 0) continue;
 
-		track.times = convertArray( times, track.times.constructor );
-		track.values = convertArray( values, track.values.constructor );
+		track.times = convertArray(times, track.times.constructor);
+		track.values = convertArray(values, track.values.constructor);
 
-		tracks.push( track );
+		tracks.push(track);
 
 	}
 
@@ -215,11 +240,11 @@ function subclip( sourceClip, name, startFrame, endFrame, fps = 30 ) {
 
 	let minStartTime = Infinity;
 
-	for ( let i = 0; i < clip.tracks.length; ++ i ) {
+	for (let i = 0; i < clip.tracks.length; ++i) {
 
-		if ( minStartTime > clip.tracks[ i ].times[ 0 ] ) {
+		if (minStartTime > clip.tracks[i].times[0]) {
 
-			minStartTime = clip.tracks[ i ].times[ 0 ];
+			minStartTime = clip.tracks[i].times[0];
 
 		}
 
@@ -227,9 +252,9 @@ function subclip( sourceClip, name, startFrame, endFrame, fps = 30 ) {
 
 	// shift all tracks such that clip begins at t=0
 
-	for ( let i = 0; i < clip.tracks.length; ++ i ) {
+	for (let i = 0; i < clip.tracks.length; ++i) {
 
-		clip.tracks[ i ].shift( - 1 * minStartTime );
+		clip.tracks[i].shift(- 1 * minStartTime);
 
 	}
 
@@ -248,36 +273,41 @@ function subclip( sourceClip, name, startFrame, endFrame, fps = 30 ) {
  * @param {number} [fps=30] - The FPS.
  * @return {AnimationClip} The updated clip which is now additive.
  */
-function makeClipAdditive( targetClip, referenceFrame = 0, referenceClip = targetClip, fps = 30 ) {
+function makeClipAdditive(
+	targetClip: AnimationClip,
+	referenceFrame: number = 0,
+	referenceClip: AnimationClip = targetClip,
+	fps: number = 30
+): AnimationClip {
 
-	if ( fps <= 0 ) fps = 30;
+	if (fps <= 0) fps = 30;
 
 	const numTracks = referenceClip.tracks.length;
 	const referenceTime = referenceFrame / fps;
 
 	// Make each track's values relative to the values at the reference frame
-	for ( let i = 0; i < numTracks; ++ i ) {
+	for (let i = 0; i < numTracks; ++i) {
 
-		const referenceTrack = referenceClip.tracks[ i ];
+		const referenceTrack = referenceClip.tracks[i];
 		const referenceTrackType = referenceTrack.ValueTypeName;
 
 		// Skip this track if it's non-numeric
-		if ( referenceTrackType === 'bool' || referenceTrackType === 'string' ) continue;
+		if (referenceTrackType === 'bool' || referenceTrackType === 'string') continue;
 
 		// Find the track in the target clip whose name and type matches the reference track
-		const targetTrack = targetClip.tracks.find( function ( track ) {
+		const targetTrack = targetClip.tracks.find(function (track) {
 
 			return track.name === referenceTrack.name
 				&& track.ValueTypeName === referenceTrackType;
 
-		} );
+		});
 
-		if ( targetTrack === undefined ) continue;
+		if (targetTrack === undefined) continue;
 
 		let referenceOffset = 0;
 		const referenceValueSize = referenceTrack.getValueSize();
 
-		if ( referenceTrack.createInterpolant.isInterpolantFactoryMethodGLTFCubicSpline ) {
+		if ((referenceTrack.createInterpolant as any).isInterpolantFactoryMethodGLTFCubicSpline) {
 
 			referenceOffset = referenceValueSize / 3;
 
@@ -286,7 +316,7 @@ function makeClipAdditive( targetClip, referenceFrame = 0, referenceClip = targe
 		let targetOffset = 0;
 		const targetValueSize = targetTrack.getValueSize();
 
-		if ( targetTrack.createInterpolant.isInterpolantFactoryMethodGLTFCubicSpline ) {
+		if ((targetTrack.createInterpolant as any).isInterpolantFactoryMethodGLTFCubicSpline) {
 
 			targetOffset = targetValueSize / 3;
 
@@ -296,19 +326,19 @@ function makeClipAdditive( targetClip, referenceFrame = 0, referenceClip = targe
 		let referenceValue;
 
 		// Find the value to subtract out of the track
-		if ( referenceTime <= referenceTrack.times[ 0 ] ) {
+		if (referenceTime <= referenceTrack.times[0]) {
 
 			// Reference frame is earlier than the first keyframe, so just use the first keyframe
 			const startIndex = referenceOffset;
 			const endIndex = referenceValueSize - referenceOffset;
-			referenceValue = referenceTrack.values.slice( startIndex, endIndex );
+			referenceValue = referenceTrack.values.slice(startIndex, endIndex);
 
-		} else if ( referenceTime >= referenceTrack.times[ lastIndex ] ) {
+		} else if (referenceTime >= referenceTrack.times[lastIndex]) {
 
 			// Reference frame is after the last keyframe, so just use the last keyframe
 			const startIndex = lastIndex * referenceValueSize + referenceOffset;
 			const endIndex = startIndex + referenceValueSize - referenceOffset;
-			referenceValue = referenceTrack.values.slice( startIndex, endIndex );
+			referenceValue = referenceTrack.values.slice(startIndex, endIndex);
 
 		} else {
 
@@ -316,27 +346,27 @@ function makeClipAdditive( targetClip, referenceFrame = 0, referenceClip = targe
 			const interpolant = referenceTrack.createInterpolant();
 			const startIndex = referenceOffset;
 			const endIndex = referenceValueSize - referenceOffset;
-			interpolant.evaluate( referenceTime );
-			referenceValue = interpolant.resultBuffer.slice( startIndex, endIndex );
+			interpolant.evaluate(referenceTime);
+			referenceValue = interpolant.resultBuffer.slice(startIndex, endIndex);
 
 		}
 
 		// Conjugate the quaternion
-		if ( referenceTrackType === 'quaternion' ) {
+		if (referenceTrackType === 'quaternion') {
 
-			const referenceQuat = new Quaternion().fromArray( referenceValue ).normalize().conjugate();
-			referenceQuat.toArray( referenceValue );
+			const referenceQuat = new Quaternion().fromArray(referenceValue).normalize().conjugate();
+			referenceQuat.toArray(referenceValue);
 
 		}
 
 		// Subtract the reference value from all of the track values
 
 		const numTimes = targetTrack.times.length;
-		for ( let j = 0; j < numTimes; ++ j ) {
+		for (let j = 0; j < numTimes; ++j) {
 
 			const valueStart = j * targetValueSize + targetOffset;
 
-			if ( referenceTrackType === 'quaternion' ) {
+			if (referenceTrackType === 'quaternion') {
 
 				// Multiply the conjugate for quaternion track types
 				Quaternion.multiplyQuaternionsFlat(
@@ -353,9 +383,9 @@ function makeClipAdditive( targetClip, referenceFrame = 0, referenceClip = targe
 				const valueEnd = targetValueSize - targetOffset * 2;
 
 				// Subtract each value for all other numeric track types
-				for ( let k = 0; k < valueEnd; ++ k ) {
+				for (let k = 0; k < valueEnd; ++k) {
 
-					targetTrack.values[ valueStart + k ] -= referenceValue[ k ];
+					targetTrack.values[valueStart + k] -= referenceValue[k];
 
 				}
 
@@ -386,9 +416,12 @@ class AnimationUtils {
 	 * @param {TypedArray.constructor} type - The constructor of a type array.
 	 * @return {TypedArray} The converted array
 	 */
-	static convertArray( array, type ) {
+	static convertArray(
+		array: Array<number> | AnyTypedArray,
+		type: any	// TODO: type well
+	): Array<number> | AnyTypedArray {
 
-		return convertArray( array, type );
+		return convertArray(array, type);
 
 	}
 
@@ -399,9 +432,9 @@ class AnimationUtils {
 	 * @param {any} object - The object to check.
 	 * @return {boolean} Whether the given object is a typed array.
 	 */
-	static isTypedArray( object ) {
+	static isTypedArray(object: Array<number> | AnyTypedArray): boolean {
 
-		return isTypedArray( object );
+		return isTypedArray(object);
 
 	}
 
@@ -412,9 +445,9 @@ class AnimationUtils {
 	 * @param {Array<number>} times - The keyframe time values.
 	 * @return {Array<number>} The array.
 	 */
-	static getKeyframeOrder( times ) {
+	static getKeyframeOrder(times: number[]): number[] {
 
-		return getKeyframeOrder( times );
+		return getKeyframeOrder(times);
 
 	}
 
@@ -427,9 +460,13 @@ class AnimationUtils {
 	 * @param {Array<number>} order - The sort order.
 	 * @return {Array<number>} The sorted values.
 	 */
-	static sortedArray( values, stride, order ) {
+	static sortedArray(
+		values: number[],
+		stride: number,
+		order: number[]
+	): number[] {
 
-		return sortedArray( values, stride, order );
+		return sortedArray(values, stride, order);
 
 	}
 
@@ -442,9 +479,14 @@ class AnimationUtils {
 	 * @param {Array<number>} values - This array will be filled with keyframe values by this method.
 	 * @param {string} valuePropertyName - The name of the property to use.
 	 */
-	static flattenJSON( jsonKeys, times, values, valuePropertyName ) {
+	static flattenJSON(
+		jsonKeys: JSONKeyframe[],
+		times: number[],
+		values: number[],
+		valuePropertyName: string
+	) {
 
-		flattenJSON( jsonKeys, times, values, valuePropertyName );
+		flattenJSON(jsonKeys, times, values, valuePropertyName);
 
 	}
 
@@ -459,9 +501,15 @@ class AnimationUtils {
 	 * @param {number} [fps=30] - The FPS.
 	 * @return {AnimationClip} The new sub clip.
 	 */
-	static subclip( sourceClip, name, startFrame, endFrame, fps = 30 ) {
+	static subclip(
+		sourceClip: AnimationClip,
+		name: string,
+		startFrame: number,
+		endFrame: number,
+		fps: number = 30
+	) {
 
-		return subclip( sourceClip, name, startFrame, endFrame, fps );
+		return subclip(sourceClip, name, startFrame, endFrame, fps);
 
 	}
 
@@ -475,9 +523,14 @@ class AnimationUtils {
 	 * @param {number} [fps=30] - The FPS.
 	 * @return {AnimationClip} The updated clip which is now additive.
 	 */
-	static makeClipAdditive( targetClip, referenceFrame = 0, referenceClip = targetClip, fps = 30 ) {
+	static makeClipAdditive(
+		targetClip: AnimationClip,
+		referenceFrame: number = 0,
+		referenceClip: AnimationClip = targetClip,
+		fps: number = 30
+	) {
 
-		return makeClipAdditive( targetClip, referenceFrame, referenceClip, fps );
+		return makeClipAdditive(targetClip, referenceFrame, referenceClip, fps);
 
 	}
 

@@ -2,6 +2,9 @@ import { clamp } from './MathUtils';
 import type { Matrix4 } from './Matrix4';
 import type { Vector3 } from './Vector3';
 import type { Euler } from './Euler';
+import { AnyTypedArray } from '../constants';
+
+type NumericBuffer = number[] | AnyTypedArray;
 
 /**
  * Class for representing quaternions.
@@ -657,7 +660,14 @@ export class Quaternion {
    * @returns The destination array containing the result
    * @see {@link Quaternion#multiplyQuaternions}
    */
-  static multiplyQuaternionsFlat(dst: number[], dstOffset: number, src0: number[], srcOffset0: number, src1: number[], srcOffset1: number): number[] {
+  static multiplyQuaternionsFlat(
+    dst: NumericBuffer,
+    dstOffset: number,
+    src0: NumericBuffer,
+    srcOffset0: number,
+    src1: NumericBuffer,
+    srcOffset1: number
+  ): ArrayLike<number> {
     const x0 = src0[srcOffset0];
     const y0 = src0[srcOffset0 + 1];
     const z0 = src0[srcOffset0 + 2];
@@ -789,7 +799,15 @@ export class Quaternion {
    * @param srcOffset1 - The offset into the source array for the second quaternion.
    * @param t - The interpolation factor in the range `[0, 1]`.
    */
-  static slerpFlat(dst: number[], dstOffset: number, src0: number[], srcOffset0: number, src1: number[], srcOffset1: number, t: number): void {
+  static slerpFlat(
+    dst: NumericBuffer, 
+    dstOffset: number, 
+    src0: NumericBuffer, 
+    srcOffset0: number, 
+    src1: NumericBuffer, 
+    srcOffset1: number, 
+    t: number
+  ): void {
     // fuzz-free, array-based Quaternion SLERP operation
 
     // Extract quaternion components from the source arrays
@@ -944,7 +962,7 @@ export class Quaternion {
    * @param offset - The offset into the array
    * @returns A reference to this quaternion
    */
-  public fromArray(array: number[], offset: number = 0): this {
+  public fromArray(array: ArrayLike<number>, offset: number = 0): this {
     this.x = array[offset];
     this.y = array[offset + 1];
     this.z = array[offset + 2];
@@ -963,7 +981,7 @@ export class Quaternion {
    * @param offset - The index to start writing from
    * @returns The quaternion components
    */
-  public toArray(array: number[], offset: number = 0): number[] {
+  public toArray(array: number[] | AnyTypedArray, offset: number = 0): number[] | AnyTypedArray {
     array[offset] = this.x;
     array[offset + 1] = this.y;
     array[offset + 2] = this.z;
@@ -996,7 +1014,7 @@ export class Quaternion {
    *
    * @returns The serialized quaternion
    */
-  public ToJSON(): number[] {
+  public ToJSON(): number[] | AnyTypedArray {
     return this.toArray([]);
   }
 

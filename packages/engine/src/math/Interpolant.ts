@@ -73,6 +73,9 @@ export class Interpolant<S extends object = {}> {
 	 */
 	public DefaultSettings_: Partial<S> = {};
 
+	public __cacheIndex: number | null = null; // Used internally by AnimationMixer
+
+
 	/**
 	 * Constructs a new interpolant.
 	 *
@@ -85,7 +88,7 @@ export class Interpolant<S extends object = {}> {
 		parameterPositions: AnyTypedArray,
 		sampleValues: AnyTypedArray,
 		sampleSize: number,
-		resultBuffer: AnyTypedArray
+		resultBuffer?: AnyTypedArray
 	) {
 
 		this.parameterPositions = parameterPositions;

@@ -63,7 +63,7 @@ export type BufferUsage = typeof StaticDrawUsage | typeof DynamicDrawUsage | typ
 
 export type GpuType = typeof FloatType | typeof IntType;
 
-export type AnyTypedArray = Float32Array | Uint32Array | Uint16Array | Uint8Array | Uint8ClampedArray | Int32Array | Int16Array | Int8Array;
+export type AnyTypedArray = Float64Array| Float32Array | Uint32Array | Uint16Array | Uint8Array | Uint8ClampedArray | Int32Array | Int16Array | Int8Array;
 
 /**
  * A TypedArray with a buffer that has an optional _uuid property
@@ -97,7 +97,7 @@ export const EulerDefaultOrder = 'XYZ';
 
 export type InterpolationMode = typeof InterpolateLinear | typeof InterpolateDiscrete | typeof InterpolateSmooth | typeof InterpolateBezier;
 
-export type AnimationBlendMode = typeof NormalBlending | typeof AdditiveBlending;
+export type AnimationBlendMode = typeof NormalAnimationBlendMode | typeof AdditiveAnimationBlendMode;
 
 export type MaterialBlendMode = typeof NoBlending | typeof NormalBlending | typeof AdditiveBlending | typeof SubtractiveBlending | typeof MultiplyBlending | typeof CustomBlending;
 
@@ -323,6 +323,11 @@ export type WebGLInternalFormatName =
   { [K in keyof WebGL2RenderingContext]:
     WebGL2RenderingContext[K] extends number ? K : never
   }[keyof WebGL2RenderingContext]
+
+export type AnimationRepeatMode =
+  | typeof LoopRepeat
+  | typeof LoopRepeat
+  | typeof LoopPingPong;
 
 export const REVISION = '0.1.0-dev';
 

@@ -5,7 +5,7 @@ import {
   InterpolateBezier,
   InterpolationMode,
   AnyTypedArray,
-  TypedArrayConstructor
+  TypedArrayConstructor,
 } from '../constants.js';
 import { CubicInterpolant } from '../math/interpolants/CubicInterpolant';
 import { LinearInterpolant } from '../math/interpolants/LinearInterpolant';
@@ -23,7 +23,7 @@ interface KeyframeTrackJSON {
   type: string;
 }
 
-export type InterpolantFactory = (result: AnyTypedArray) =>
+export type InterpolantFactory = (result?: AnyTypedArray) =>
   | DiscreteInterpolant
   | LinearInterpolant
   | CubicInterpolant
@@ -33,6 +33,10 @@ export type InterpolantFactory = (result: AnyTypedArray) =>
  * Represents a timed sequence of keyframes, which are composed of lists of
  * times and related values, and which are used to animate a specific property
  * of an object.
+ * 
+ * @remarks
+ * A track is:
+ * - Address + Timeline + values + Interpolation rule
  */
 export class KeyframeTrack {
 
@@ -107,8 +111,8 @@ export class KeyframeTrack {
    */
   constructor(
     name: string,
-    times: number[],
-    values: number[] | string[] | boolean[],
+    times: ArrayLike<number>,
+    values: ArrayLike<number> | ArrayLike<string> | ArrayLike<boolean>,
     interpolation: InterpolationMode = this.DefaultInterpolation
   ) {
 
@@ -181,7 +185,7 @@ export class KeyframeTrack {
    * @param {TypedArray} [result] - The result buffer.
    * @return {DiscreteInterpolant} The new interpolant.
    */
-  public InterpolantFactoryMethodDiscrete(result: AnyTypedArray): DiscreteInterpolant {
+  public InterpolantFactoryMethodDiscrete(result?: AnyTypedArray): DiscreteInterpolant {
 
     return new DiscreteInterpolant(this.times, this.values, this.getValueSize(), result);
 
@@ -194,7 +198,7 @@ export class KeyframeTrack {
    * @param {TypedArray} [result] - The result buffer.
    * @return {LinearInterpolant} The new interpolant.
    */
-  public InterpolantFactoryMethodLinear(result: AnyTypedArray): LinearInterpolant {
+  public InterpolantFactoryMethodLinear(result?: AnyTypedArray): LinearInterpolant {
 
     return new LinearInterpolant(this.times, this.values, this.getValueSize(), result);
 
@@ -207,7 +211,7 @@ export class KeyframeTrack {
    * @param {TypedArray} [result] - The result buffer.
    * @return {CubicInterpolant} The new interpolant.
    */
-  public InterpolantFactoryMethodSmooth(result: AnyTypedArray): CubicInterpolant {
+  public InterpolantFactoryMethodSmooth(result?: AnyTypedArray): CubicInterpolant {
 
     return new CubicInterpolant(this.times, this.values, this.getValueSize(), result);
 
@@ -225,7 +229,7 @@ export class KeyframeTrack {
    * @param {TypedArray} [result] - The result buffer.
    * @return {BezierInterpolant} The new interpolant.
    */
-  public InterpolantFactoryMethodBezier(result: AnyTypedArray): BezierInterpolant {
+  public InterpolantFactoryMethodBezier(result?: AnyTypedArray): BezierInterpolant {
 
     const interpolant = new BezierInterpolant(this.times, this.values, this.getValueSize(), result);
 
@@ -659,15 +663,15 @@ export class KeyframeTrack {
    */
   public clone(): KeyframeTrack {
 
-    const times = Array.from(this.times.slice());
-    const values = Array.from(this.values.slice());
+    const times = this.times.slice();
+    const values = this.values.slice();
 
     // const TypedKeyframeTrack = this.constructor;
 
     const TypedKeyframeTrack = this.constructor as new (
       name: string,
-      times: number[],
-      values: number[] | string[] | boolean[],
+      times: ArrayLike<number>,
+      values: ArrayLike<number> | ArrayLike<string> | ArrayLike<boolean>,
       interpolation?: InterpolationMode
     ) => KeyframeTrack;
 

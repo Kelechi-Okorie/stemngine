@@ -21,14 +21,14 @@ export class DiscreteInterpolant extends Interpolant {
 		parameterPositions: AnyTypedArray, 
 		sampleValues: AnyTypedArray, 
 		sampleSize: number, 
-		resultBuffer: AnyTypedArray
+		resultBuffer?: AnyTypedArray
 	 ) {
 
 		super( parameterPositions, sampleValues, sampleSize, resultBuffer );
 
 	}
 
-	public interpolate_( i1: number /*, t0, t, t1 */ ) {
+	public interpolate_( i1: number , t0: number, t: number, t1: number ) {
 
 		return this.copySampleValue_( i1 - 1 );
 

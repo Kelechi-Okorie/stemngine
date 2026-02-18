@@ -30,7 +30,7 @@ export class VectorKeyframeTrack extends KeyframeTrack {
 		name: string, 
 		times: number[], 
 		values: number[], 
-		interpolation: InterpolationMode
+		interpolation?: InterpolationMode
 	) {
 
 		super(name, times, values, interpolation);

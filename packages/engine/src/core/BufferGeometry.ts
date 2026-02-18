@@ -125,6 +125,7 @@ export class BufferGeometry extends EventDispatcher {
    *
    * Morph targets (or blend shapes) are a way to animate vertex positions without changing
    * mesh topology
+   * 
    * Example:
    * One  morph target might move the vertices to make a smile
    * Another morph target might move the vertices to make a frown

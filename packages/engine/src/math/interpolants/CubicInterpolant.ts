@@ -34,7 +34,7 @@ export class CubicInterpolant extends Interpolant<CubicSettings> {
 		parameterPositions: AnyTypedArray,
 		sampleValues: AnyTypedArray,
 		sampleSize: number,
-		resultBuffer: AnyTypedArray
+		resultBuffer?: AnyTypedArray
 	) {
 
 		super(parameterPositions, sampleValues, sampleSize, resultBuffer);

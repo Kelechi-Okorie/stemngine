@@ -1477,7 +1477,7 @@ export class Matrix4 {
    * @param offset - Index of the element in the array to start writing
    * @return The the array containing matrix elements in column-major order
    */
-  public toArray(array: WritableArrayLike<number>, offset: number = 0): WritableArrayLike<number> {
+  public toArray(array: WritableArrayLike<number> = [], offset: number = 0): ArrayLike<number> {
     const te = this.elements;
 
     array[offset] = te[0];
