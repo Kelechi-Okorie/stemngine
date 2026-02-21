@@ -139,7 +139,7 @@ export class OrbitControls extends Controls<PerspectiveCamera | OrthographicCame
   /**
    * How far you can zoom out (orthographic camera only)
    */
-  public maxZoom = 0;
+  public maxZoom = Infinity;
 
   /**
    * How close you can get the target to the 3D cursor
