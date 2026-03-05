@@ -115,6 +115,15 @@
 // export { FogExp2 } from './scenes/FogExp2';
 // export { Scene } from './scenes/Scene';
 
+// // Simulations
+// // -- domains -- //
+// export { SimPropertyBinding } from './simulations/core/SimPropertyBinding';
+// export { SimBindingManager } from './simulations/core/SimBindingManager';
+// export { Simulation } from './simulations/Simulation';
+// export { World } from './simulations/World';
+
+// export { ParticleSystem} from './simulations/domains/physics/ParticleSystem';
+
 // // textures
 // export { CanvasTexture } from './textures/CanvasTexture';
 // export { CompressedArrayTexture } from './textures/CompressedArrayTexture';

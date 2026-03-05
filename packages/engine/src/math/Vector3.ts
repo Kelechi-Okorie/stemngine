@@ -71,6 +71,21 @@ export class Vector3 {
   }
 
   /**
+   * Clears the components of this vector to 0
+   * 
+   * @returns The current instance
+   */
+  public clear(): this {
+
+    this.x = 0;
+    this.y = 0;
+    this.z = 0;
+
+    return this;
+
+  }
+
+  /**
    * Sets the vector components to the same value.
    *
    * @param scalar - The value to set for all components.
@@ -458,7 +473,9 @@ export class Vector3 {
    * @return The current instance
    */
   public project<T extends Camera>(camera: T): this {
+
     return this.applyMatrix4(camera.matrixWorldInverse).applyMatrix4(camera.projectionMatrix);
+
   }
 
   /**
@@ -469,7 +486,9 @@ export class Vector3 {
    * @return The current instance
    */
   public unproject<T extends Camera>(camera: T): this {
+
     return this.applyMatrix4(camera.projectionMatrixInverse).applyMatrix4(camera.matrixWorld);
+
   }
 
   /**
@@ -513,11 +532,13 @@ export class Vector3 {
    * @returns The current instance.
    */
   public min(v: Vector3): this {
+
     this.x = Math.min(this.x, v.x);
     this.y = Math.min(this.y, v.y);
     this.z = Math.min(this.z, v.z);
 
     return this;
+
   }
 
   /**
@@ -528,11 +549,13 @@ export class Vector3 {
    * @returns The current instance.
    */
   public max(v: Vector3): this {
+
     this.x = Math.max(this.x, v.x);
     this.y = Math.max(this.y, v.y);
     this.z = Math.max(this.z, v.z);
 
     return this;
+
   }
 
   /**

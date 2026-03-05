@@ -1,7 +1,7 @@
-import { Vector2 } from "../engine.core";
+import { Vector2 } from '../math/Vector2';
 import { MOUSE, TOUCH } from "../constants";
 
-import { BrowserInputManager } from "../engine.core";
+import { BrowserInputManager } from '../inputs/BrowserInputManager';
 import { OrbitControls } from "./OrbitControls";
 
 export class InputOrbitMapper {

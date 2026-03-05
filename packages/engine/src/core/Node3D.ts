@@ -113,11 +113,11 @@ export class Node3D extends EventDispatcher {
   public readonly isNode3D: boolean = true;
 
   /**
- * The ID of the node.
- *
- * @name Node#id
- * @readonly
-*/
+   * The ID of the node.
+   *
+   * @name Node#id
+   * @readonly
+  */
   public readonly id: number;
 
   /**

@@ -1,7 +1,7 @@
 // Event type definition
-export interface BaseEvent<TTarget = any> {
+export interface BaseEvent {
   type: string;
-  target?: any;
+  target: any;
   [key: string]: any;
 }
 
@@ -14,7 +14,7 @@ type EventListener<E extends BaseEvent> = (event: E) => void;
  *
  * @see https://doc.babylonjs.com/features/featuresDeepDive/events/eventDispatcher
  */
-export class EventDispatcher<TEvents extends  Record<string, BaseEvent<any>> = any> {
+export class EventDispatcher<TEvents extends  Record<string, BaseEvent> = any> {
   private _listeners?: { [K in keyof TEvents]?: EventListener<TEvents[K]>[] };
 
 
@@ -92,7 +92,7 @@ export class EventDispatcher<TEvents extends  Record<string, BaseEvent<any>> = a
 
     const array = listeners[event.type as K];
     if (array !== undefined) {
-      (event as BaseEvent).target = this;
+      // (event as BaseEvent).target = this;
 
       const copy = array.slice(0);
       for (let i = 0, l = copy.length; i < l; i++) {
