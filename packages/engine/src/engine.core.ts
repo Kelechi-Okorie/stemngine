@@ -122,7 +122,7 @@
 // export { Simulation } from './simulations/Simulation';
 // export { World } from './simulations/World';
 
-// export { ParticleSystem} from './simulations/domains/physics/ParticleSystem';
+// export { ParticleSystem } from './simulations/domains/physics/ParticleSystem';
 
 // // textures
 // export { CanvasTexture } from './textures/CanvasTexture';
@@ -130,11 +130,45 @@
 // export { CompressedCubeTexture } from './textures/CompressedCubeTexture';
 // export { CompressedTexture } from './textures/CompressedTexture';
 // export { CubeTexture } from './textures/CubeTexture';
-// export { Data3DTexture} from './textures/Data3DTexture';
+// export { Data3DTexture } from './textures/Data3DTexture';
 // export { DataArrayTexture } from './textures/DataArrayTexture';
 // export { DataTexture } from './textures/DataTexture';
 // export { DepthTexture } from './textures/DepthTexture';
-// export {ExternalTexture } from './textures/ExternalTexture';
+// export { ExternalTexture } from './textures/ExternalTexture';
 // export { Source } from './textures/Source';
 // export { Texture } from './textures/Texture';
 // export { VideoTexture } from './textures/VideoTexture';
+
+// /**
+//  * visualizations
+//  */
+// /**
+//  * chart
+//  */
+// export type { DataSourceOptions, RenderContext } from './visualizations/chart/Interfaces';
+// export { DataSourceTypes } from './visualizations/chart/Interfaces';
+// export type { PointAttribute } from './visualizations/chart/Interfaces';
+// export { PlotType} from './visualizations/chart/Interfaces';
+// export type { SeriesOptions } from './visualizations/chart/core/Series';
+// export { Chart } from './visualizations/chart/Chart';
+
+// // core
+// export { Axes } from './visualizations/chart/core/Axes';
+// export { GridLayout } from './visualizations/chart/core/GridLayout';
+// export { Plot } from './visualizations/chart/core/Plot';
+// export { PlotArea } from './visualizations/chart/core/PlotArea';
+// export { Series } from './visualizations/chart/core/Series';
+// export { TransformPipeline } from './visualizations/chart/core/TransformPipeline';
+
+// // extras
+// export {aosToBuffer} from './visualizations/chart/extras/DataAdapter';
+// export { bufferToAOS} from './visualizations/chart/extras/DataAdapter';
+
+// // plotters
+// export { BarPlotter } from './visualizations/chart/plotters/BarPlotter';
+// export { LinePlotter } from './visualizations/chart/plotters/LinePlotter';
+// export { PointPlotter } from './visualizations/chart/plotters/PointPlotter';
+
+// // sources
+// export { StaticArraySource } from './visualizations/chart/sources/StaticArraySource';
+// export { StreamingSource } from './visualizations/chart/sources/StreamingSource';

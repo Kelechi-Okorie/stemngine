@@ -12,6 +12,10 @@ import { warnOnce } from '../utils.js';
 import { Color } from './Color.js';
 import { Vector3 } from './Vector3.js';
 
+// TODO: find out if color management is large and reduce it
+// view it in console.
+// in fact, check all classes and files in this codebase
+
 /* ------------------------------------------------------------------------- */
 /* XYZ Conversion Matrices */
 /* ------------------------------------------------------------------------- */
