@@ -117,6 +117,8 @@ export class Scene extends Node3D {
   constructor() {
     super();
 
+    this.name = 'Scene'
+
   }
 
   /**

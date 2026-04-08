@@ -1,3 +1,3 @@
-// export * from './engine.core';
+export * from './engine.core';
 
-// export { WebGLRenderer } from './renderers/WebGLRenderer';
+export { WebGLRenderer } from './renderers/WebGLRenderer';

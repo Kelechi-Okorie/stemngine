@@ -131,6 +131,7 @@ export class Mesh extends Node3D {
 
     super();
 
+    this.name = `Mesh${this.id}`;
     this.geometry = geometry;
     this.material = material;
 
