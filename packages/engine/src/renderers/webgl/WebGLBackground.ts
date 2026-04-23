@@ -136,7 +136,7 @@ export class WebGLBackground {
     return this.clearColor;
   }
 
-  public setClearColor(color: Color | number, alpha = 1): void {
+  public setClearColor(color: Color | number | string, alpha = 1): void {
 
     this.clearColor.set(color);
     this.clearAlpha = alpha;

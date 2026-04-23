@@ -15,29 +15,31 @@ const distFolder = 'dist';
 
 export default [
   // UMD (minified + obfuscated)
-  {
-    input: 'src/engine.ts',
-    output: {
-      file: path.join(distFolder, 'engine.umd.min.js'),
-      format: 'umd',
-      name: 'STEMEngine',
-      sourcemap: false,
-    },
-    plugins: [
-      typescript(),
-      terser(),
-      obfuscatorPlugin({
-        compact: true,
-        controlFlowFlattening: true,
-        deadCodeInjection: true,
-        stringArray: true,
-        stringArrayEncoding: ['base64'],
-        rotateStringArray: true,
-      }),
-    ],
-  },
+  // TODO: have to prove that UMD should be supported
+  // {
+  //   input: 'src/engine.ts',
+  //   output: {
+  //     file: path.join(distFolder, 'engine.umd.min.js'),
+  //     format: 'umd',
+  //     name: 'STEMEngine',
+  //     sourcemap: false,
+  //   },
+  //   plugins: [
+  //     typescript(),
+  //     terser(),
+  //     obfuscatorPlugin({
+  //       compact: true,
+  //       controlFlowFlattening: true,
+  //       deadCodeInjection: true,
+  //       stringArray: true,
+  //       stringArrayEncoding: ['base64'],
+  //       rotateStringArray: true,
+  //     }),
+  //   ],
+  // },
 
   // ESM (clean, modern build)
+  // TODO: may have to add a minifier and obfuscator
   {
     input: 'src/engine.ts',
     output: {

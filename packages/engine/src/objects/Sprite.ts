@@ -131,7 +131,7 @@ export class Sprite extends Node3D {
 
     if (raycaster.camera === null) {
 
-      console.error('THREE.Sprite: "Raycaster.camera" needs to be set in order to raycast against sprites.');
+      console.error('Sprite: "Raycaster.camera" needs to be set in order to raycast against sprites.');
 
     }
 
@@ -192,11 +192,20 @@ export class Sprite extends Node3D {
 
     intersects.push({
 
+      object: this,
       distance: distance,
       point: _intersectPoint.clone(),
-      uv: Triangle.getInterpolation(_intersectPoint, _vA, _vB, _vC, _uvA, _uvB, _uvC, new Vector2()),
-      face: null,
-      object: this
+      uv: Triangle.getInterpolation(
+        _intersectPoint,
+        _vA,
+        _vB,
+        _vC,
+        _uvA as unknown as Vector3,
+        _uvB as unknown as Vector3,
+        _uvC as unknown as Vector3,
+        new Vector3()
+      ),
+      face: null
 
     });
 
@@ -240,7 +249,6 @@ function transformVertex(
     _rotatedPosition.copy(_alignedPosition);
 
   }
-
 
   vertexPosition.copy(mvPosition);
   vertexPosition.x += _rotatedPosition.x;

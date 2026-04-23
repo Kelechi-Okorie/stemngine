@@ -22,7 +22,6 @@ export class State {
 
     public scene: Scene;
     public camera: Camera;
-    // public selection: number;
     public selectionManager: SelectionManager;
     public isDragging: boolean;   // TODO: use generic browser event listener
 

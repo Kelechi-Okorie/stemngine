@@ -113,7 +113,7 @@ export class MeshDepthMaterial extends Material {
    * in here. Color values can be passed any type of value accepted
    * by {@link Color#set}.
    */
-  constructor(parameters: { [key: string]: any }) {
+  constructor(parameters?: { [key: string]: any }) {
 
     super();
     this.setValues(parameters);

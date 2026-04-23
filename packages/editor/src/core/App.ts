@@ -103,6 +103,7 @@ export class App {
 
         // leaf
         if (region.type === 'leaf') {
+
             this.renderEditor(region, container);
             return;
 
@@ -130,11 +131,6 @@ export class App {
             throw new Error('divider cannot be created');
 
         }
-
-        // a.style.background = 'blue';
-        // b.style.background = 'green';
-        // divider.style.background = 'red';
-
 
         wrapper.appendChild(a);
         wrapper.appendChild(divider);
@@ -212,6 +208,7 @@ export class App {
             this.layoutRegion(region.b, width, hB);
 
         }
+
     }
 
     // TODO: createState should be done by the state class
@@ -300,6 +297,7 @@ export class App {
 
             e.preventDefault();
             this.startDragging(region, e);
+
         });
 
         return divider;
@@ -348,8 +346,6 @@ export class App {
 
         split.ratio = Math.max(0.1, Math.min(0.9, split.ratio + delta));
 
-        console.log(split.ratio)
-
         this.layout();
     }
 
@@ -359,8 +355,8 @@ export class App {
 
         window.removeEventListener('mousemove', onMove);
         window.removeEventListener('mouseup', onUp);
+        
     }
-
 
 }
 

@@ -75,7 +75,7 @@ export class WebGLCubeMaps {
 
 	}
 
-	public onTextureDispose( event: BaseEvent<Texture> ) {
+	public onTextureDispose( event: any ) { // TODO: type better
 
 		const texture = event.target;
 

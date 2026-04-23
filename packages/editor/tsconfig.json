@@ -25,7 +25,7 @@
     "module": "ESNext",
     "target": "ES2022",
     "rootDir": "src",
-    "moduleResolution": "Node",
+    "moduleResolution": "bundler",
     "strict": true
   },
   "include": ["src"]

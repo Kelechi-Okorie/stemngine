@@ -126,7 +126,7 @@ export class RenderTarget extends EventDispatcher {
    */
   public resolveStencilBuffer: boolean;
 
-  private _depthTexture: Texture | null = null;
+  protected _depthTexture: Texture | null = null;
 
   /**
    * The number of MSAA samples.
@@ -139,7 +139,7 @@ export class RenderTarget extends EventDispatcher {
   public samples: number;
 
   /**
-   * Whether to this target is used in multiview rendering.
+   * Whether this target is used in multiview rendering.
    *
    * @type {boolean}
    * @default false

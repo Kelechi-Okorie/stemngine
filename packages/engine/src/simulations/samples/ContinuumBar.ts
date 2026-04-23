@@ -1,7 +1,7 @@
-export class ContinuumBar implements Representation {
+export class ContinuumBar {
     type = "continuum-bar"
 
-    temperature: Float32Array
-    strain: Float32Array
-    color: Float32Array
+    // temperature: Float32Array
+    // strain: Float32Array
+    // color: Float32Array
 }

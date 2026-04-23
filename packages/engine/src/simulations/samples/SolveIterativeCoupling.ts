@@ -1,29 +1,31 @@
-function solveIterativeCoupling(loopSolvers: Solver[], dt: number, maxIterations: number, tolerance: number) {
-    let converged = false;
-    let iteration = 0;
+// function solveIterativeCoupling(loopSolvers: Solver[], dt: number, maxIterations: number, tolerance: number) {
+//     let converged = false;
+//     let iteration = 0;
 
-    // store previous state for convergence check
-    let prevStates = loopSolvers.map(s => s.snapshot());
+//     // store previous state for convergence check
+//     let prevStates = loopSolvers.map(s => s.snapshot());
 
-    while (!converged && iteration < maxIterations) {
-        for (const solver of loopSolvers) {
-            solver.solve(dt);
-        }
+//     while (!converged && iteration < maxIterations) {
+//         for (const solver of loopSolvers) {
+//             solver.solve(dt);
+//         }
 
-        converged = true;
+//         converged = true;
 
-        // check if all solvers converged
-        for (let i = 0; i < loopSolvers.length; i++) {
-            if (!loopSolvers[i].hasConverged(prevStates[i], tolerance)) {
-                converged = false;
-                prevStates[i] = loopSolvers[i].snapshot(); // update snapshot
-            }
-        }
+//         // check if all solvers converged
+//         for (let i = 0; i < loopSolvers.length; i++) {
+//             if (!loopSolvers[i].hasConverged(prevStates[i], tolerance)) {
+//                 converged = false;
+//                 prevStates[i] = loopSolvers[i].snapshot(); // update snapshot
+//             }
+//         }
 
-        iteration++;
-    }
+//         iteration++;
+//     }
 
-    if (!converged) {
-        console.warn(`Iterative coupling did not converge in ${maxIterations} iterations`);
-    }
-}
+//     if (!converged) {
+//         console.warn(`Iterative coupling did not converge in ${maxIterations} iterations`);
+//     }
+// }
+
+function solve() {}

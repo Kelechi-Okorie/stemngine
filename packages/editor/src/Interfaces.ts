@@ -42,3 +42,9 @@ export interface IBinding<T> {
     subscribe(fn: Listener<T>): void;
     notify(): void;
 };
+
+export const LAYERS = {
+  DEFAULT: 0,
+  HELPERS: 1,
+  GIZMOS: 2
+};

@@ -53,9 +53,9 @@ const _intersectionPointWorld = /*@__PURE__*/ new Vector3();
  * Class representing triangular polygon mesh based objects.
  *
  * ```js
- * const geometry = new THREE.BoxGeometry( 1, 1, 1 );
- * const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
- * const mesh = new THREE.Mesh( geometry, material );
+ * const geometry = new BoxGeometry( 1, 1, 1 );
+ * const material = new MeshBasicMaterial( { color: 0xffff00 } );
+ * const mesh = new Mesh( geometry, material );
  * scene.add( mesh );
  * ```
  *
@@ -86,7 +86,6 @@ export class Mesh extends Node3D {
    * @type {Material|Array<Material>}
    * @default MeshBasicMaterial
    */
-  // public material: MeshBasicMaterial | MeshBasicMaterial[];
   public material: Material | Material[];
 
   /**

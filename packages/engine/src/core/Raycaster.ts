@@ -8,7 +8,6 @@ import { isOrthographicCamera } from '../cameras/OrthographicCamera';
 import { isPerspectiveCamera } from '../cameras/PerspectiveCamera';
 import { Node3D } from './Node3D';
 import { Mesh } from '../objects/Mesh';
-import { SpatialNode } from './SpatialNode';
 import { BufferAttribute } from './BufferAttribute';
 
 const _matrix = /*@__PURE__*/ new Matrix4();
@@ -131,8 +130,8 @@ export class Raycaster {
    * @param {number} [far=Infinity] - All results returned are closer than far. Far can't be lower than near.
    */
   constructor(
-    origin: Vector3,
-    direction: Vector3,
+    origin: Vector3 = new Vector3(),
+    direction: Vector3 = new Vector3(0, 0, -1),
     near: number = 0,
     far: number = Infinity
   ) {
@@ -321,4 +320,3 @@ function intersect(
   }
 
 }
-

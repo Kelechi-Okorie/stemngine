@@ -1,7 +1,7 @@
 import { Node3D } from "../core/Node3D";
 
 /**
- * This is almost identical to SpatialNode, but
+ * This is almost identical to Node3, but
  * it is used as a base class for grouping objects.
  */
 export class Group extends Node3D {

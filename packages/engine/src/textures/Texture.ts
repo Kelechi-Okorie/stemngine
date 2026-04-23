@@ -22,7 +22,7 @@ import {
   UpdateRange
 } from '../constants';
 import { generateUUID } from "../math/MathUtils";
-import { Vector2 } from "../engine";
+import { Vector2 } from "../math/Vector2";
 import { Vector3 } from "../math/Vector3";
 import { Matrix3 } from "../math/Matrix3";
 import { Source } from "./Source";

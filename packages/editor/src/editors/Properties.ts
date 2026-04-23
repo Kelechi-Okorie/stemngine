@@ -1,5 +1,3 @@
-import { Vector2, Vector3 } from "@stemngine/engine";
-
 import { State } from "../core/State";
 import { Editor } from "../Interfaces";
 import { Panel } from "../pane/Panel";

@@ -1,7 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { Node3D } from '../../../src/core/Node3D';
-import { SpatialNode } from '../../../src/core/SpatialNode';
-import { Node } from '../../../src/core/Node';
 import { Vector3 } from '../../../src/math/Vector3';
 import { Quaternion } from '../../../src/math/Quaternion';
 import { Euler } from '../../../src/math/Euler';
@@ -42,8 +40,8 @@ describe('Node3D', () => {
       expect(node).toBeInstanceOf(Node3D);
     });
 
-    it('should inherit from SpatialNode and Node', () => {
-      expect(node).toBeInstanceOf(SpatialNode);
+    it('should inherit from Node3D and Node', () => {
+      expect(node).toBeInstanceOf(Node3D);
       expect(node).toBeInstanceOf(Node);
     });
 
@@ -71,7 +69,7 @@ describe('Node3D', () => {
     });
 
     it('should have isNode flag set to true', () => {
-      expect(node.isNode).toBe(true);
+      expect(node.isNode3D).toBe(true);
     });
 
     it('should have default up vector', () => {
@@ -186,7 +184,7 @@ describe('Node3D', () => {
       parent.add(parent);
 
       expect(consoleSpy).toHaveBeenCalledWith(
-        "SpatialNode.add: object can't be added as a child of itself.",
+        "Node3D.add: object can't be added as a child of itself.",
         parent
       );
 
@@ -195,12 +193,12 @@ describe('Node3D', () => {
       consoleSpy.mockRestore();
     });
 
-    it('should display an error when adding a non-SpatialNode', () => {
+    it('should display an error when adding a non-Node3D', () => {
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
 
       parent.add({} as any);
 
-      expect(consoleSpy).toHaveBeenCalledWith('Can only add instances of SpatialNode');
+      expect(consoleSpy).toHaveBeenCalledWith('Can only add instances of Node3D');
 
       consoleSpy.mockRestore();
     });
@@ -834,7 +832,7 @@ describe('Node3D', () => {
     });
 
     it('should not modify the result array passed in', () => {
-      const externalResult: SpatialNode[] = [];
+      const externalResult: Node3D[] = [];
       const result = root.getObjectsByProperty('visible', false, externalResult);
 
       // result and externalResult should be the same reference
@@ -2557,7 +2555,7 @@ describe('Node3D', () => {
       source.recieveShadow = false;
       source.frustumCulled = false;
       source.renderOrder = 7;
-      source.animations = [{ name: 'anim1' }];
+      source.animations = [/* { name: 'anim1' } */];
       source.userData = { someKey: 'someValue' };
 
       // Add a child

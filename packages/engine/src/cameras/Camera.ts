@@ -71,6 +71,13 @@ export abstract class Camera extends Node3D {
    */
   constructor() {
     super();
+
+    // TODO: may eventually have to use (advanced split rendering)
+    // render multiple passes:
+    // 1. scene pass (objects)
+    // 2. overlay pass (helpers/gizmos)
+    // 3. etc
+    this.layers.enableAll();
   }
 
   /**

@@ -52,7 +52,7 @@ export class Source {
    * Constructs a new video texture
    */
   constructor(data: any = null) {
-    data = data;
+    this.data = data;
   }
 
   /**
@@ -106,6 +106,7 @@ export class Source {
    * @returns A JSON object representing the serialized source
    */
   public toJSON(meta: { [key: string]: any } | string): { [key: string]: any } {
+    
     // TODO: confirm if the input and return typing are correct
     const isRootObject = (meta === undefined || typeof meta === 'string');
 

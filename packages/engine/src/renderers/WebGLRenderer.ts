@@ -54,7 +54,7 @@ import { WebGLState } from './webgl/WebGLState';
 import { WebGLTextures } from './webgl/WebGLTextures';
 import { WebGLUniforms } from './webgl/WebGLUniforms';
 import { WebGLUtils } from './webgl/WebGLUtils';
-import { WebXRManager } from './webxr/WebXRManager';
+// import { WebXRManager } from './webxr/WebXRManager';
 import { WebGLMaterials } from './webgl/WebGLMaterials';
 import { WebGLUniformsGroups } from './webgl/WebGLUniformsGroups';
 import { createCanvasElement, probeAsync, warnOnce } from '../utils';
@@ -116,31 +116,31 @@ export class WebGLRenderer {
   public readonly isWebGLRenderer: boolean = true;
 
   /**
- * A canvas where the renderer draws its output.This is automatically created by the renderer
- * in the constructor (if not provided already); you just need to add it to your page like so:
- * ```js
- * document.body.appendChild( renderer.domElement );
- * ```
- *
- * @type {DOMElement}
- */
+   * A canvas where the renderer draws its output.This is automatically created by the renderer
+   * in the constructor (if not provided already); you just need to add it to your page like so:
+   * ```js
+   * document.body.appendChild( renderer.domElement );
+   * ```
+   *
+   * @type {DOMElement}
+   */
   public domElement: HTMLCanvasElement;
 
   /**
- * A object with debug configuration settings.
- *
- * - `checkShaderErrors`: If it is `true`, defines whether material shader programs are
- * checked for errors during compilation and linkage process. It may be useful to disable
- * this check in production for performance gain. It is strongly recommended to keep these
- * checks enabled during development. If the shader does not compile and link - it will not
- * work and associated material will not render.
- * - `onShaderError(gl, program, glVertexShader,glFragmentShader)`: A callback function that
- * can be used for custom error reporting. The callback receives the WebGL context, an instance
- * of WebGLProgram as well two instances of WebGLShader representing the vertex and fragment shader.
- * Assigning a custom function disables the default error reporting.
- *
- * @type {Object}
- */
+   * A object with debug configuration settings.
+   *
+   * - `checkShaderErrors`: If it is `true`, defines whether material shader programs are
+   * checked for errors during compilation and linkage process. It may be useful to disable
+   * this check in production for performance gain. It is strongly recommended to keep these
+   * checks enabled during development. If the shader does not compile and link - it will not
+   * work and associated material will not render.
+   * - `onShaderError(gl, program, glVertexShader,glFragmentShader)`: A callback function that
+   * can be used for custom error reporting. The callback receives the WebGL context, an instance
+   * of WebGLProgram as well two instances of WebGLShader representing the vertex and fragment shader.
+   * Assigning a custom function disables the default error reporting.
+   *
+   * @type {Object}
+   */
   public debug: DebugOptions = {
 
     /**
@@ -955,7 +955,7 @@ export class WebGLRenderer {
    * @param {Color} color - The clear color.
    * @param {number} [alpha=1] - The clear alpha.
    */
-  public setClearColor(color: Color | number, alpha: number = 1): void {
+  public setClearColor(color: Color | number | string, alpha: number = 1): void {
 
     this.background.setClearColor(color, alpha);
 
@@ -1128,7 +1128,7 @@ export class WebGLRenderer {
 
   // Events
 
-  public onContextLost(event: BaseEvent<WebGLRenderer>): void {
+  public onContextLost(event: any): void {  // TODO: get the correct event type
 
     event.preventDefault();
 
@@ -1160,7 +1160,7 @@ export class WebGLRenderer {
 
   }
 
-  public onContextCreationError(event: BaseEvent<WebGLRenderer>) {
+  public onContextCreationError(event: any) { // TODO: get the event type
 
     console.error('WebGLRenderer: A WebGL context could not be created. Reason: ', event.statusMessage);
 

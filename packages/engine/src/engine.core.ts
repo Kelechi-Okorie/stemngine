@@ -1,5 +1,8 @@
 import { REVISION } from "./constants";
 
+// constants.ts
+export { HalfFloatType, NoBlending, AdditiveBlending, DoubleSide, RGBADepthPacking } from './constants';
+
 // animation
 export { AnimationClip } from './animation/AnimationClip';
 
@@ -7,16 +10,16 @@ export { AnimationClip } from './animation/AnimationClip';
 export { ArrayCamera } from './cameras/ArrayCamera';
 export { CubeCamera } from './cameras/CubeCamera';
 export { Camera } from './cameras/Camera';
-export { OrthographicCamera } from './cameras/OrthographicCamera';
-export { PerspectiveCamera } from './cameras/PerspectiveCamera';
+export { OrthographicCamera, isOrthographicCamera } from './cameras/OrthographicCamera';
+export { PerspectiveCamera, isPerspectiveCamera } from './cameras/PerspectiveCamera';
 
 // controls
-// export { Controller } from './controllers/Controller';
 export { OrbitControls } from './controllers/OrbitControls';
 export { InputOrbitMapper } from './controllers/InputOrbitMapper';
 
 // core
 export { BufferAttribute } from './core/BufferAttribute';
+export { Float32BufferAttribute } from './core/BufferAttribute';
 export { BufferGeometry } from './core/BufferGeometry';
 export { Clock } from './core/Clock';
 export { EventDispatcher } from './core/EventDispatcher';
@@ -38,8 +41,12 @@ export { UniformsGroup } from './core/UniformsGroup';
 
 // geometries
 export { BoxGeometry } from './geometries/BoxGeometry';
+export { CylinderGeometry } from './geometries/CylinderGeometry';
 export { PlaneGeometry } from './geometries/PlaneGeometry';
 export { SphereGeometry } from './geometries/SphereGeometry';
+
+// helpers
+export { BoxHelper } from './helpers/BoxHelper';
 
 // inputs
 // export { InputManager } from './inputs/InputManager';
@@ -112,17 +119,17 @@ export { WebGLArrayRenderTarget } from './renderers/WebGLArrayRenderTarget';
 export { WebGLCubeRenderTarget } from './renderers/WebGLCubeRenderTarget';
 export { WebGLRenderTarget } from './renderers/WebGLRenderTarget';
 
+export { cloneUniforms } from './renderers/shaders/UniformsUtils'
+
 // scenes
 export { Fog } from './scenes/Fog';
 export { FogExp2 } from './scenes/FogExp2';
 export { Scene } from './scenes/Scene';
 
-
 // utils
 export { createCanvasElement } from './utils';
 
 // Simulations
-// -- domains -- //
 export { SimPropertyBinding } from './simulations/core/SimPropertyBinding';
 export { SimBindingManager } from './simulations/core/SimBindingManager';
 export { Simulation } from './simulations/Simulation';
@@ -145,16 +152,17 @@ export { Source } from './textures/Source';
 export { Texture } from './textures/Texture';
 export { VideoTexture } from './textures/VideoTexture';
 
-/**
- * visualizations
- */
+//////////////////////////////
+// visualizations
+/////////////////////////////
 /**
  * chart
  */
+// interfaces
 export type { DataSourceOptions, RenderContext } from './visualizations/chart/Interfaces';
 export { DataSourceTypes } from './visualizations/chart/Interfaces';
 export type { PointAttribute } from './visualizations/chart/Interfaces';
-export { PlotType} from './visualizations/chart/Interfaces';
+export { PlotType } from './visualizations/chart/Interfaces';
 export type { SeriesOptions } from './visualizations/chart/core/Series';
 export { Chart } from './visualizations/chart/Chart';
 
@@ -167,8 +175,8 @@ export { Series } from './visualizations/chart/core/Series';
 export { TransformPipeline } from './visualizations/chart/core/TransformPipeline';
 
 // extras
-export {aosToBuffer} from './visualizations/chart/extras/DataAdapter';
-export { bufferToAOS} from './visualizations/chart/extras/DataAdapter';
+export { aosToBuffer } from './visualizations/chart/extras/DataAdapter';
+export { bufferToAOS } from './visualizations/chart/extras/DataAdapter';
 
 // plotters
 export { BarPlotter } from './visualizations/chart/plotters/BarPlotter';

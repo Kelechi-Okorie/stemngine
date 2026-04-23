@@ -1,10 +1,10 @@
 import { Solver } from "../Interfaces"
 
-class HeatSolver implements Solver {
+class HeatSolver /* implements Solver */ {
     name = "heat"
     dependencies = []
 
-    step(dt, world) {
-        diffuseTemperature(world.temperatureGrid)
-    }
+    // step(dt, world) {
+    //     diffuseTemperature(world.temperatureGrid)
+    // }
 }
