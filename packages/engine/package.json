@@ -2,15 +2,14 @@
   "name": "@stemngine/engine",
   "version": "1.0.0",
   "description": "Unreal engine for STEM",
-  "main": "dist/engine.umd.js",
+  "main": "./dist/engine.esm.js",
   "module": "dist/engine.esm.js",
-  "types": "dist/engine.d.ts",
+  "types": "./dist/types/engine.d.ts",
   "type": "module",
   "exports": {
     ".": {
       "types": "./dist/types/engine.d.ts",
-      "import": "./dist/engine.esm.js",
-      "require": "./dist/engine.umd.js"
+      "import": "./dist/engine.esm.js"
     }
   },
   "scripts": {

@@ -919,4 +919,3 @@ export function isVector2(
 ): vector is Vector2 {
   return (vector as any).isVector2 === true;
 }
-

@@ -1,5 +1,5 @@
-import { Vector2 } from '../math/Vector2';
-import { MOUSE, TOUCH } from "../constants";
+import { Vector2 } from '@stemngine/engine';
+import { MOUSE, TOUCH } from "@stemngine/engine";
 
 import { BrowserInputManager } from '../inputs/BrowserInputManager';
 import { OrbitControls } from "./OrbitControls";
@@ -823,6 +823,5 @@ export class InputOrbitMapper {
       );
     }
   }
-
 
 }

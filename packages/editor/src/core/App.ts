@@ -1,23 +1,13 @@
-// TODO: make sure every module in the editor uses the exports from
-// stemngine build
-
-import { DirectionalLight, MeshPhongMaterial, OrthographicCamera, Scene } from "@stemngine/engine";
-import { PerspectiveCamera } from "@stemngine/engine";
-import { WebGLRenderer } from "@stemngine/engine";
-import { BoxGeometry } from "@stemngine/engine";
-import { MeshBasicMaterial } from "@stemngine/engine";
-import { Mesh } from "@stemngine/engine";
-import { OrbitControls, Color } from "@stemngine/engine";
-import { createCanvasElement } from "@stemngine/engine";
-
-
-import { Editor, Region } from "../Interfaces";
+import { Editor, EditorContext, Region } from "../Interfaces";
 import { ViewportEditor } from "../editors/ViewportEditor";
 import { Outliner } from "../editors/Outliner";
 import { Properties } from "../editors/Properties";
 import { State, StateConfig } from '../core/State';
 import { SelectionManager } from "../pane/SelectionManager";
-import { SphereGeometry } from "@stemngine/engine";
+import { Clock, Scene, SimBindingManager, Vector3 } from "@stemngine/engine";
+import { SimulationManager } from "./SimulationManager";
+import { GlobalEventDispatcher } from "@stemngine/engine";
+import { ToolManager } from "../tools/ToolManager";
 
 export class App {
 
@@ -30,10 +20,47 @@ export class App {
 
     private draggingRegion: Region | null = null;
 
+    private simulationManager: SimulationManager;
+    private bindingManager: SimBindingManager;
+
+    private clock: Clock;
+
+    private viewports: Set<ViewportEditor> = new Set();
+
+    private isPlaying = false;
+
     constructor(container: HTMLElement) {
 
         this.container = container;
-        this.state = this.createState();
+        this.bindingManager = new SimBindingManager();
+
+        this.clock = new Clock();
+
+        const stateConfig = {
+            scene: new Scene(),
+            selectionManager: new SelectionManager(),
+            isDragging: false,
+            cursor: { position: new Vector3(), visible: true }
+        }
+
+        this.state = new State(stateConfig)
+
+        this.simulationManager = new SimulationManager(this.bindingManager);
+
+        const context: EditorContext = {
+            simulationManager: this.simulationManager,
+            state: this.state,
+            toolManager: new ToolManager(/* this.context */),
+
+            select: (id: string) => console.log('test'),
+            getSelection: () => console.log('get selection'),
+
+            emit: GlobalEventDispatcher.instance.dispatchEvent.bind(GlobalEventDispatcher.instance),
+            on: GlobalEventDispatcher.instance.addEventListener.bind(GlobalEventDispatcher.instance),
+        }
+
+        const viewport = new ViewportEditor('3D viewport', context);
+        this.addViewport(viewport);
 
         this.region = {
             type: 'split',
@@ -44,17 +71,29 @@ export class App {
                 type: 'leaf',
                 id: 'a-1',
                 name: '3D viewport',
-                editor: new ViewportEditor('3D viewport', this.state)
+                editor: viewport
             },
             b: {
                 type: 'split',
                 id: 'b-1',
                 direction: 'vertical',
                 ratio: 0.3,
-                a: { type: 'leaf', id: 'a-2', name: 'outliner', editor: new Outliner('outliner', this.state) },
-                b: { type: 'leaf', id: 'b-2', name: 'properties', editor: new Properties('properties panel', this.state) }
+                a: { type: 'leaf', id: 'a-2', name: 'outliner', editor: new Outliner('outliner', context) },
+                b: { type: 'leaf', id: 'b-2', name: 'properties', editor: new Properties('properties panel', context) }
             }
         }
+
+        requestAnimationFrame(this.loop);
+
+        const btn = document.createElement('button');
+        btn.innerText = 'button';
+        btn.style.position = 'absolute';
+        btn.style.right = '10px'
+        btn.style.top = '10px';
+        btn.style.cursor = 'pointer';
+        btn.style.zIndex = '100';
+
+        this.container.appendChild(btn)
 
     }
 
@@ -156,8 +195,8 @@ export class App {
         const el = document.createElement('div');
         el.style.width = '100%';
         el.style.height = '100%';
-        // el.style.background = 'yellow';    // TODO: to be removed
         el.style.padding = '2px';
+        el.style.position = 'relative';
 
         container.appendChild(el);
 
@@ -211,51 +250,6 @@ export class App {
 
     }
 
-    // TODO: createState should be done by the state class
-    /**
-     * 
-     * @returns 
-     */
-    private createState(): State {
-
-        const geometry = new BoxGeometry(1, 1, 1);
-        const material = new MeshBasicMaterial({ color: 0x00ff00 });
-        const cube = new Mesh(geometry, material);
-        cube.position.z = -10;
-
-        const geometry2 = new SphereGeometry();
-        const material2 = new MeshBasicMaterial({color: 0xff0000});
-        const sphere1 = new Mesh(geometry2, material2);
-        sphere1.position.x = 2;
-
-        const scene = new Scene();
-        scene.background = new Color(0xff0000)
-
-        const left = -5;
-        const right = 5;
-        const top = 5;
-        const bottom = -5;
-        const near = 5;
-        const far = 50
-        const camera = new OrthographicCamera(left, right, top, bottom, near, far);
-        // const camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-
-        scene.add(cube);
-        scene.add(sphere1);
-
-        camera.position.z = 20;
-        // camera.position.x = 2;
-        camera.lookAt(0, 0, 0);
-
-        return {
-            scene,
-            camera,
-            // selection: -1,
-            selectionManager: new SelectionManager(),
-            isDragging: false   // TODO: use the generic browser event dispatcher
-        }
-
-    }
 
     /**
      * for divider
@@ -355,13 +349,51 @@ export class App {
 
         window.removeEventListener('mousemove', onMove);
         window.removeEventListener('mouseup', onUp);
-        
+
+    }
+
+    public addViewport(viewport: ViewportEditor) {
+
+        this.viewports.add(viewport);
+
+    }
+
+    // TODO: check with the engines animation loop
+    private loop = () => {
+
+        this.clock.tick();
+        const dt = this.clock.dt;
+
+        // 1.simulation - only if playing
+        if (this.isPlaying) {
+
+            this.simulationManager.step(dt);
+
+        }
+
+        // 2. simulation -> renderer binding - only if playing
+        if (this.isPlaying) {
+            this.bindingManager.update();
+        }
+
+        // 3. render all viewports
+        for (const vp of this.viewports) {
+
+            vp.update(dt);
+        }
+
+        requestAnimationFrame(this.loop);
+    }
+
+    public play() {
+        this.isPlaying = true;
+    }
+
+    public pause() {
+        this.isPlaying = false;
     }
 
 }
-
-
-
 
 /**
  * 

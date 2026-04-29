@@ -1,86 +1,83 @@
 // TODO: use imports from the build
-import { DirectionalLight, Group, MeshPhongMaterial, OrthographicCamera, Scene, Vector3 } from "@stemngine/engine";
-import { PerspectiveCamera } from "@stemngine/engine";
+import { BufferGeometry, Camera, DirectionalLight, Group, LineBasicMaterial, MeshPhongMaterial, OrthographicCamera, Scene, Vector3, Line, isOrthographicCamera, isPerspectiveCamera } from "@stemngine/engine";
+import { PerspectiveCamera, Plane, PlaneGeometry } from "@stemngine/engine";
 import { WebGLRenderer } from "@stemngine/engine";
 import { BoxGeometry } from "@stemngine/engine";
 import { MeshBasicMaterial } from "@stemngine/engine";
 import { Mesh } from "@stemngine/engine";
-import { OrbitControls, Color } from "@stemngine/engine";
+import { OrbitControls } from "../controllers/OrbitControls";
 import { createCanvasElement } from "@stemngine/engine";
 import { Raycaster } from "@stemngine/engine";
 import { Vector2 } from "@stemngine/engine";
-import { Node3D, Clock } from "@stemngine/engine";
+import { Node3D, TextureLoader } from "@stemngine/engine";
 
 import { State } from "../core/State";
-import { Editor, LAYERS } from '../Interfaces';
-import { getMouseNDC } from "./extras";
+import { Editor, EditorContext, LAYERS } from '../Interfaces';
 import { BoxHelper } from "@stemngine/engine";
 import { EffectComposer } from "../rendering/postprocessing/EffectComposer";
 import { RenderPass } from "../rendering/postprocessing/RenderPass";
 import { OutlinePass } from "../rendering/postprocessing/OutlinePass";
 import { TestPass } from "../rendering/postprocessing/TestPass";    // TODO: remove
 import { attachGizmo, createAxis } from "../rendering/gizmos";
+import { Toolbar } from "../tools/Toolbar";
+import { ToolManager } from "../tools/ToolManager";
+import { cursor3D } from "../assets/icons/3dcursor";
+import { Cursor3D } from "../viewport/renderer/Cursor3D";
+import { ViewportGizmo } from "../viewport/renderer/ViewportGizmo";
 
 export class ViewportEditor implements Editor {
     public name: string;
-    private renderer = new WebGLRenderer({ antialias: true });
-    private state: State;
+    private width!: number;
+    private height!: number
+    public readonly renderer: WebGLRenderer;
+    public readonly state: State;
+    private context: EditorContext;
 
     private highlightBox: BoxHelper | null = null;
-    // private outlinePass: OutlinePass;
-    // public composer: EffectComposer;
     private selectedObject!: Mesh;  // TODO: should be a set
-    public clock = new Clock();
+    private toolbar: Toolbar;
 
-    constructor(name: string, state: State) {
+    public readonly camera: Camera;
+    private cursor: Cursor3D;
+    private viewportGizmo: ViewportGizmo;
 
-        const { scene, camera } = state;
+    constructor(name: string, context: EditorContext) {
+
+        this.renderer = new WebGLRenderer({ antialias: true });
+        this.context = context;
+
+        this.state = context.state;
+
+        this.cursor = new Cursor3D(this.context);
+        this.viewportGizmo = new ViewportGizmo();
+
+        // TODO: to be removed
+        const left = -5;
+        const right = 5;
+        const top = 5;
+        const bottom = -5;
+        const near = 0.1;
+        const far = 1000
+        this.camera = new OrthographicCamera(left, right, top, bottom, near, far);
+        // this.camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+        this.camera.position.z = 15;
+        this.camera.position.x = 2;
+        this.camera.lookAt(0, 0, 0);
 
         this.name = name;
-        this.state = state;
 
-        this.renderer.domElement.addEventListener('click', (e) => {
+        this.toolbar = new Toolbar(this.context)
 
-            this.onMouseClick(e, this.renderer.domElement);
+        // this.state.renderer.domElement.addEventListener('mousemove', (e) => {
+        //     this.onMouseMove(e, this.state.renderer.domElement);
+        // });
 
-        });
+        // this.state.selectionManager.subscribe((selectedObject) => {
 
-        this.renderer.domElement.addEventListener('mousemove', (e) => {
-            this.onMouseMove(e, this.renderer.domElement);
-        });
+        //     this.highlightObject(selectedObject);
 
-        this.state.selectionManager.subscribe((selectedObject) => {
-
-            this.highlightObject(selectedObject);
-
-        });
-
-        // TODO: change window to be the 3d editor viewport
-        // this.renderer.setSize(window.innerWidth, window.innerHeight);
-        // this.renderer.setPixelRatio(window.devicePixelRatio);
-
-        // this.composer = new EffectComposer(this.renderer, undefined);
-
-        // this.composer.addPass(new RenderPass(scene, camera));
-
-        // this.outlinePass = new OutlinePass(
-        //     // TODO: change window to be the 3d editor viewport
-        //     // new Vector2(this.renderer.domElement.width, this.renderer.domElement.height),
-        //     new Vector2(window.innerWidth, window.innerHeight),
-        //     scene,
-        //     camera,
-        //     []
-        // );
-
-        // this.outlinePass.edgeStrength = 3;
-        // this.outlinePass.edgeThickness = 1;
-        // this.outlinePass.visibleEdgeColor.set(0xffff00);
-        // this.outlinePass.hiddenEdgeColor.set(0x22090a);
-
-        // this.composer.addPass(this.outlinePass);
-
-        // // TODO: should this be here
-        // this.clock.tick();
+        // });
 
     }
 
@@ -88,73 +85,69 @@ export class ViewportEditor implements Editor {
 
         container.appendChild(this.renderer.domElement);
 
-        // TODO: for testing only - should be removed
-        this.renderer.setAnimationLoop(this.animate);
+        // TODO: may have to be inside the select tool
+        const orbitControl = new OrbitControls(this.camera as OrthographicCamera, this.renderer.domElement);
 
+        this.toolbar.create(container);
+
+        const domElement = this.renderer.domElement;
+        const toolManager = this.context.toolManager;
+
+        domElement.addEventListener('mousedown', (e) => {
+
+            toolManager.onMouseDown(e, this);
+
+        });
+
+        domElement.addEventListener('mousemove', (e) => {
+
+            toolManager.onMouseMove(e, this);
+
+        });
+
+        domElement.addEventListener('click', (e) => {
+
+            toolManager.onClick(e, this);
+
+        });
+
+        this.cursor.attach(this.state.scene);
 
     }
 
     public resize(width: number, height: number) {
 
+        this.width = width;
+        this.height = height;
+
         this.renderer.setSize(width, height);
-        this.renderer.render(this.state.scene, this.state.camera);  // TODO: may have to batch render
+        this.renderer.render(this.state.scene, this.camera);  // TODO: may have to batch render
 
     }
 
-    public update(/* state: any */) { // TODO: should not be any
+    public update(dt: number) {
 
-        // console.log(this.name);
-        console.log(this.state);
+        // 1. 3D cursor
+        this.cursor.update(this.camera, this.renderer);
+
+        // 2. render
+        this.renderer.setViewport(0, 0, this.width, this.height);
+        this.renderer.render(this.state.scene, this.camera);
+
+        // 3. viewport gizmo
+        const context = {
+            mainCamera: this.camera,
+            renderer: this.renderer,
+            width: this.width,
+            height: this.height
+        }
+        this.viewportGizmo.update(context);
+        this.viewportGizmo.render(context);
+
     }
 
     public destroy(): void {
         console.log('release all acquired resources')
-    }
-
-    public animate = (): void => {
-        this.clock.tick();
-
-        const dt = this.clock.dt;
-
-        // this.state.scene.children[2].rotation.x = dt;
-
-        this.renderer.render(this.state.scene, this.state.camera);
-
-        // this.composer.render(dt);
-
-
-    }
-
-    public onMouseClick(event: MouseEvent, canvas: HTMLCanvasElement) {
-
-        const rect = canvas.getBoundingClientRect();
-
-        const mouse = new Vector2();
-
-        mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-        mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-
-        // TODO: may need to set near and far
-        const raycaster = new Raycaster();
-        raycaster.layers.set(LAYERS.DEFAULT);
-
-        raycaster.setFromCamera(mouse, this.state.camera);
-
-        // intersects is array of RaycasterIntersection objects sorted by distance
-        const intersects = raycaster.intersectObjects(this.state.scene.children, true); // recursive
-
-
-        if (intersects.length > 0) {
-
-            const selectedObject = intersects[0].object;
-            this.state.selectionManager.set(selectedObject);
-
-
-        } else {
-
-            this.state.selectionManager.set(null);  // click on empty space
-        }
-
     }
 
     private highlightObject(selected: Mesh | null) {
@@ -185,7 +178,7 @@ export class ViewportEditor implements Editor {
 
     private onMouseMove(event: MouseEvent, canvas: HTMLCanvasElement) {
 
-        // const canvas = this.renderer.domElement;
+        // const canvas = this.state.renderer.domElement;
         const rect = canvas.getBoundingClientRect();
 
         const mouse = new Vector2();
@@ -195,7 +188,7 @@ export class ViewportEditor implements Editor {
 
         // may need to set near and far
         const raycaster = new Raycaster();
-        raycaster.setFromCamera(mouse, this.state.camera);
+        raycaster.setFromCamera(mouse, this.camera);
 
         const intersects = raycaster.intersectObjects(this.state.scene.children, true);
 
@@ -213,4 +206,44 @@ export class ViewportEditor implements Editor {
 
     }
 
+    public getIntersectionPoint(event: MouseEvent): Vector3 | null {
+
+        const rect = this.renderer.domElement.getBoundingClientRect();
+
+        const mouse = new Vector2(
+            ((event.clientX - rect.left) / rect.width) * 2 - 1,
+            -((event.clientY - rect.top) / rect.height) * 2 + 1
+        );
+
+        // TODO: should you create raycaster and point on every click?
+        const raycaster = new Raycaster();
+        raycaster.setFromCamera(mouse, this.camera);
+
+        // try objects first
+        const hits = raycaster.intersectObjects(this.state.scene.children, true);
+
+        if (hits.length > 0) return hits[0].point;
+
+        // fallback: ground plane
+        const plane = new Plane(new Vector3(0, 0, 1), 0);
+        const point = new Vector3();
+
+        if (raycaster.ray.intersectPlane(plane, point)) return point;
+
+        return null;
+
+    }
+
 }
+
+// 🚀 After that, your editor becomes powerful
+
+// You can add:
+
+// 1. Hover preview (before click)
+// mousemove → temporary hover point
+// click → commit to cursor
+// 2. Grid snapping
+// cursor snaps to nearest grid cell
+// 3. Surface snapping
+// cursor sticks to object surfaces

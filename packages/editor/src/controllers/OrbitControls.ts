@@ -1,15 +1,16 @@
-import { Plane } from '../math/Plane';
-import { Quaternion } from '../math/Quaternion';
-import { Ray } from '../math/Ray';
-import { Spherical } from "../math/Spherical";
-import { Vector2 } from "../math/Vector2";
-import { Vector3 } from "../math/Vector3";
-import { MathUtils } from "../math/MathUtils";
+import { Plane } from '@stemngine/engine';
+import { Quaternion } from '@stemngine/engine';
+import { Ray } from '@stemngine/engine';
+import { Spherical } from "@stemngine/engine";
+import { Vector2 } from "@stemngine/engine";
+import { Vector3 } from "@stemngine/engine";
+import { MathUtils } from "@stemngine/engine";
+import { MOUSE, TOUCH } from "@stemngine/engine";
+import { Matrix4 } from "@stemngine/engine";
+import { isPerspectiveCamera, PerspectiveCamera } from "@stemngine/engine";
+import { isOrthographicCamera, OrthographicCamera } from "@stemngine/engine";
+
 import { Controls } from "./Controls";
-import { MOUSE, TOUCH } from "../constants";
-import { Matrix4 } from "../math/Matrix4";
-import { isPerspectiveCamera, PerspectiveCamera } from "../cameras/PerspectiveCamera";
-import { isOrthographicCamera, OrthographicCamera } from "../cameras/OrthographicCamera";
 import { InputOrbitMapper } from './InputOrbitMapper';
 
 // Controller orchestration (optional but powerful)

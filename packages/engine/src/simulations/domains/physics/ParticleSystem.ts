@@ -30,7 +30,7 @@ export class ParticleSystem extends System {
 
     }
 
-    public createParticle(options: ParticleOptions) {
+    public createParticle(options: ParticleOptions): Particle {
 
         const particle = new Particle(options);
 
@@ -44,7 +44,7 @@ export class ParticleSystem extends System {
             systemType: SystemType.ParticleSystem
         })
 
-        return
+        return particle
 
     }
 

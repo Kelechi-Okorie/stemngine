@@ -79,10 +79,8 @@ export function findSchema(obj: any) {
 
     } else {
 
-        console.log(obj);
-        throw new Error('Schema: findSchema - obj schema not found');
+        throw new Error(`Schema: findSchema - obj schema not found - ${obj}`);
 
     }
-
 
 }

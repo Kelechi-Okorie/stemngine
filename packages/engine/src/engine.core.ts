@@ -1,7 +1,7 @@
 import { REVISION } from "./constants";
 
 // constants.ts
-export { HalfFloatType, NoBlending, AdditiveBlending, DoubleSide, RGBADepthPacking } from './constants';
+export { HalfFloatType, NoBlending, AdditiveBlending, DoubleSide, RGBADepthPacking, TOUCH, MOUSE } from './constants';
 
 // animation
 export { AnimationClip } from './animation/AnimationClip';
@@ -13,10 +13,6 @@ export { Camera } from './cameras/Camera';
 export { OrthographicCamera, isOrthographicCamera } from './cameras/OrthographicCamera';
 export { PerspectiveCamera, isPerspectiveCamera } from './cameras/PerspectiveCamera';
 
-// controls
-export { OrbitControls } from './controllers/OrbitControls';
-export { InputOrbitMapper } from './controllers/InputOrbitMapper';
-
 // core
 export { BufferAttribute } from './core/BufferAttribute';
 export { Float32BufferAttribute } from './core/BufferAttribute';
@@ -24,6 +20,7 @@ export { BufferGeometry } from './core/BufferGeometry';
 export { Clock } from './core/Clock';
 export { EventDispatcher } from './core/EventDispatcher';
 export { GLBufferAttribute } from './core/GLBufferAttribute';
+export { GlobalEventDispatcher} from './core/GlobalEventDispatcher';
 export { InstancedBufferAttribute } from './core/InstancedBufferAttribute';
 export { InstancedBufferGeometry } from './core/InstancedBufferGeometry';
 export { InstancedInterleavedBuffer } from './core/InstancedInterleaveBuffer';
@@ -48,10 +45,6 @@ export { SphereGeometry } from './geometries/SphereGeometry';
 // helpers
 export { BoxHelper } from './helpers/BoxHelper';
 
-// inputs
-// export { InputManager } from './inputs/InputManager';
-export { BrowserInputManager } from './inputs/BrowserInputManager';
-
 // lights
 export { AmbientLight } from './lights/AmbientLight';
 export { DirectionalLight } from './lights/DirectionalLight';
@@ -65,6 +58,9 @@ export { PointLightShadow } from './lights/PointLightShadow';
 export { RectAreaLight } from './lights/RectAreaLight';
 export { SpotLight } from './lights/SpotLight';
 export { SpotLightShadow } from './lights/SpotLightShadow';
+
+// loaders
+export { TextureLoader } from './loaders/TextureLoader';
 
 // materials
 export { LineBasicMaterial } from './materials/LineBasicMaterial';
@@ -91,7 +87,7 @@ export { Euler } from './math/Euler';
 export { Frustum } from './math/Frustum';
 export { FrustumArray } from './math/FrustumArray';
 export { Line3 } from './math/Line3';
-// export { mathUtils}
+export { MathUtils } from './math/MathUtils';
 export { Matrix2 } from './math/Matrix2';
 export { Matrix3 } from './math/Matrix3';
 export { Matrix4 } from './math/Matrix4';
@@ -110,6 +106,7 @@ export { Vector4 } from './math/Vector4';
 export { BatchedMesh } from './objects/BatchedMesh';
 export { Group } from './objects/Group';
 export { InstancedMesh } from './objects/InstancedMesh';
+export { Line } from './objects/Line';
 export { Mesh } from './objects/Mesh';
 export { Sprite } from './objects/Sprite';
 

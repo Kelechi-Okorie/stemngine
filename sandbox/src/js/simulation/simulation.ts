@@ -4,7 +4,7 @@ import { WebGLRenderer } from "@stemngine/engine";
 import { BoxGeometry } from "@stemngine/engine";
 import { MeshBasicMaterial } from "@stemngine/engine";
 import { Mesh } from "@stemngine/engine";
-import { OrbitControls, Color } from "@stemngine/engine";
+import { Color } from "@stemngine/engine";
 import { Clock, Simulation, World, ParticleSystem } from "@stemngine/engine";
 import { Vector3, SimPropertyBinding, SimBindingManager } from "@stemngine/engine";
 

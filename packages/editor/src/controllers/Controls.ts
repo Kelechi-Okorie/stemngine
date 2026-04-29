@@ -1,5 +1,4 @@
-import { EventDispatcher } from "../core/EventDispatcher";
-import { Node3D } from "../core/Node3D";
+import { EventDispatcher } from "@stemngine/engine";
 
 const _EPS = 0.000001;
 

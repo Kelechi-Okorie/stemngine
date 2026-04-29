@@ -2,7 +2,7 @@
 
 
 import { State } from "../core/State";
-import { Editor } from "../Interfaces";
+import { Editor, EditorContext } from "../Interfaces";
 
 interface Node {
     id: number;
@@ -31,9 +31,9 @@ export class Outliner implements Editor {
     public name: string;
     private state: State;
 
-    constructor(name: string, state: State) {
+    constructor(name: string, context: EditorContext) {
 
-        const { scene, camera, isDragging } = state;
+        const { state  } = context;
 
         this.name = name;
         this.state = state;

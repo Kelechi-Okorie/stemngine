@@ -17,7 +17,6 @@ export class BrowserInputManager {
 
   public readonly domElement: HTMLElement | SVGElement;
   public listeners = new Map<InputEventType, Listener[]>();
-  // public listeners: Map<InputEventType, Listener> = new Map();
 
   private lastX = 0;
   private lastY = 0;

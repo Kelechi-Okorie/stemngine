@@ -4,7 +4,7 @@ import { WebGLRenderer } from "@stemngine/engine";
 import { BoxGeometry } from "@stemngine/engine";
 import { MeshBasicMaterial } from "@stemngine/engine";
 import { Mesh } from "@stemngine/engine";
-import { OrbitControls, Color } from "@stemngine/engine";
+import { Color } from "@stemngine/engine";
 
 import { Pane } from 'tweakpane';
 
@@ -56,8 +56,6 @@ light.position.set(-1, 10, 4);
 // const input = new BrowserInputManager(renderer.domElement);
 
 // const orbitInput = new OrbitInputMapper(input);
-
-const orbitControl = new OrbitControls(camera, renderer.domElement);
 
 // const pane = new Pane();
 // pane.addButton({ title: 'connect' }).on('click', () => {

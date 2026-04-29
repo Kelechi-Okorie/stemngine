@@ -1,3 +1,7 @@
+import { Vector3 } from "@stemngine/engine";
+import { SimulationManager } from "./core/SimulationManager";
+import { State } from "./core/State";
+import { ToolManager } from "./tools/ToolManager";
 
 /**
  * future editors
@@ -48,3 +52,27 @@ export const LAYERS = {
   HELPERS: 1,
   GIZMOS: 2
 };
+
+export interface Tool {
+    name: string;
+    icon: string;
+    btn: HTMLElement;
+    onMouseDown?: (e: MouseEvent, obj: any) => void;
+    onMouseMove?: (e: MouseEvent, obj: any) => void;
+    onMouseUp?: (e: MouseEvent, obj: any) => void;
+    onClick?: (e: MouseEvent, obj: any) => void;
+};
+
+export interface EditorContext {
+    simulationManager: SimulationManager,
+    state: State,
+    toolManager: ToolManager;
+    // addObject(type: string): void;
+    // applyForce(id: string, force: Vector3): void;
+
+    select(id: string): void;
+    getSelection(): any;
+
+    on(event: string, handler: Function): void; // TODO: change Function
+    emit(event: string, payload?: any): void;
+}

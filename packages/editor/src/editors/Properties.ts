@@ -1,5 +1,5 @@
 import { State } from "../core/State";
-import { Editor } from "../Interfaces";
+import { Editor, EditorContext } from "../Interfaces";
 import { Panel } from "../pane/Panel";
 import { IBinding } from "../Interfaces";
 import { ParameterBinding } from "../pane/bindings/ParameterBinding";
@@ -25,9 +25,10 @@ export class Properties implements Editor {
     private panel!: Panel;
     private selectionManager: SelectionManager;
 
-    constructor(name: string, state: State) {
+    constructor(name: string, context: EditorContext) {
 
-        const { scene, camera, selectionManager, isDragging } = state;
+        const { state } = context;
+        const { selectionManager } = state;
 
         this.name = name;
         this.state = state;

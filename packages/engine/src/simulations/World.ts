@@ -1,7 +1,7 @@
-import { ParticleSystem } from "./domains/physics/ParticleSystem";
+// import { ParticleSystem } from "./domains/physics/ParticleSystem";
 import { SystemType, SimObject } from "./Interfaces";
 import { GlobalEventDispatcher } from "../core/GlobalEventDispatcher";
-import { BaseEvent } from "../core/EventDispatcher";
+// import { BaseEvent } from "../core/EventDispatcher";
 import { System } from "./core/System";
 
 // TODO: check if to add feature for removing systems
@@ -16,10 +16,6 @@ import { System } from "./core/System";
  * - etc
  */
 export class World {
-    // objects: Map<string, SimObject> = new Map();
-    // domains: DomainRegistry = new DomainRegistry();
-
-    // public particleSystem: ParticleSystem;  // fast iteration
 
     public systems: Map<SystemType, System> = new Map();    // TODO: check for better typing
 
@@ -32,6 +28,7 @@ export class World {
             return;
         }
 
+        system.attachWorld(this);
         this.systems.set(type, system);
 
         GlobalEventDispatcher.instance.dispatchEvent({
@@ -41,28 +38,27 @@ export class World {
 
     }
 
-    public getSystem(key: SystemType): any | undefined {
+    public removeSystem(type: SystemType): void {
 
-        return this.systems.get(key);
+        const system = this.systems.get(type);
+
+        if (!system) return;
+
+        this.systems.delete(type);
+
+        GlobalEventDispatcher.instance.dispatchEvent({
+            // type: 'system:removed',  // TODO: check if this is better
+            type: 'solversystemremoved',
+            target: system
+        });
 
     }
 
-    // addObject(obj: SimObject) {
-    //     this.objects.set(obj.id, obj)
+    // TODO: check this const ps = world.getSystem<ParticleSystem>(SystemType.PARTICLE);
+    public getSystem<T extends System>(key: SystemType): T | undefined {
 
-    //     // Automatically register all representations
-    //     for (const [key, rep] of obj.representations) {
-    //         this.domains.register(key, rep)
-    //     }
-    // }
+        return this.systems.get(key) as T | undefined;
 
-    // removeObject(obj: SimObject) {
-    //     this.objects.delete(obj.id)
-
-    //     // Unregister representations
-    //     for (const [key, rep] of obj.representations) {
-    //         this.domains.unregister(key, rep)
-    //     }
-    // }
+    }
 
 }
