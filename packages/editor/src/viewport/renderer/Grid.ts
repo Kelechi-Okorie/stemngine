@@ -1,4 +1,5 @@
 import { PlaneGeometry, ShaderMaterial, Mesh,  Camera, Matrix4, Material } from "@stemngine/engine";
+import { LAYERS } from "../../Interfaces";
 
 /**
  * Screen-space grids
@@ -101,6 +102,7 @@ export class Grid {
     });
 
     this.grid = new Mesh(geometry, this.material);
+    this.grid.layers.set(LAYERS.HELPERS);
 
   }
 

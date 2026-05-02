@@ -16,32 +16,14 @@ export class SelectTool implements Tool {
 
     public onMouseDown(e: MouseEvent, viewportEditor: ViewportEditor) {
 
-        const state = viewportEditor.state;
-        const canvas = viewportEditor.renderer.domElement;
-        const rect = canvas.getBoundingClientRect();
-
-        const mouse = new Vector2();
-
-        mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-        mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-
-        // TODO: may need to set near and far
-        const raycaster = new Raycaster();
-        raycaster.layers.set(LAYERS.DEFAULT);
-
-        raycaster.setFromCamera(mouse, viewportEditor.camera);
-
         // TODO: may need to get state, scene, selection manager, etc from the context
+        const state = viewportEditor.state;
 
-        // intersects is array of RaycasterIntersection objects sorted by distance
-        const intersects = raycaster.intersectObjects(state.scene.children, true); // recursive
+        const intersect = viewportEditor.getIntersection(e);
 
+        if (intersect) {
 
-        if (intersects.length > 0) {
-
-            const selectedObject = intersects[0].object;
-            state.selectionManager.set(selectedObject);
-
+            state.selectionManager.set(intersect);
 
         } else {
 
@@ -49,4 +31,5 @@ export class SelectTool implements Tool {
         }
 
     }
+    
 }

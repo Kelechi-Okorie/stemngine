@@ -1,6 +1,6 @@
 import { BufferGeometry, Camera, Group, Line, LineBasicMaterial, Material, Scene, Vector3, WebGLRenderer, isOrthographicCamera, isPerspectiveCamera } from "@stemngine/engine";
 
-import { EditorContext } from "../../Interfaces";
+import { EditorContext, LAYERS } from "../../Interfaces";
 
 export class Cursor3D {
 
@@ -12,6 +12,7 @@ export class Cursor3D {
 
         this.context = context;
         this.object = new Group();
+        this.object.name = '3D Cursor'
 
         const material = new LineBasicMaterial({ color: 0xff0000 });
         this.material = material;
@@ -24,6 +25,8 @@ export class Cursor3D {
             material
         );
 
+        xLine.name = 'x line';
+
         const yLine = new Line(
             new BufferGeometry().setFromPoints([
                 new Vector3(0, -0.2, 0),
@@ -31,6 +34,12 @@ export class Cursor3D {
             ]),
             material
         );
+
+        yLine.name = 'y line';
+
+        xLine.layers.set(LAYERS.HELPERS);
+        yLine.layers.set(LAYERS.HELPERS);
+        this.object.layers.set(LAYERS.HELPERS);
 
         this.object.addChildren([xLine, yLine]);
 
@@ -85,5 +94,5 @@ export class Cursor3D {
         this.material.dispose();
 
     }
-    
+
 }

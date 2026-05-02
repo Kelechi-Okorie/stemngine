@@ -62,7 +62,7 @@ export class Properties implements Editor {
 
     public update() {
 
-        console.log('updataing the properties panel');
+        console.log('updating the properties panel');
 
     }
 
@@ -75,18 +75,6 @@ export class Properties implements Editor {
         const schema = findSchema(obj);
 
         const ui = this.buildUIFromSchema(obj, schema);
-
-        const btn = document.createElement('button');
-        btn.textContent = 'click me';
-        btn.addEventListener('click', () => {
-
-            const obj = makeReactive(this.state.selectionManager.get());
-            obj.position.y += -0.5;
-            // obj.visible = !obj.visible;
-        })
-
-        this.panel.add({ element: btn });
-
 
         this.panel.add(ui);
 
@@ -180,7 +168,6 @@ export class Properties implements Editor {
 
                 throw new Error('Editor Properties: buildUIFromSchema - unknown control type');
             }
-
 
         }
 

@@ -25,6 +25,7 @@ import { cursor3D } from "../assets/icons/3dcursor";
 import { Cursor3D } from "../viewport/renderer/Cursor3D";
 import { ViewportGizmo } from "../viewport/renderer/ViewportGizmo";
 import { Grid } from "../viewport/renderer/Grid";
+import { RaycasterIntersection } from "../../../engine/src/core/Raycaster";
 
 export class ViewportEditor implements Editor {
     public name: string;
@@ -41,6 +42,9 @@ export class ViewportEditor implements Editor {
     public readonly camera: Camera;
     private cursor: Cursor3D;
     private viewportGizmo: ViewportGizmo;
+
+    private raycaster = new Raycaster();
+    private mouse = new Vector2();
 
     public grid!: Grid;
 
@@ -82,15 +86,19 @@ export class ViewportEditor implements Editor {
 
         // });
 
+        // TODO: may need to set near and far
+        this.raycaster.layers.set(LAYERS.DEFAULT);
+
     }
 
     public mount(container: HTMLElement) {
 
-        container.appendChild(this.renderer.domElement);
-
         const grid = new Grid();
         this.state.scene.add(grid.grid);
         this.grid = grid;
+
+        container.appendChild(this.renderer.domElement);
+
 
         // TODO: may have to be inside the select tool
         const orbitControl = new OrbitControls(this.camera as OrthographicCamera, this.renderer.domElement);
@@ -216,21 +224,10 @@ export class ViewportEditor implements Editor {
 
     }
 
-    public getIntersectionPoint(event: MouseEvent): Vector3 | null {
-
-        const rect = this.renderer.domElement.getBoundingClientRect();
-
-        const mouse = new Vector2(
-            ((event.clientX - rect.left) / rect.width) * 2 - 1,
-            -((event.clientY - rect.top) / rect.height) * 2 + 1
-        );
-
-        // TODO: should you create raycaster and point on every click?
-        const raycaster = new Raycaster();
-        raycaster.setFromCamera(mouse, this.camera);
-
+    public getIntersectionPoint(e: MouseEvent): Vector3 | null {
+        
         // try objects first
-        const hits = raycaster.intersectObjects(this.state.scene.children, true);
+        const hits = this.intersect(e);
 
         if (hits.length > 0) return hits[0].point;
 
@@ -238,9 +235,54 @@ export class ViewportEditor implements Editor {
         const plane = new Plane(new Vector3(0, 0, 1), 0);
         const point = new Vector3();
 
-        if (raycaster.ray.intersectPlane(plane, point)) return point;
+        if (this.raycaster.ray.intersectPlane(plane, point)) return point;
 
         return null;
+
+    }
+
+    /**
+     * Gets all the intersections
+     * 
+     * @param event 
+     * @returns 
+     */
+    public getIntersections(e: MouseEvent): RaycasterIntersection[] {
+
+        const hits = this.intersect(e);
+
+        return hits;
+    }
+
+    /**
+     * Gets the first intersection
+     * 
+     * @param event 
+     * @returns 
+     */
+    public getIntersection(e: MouseEvent): RaycasterIntersection | null {
+
+        const hits = this.intersect(e);
+
+        if (hits.length > 0) return hits[0];
+
+        return null;
+    }
+
+    public intersect(e: MouseEvent): RaycasterIntersection[] {
+
+        const rect = this.renderer.domElement.getBoundingClientRect();
+
+        this.mouse.set(
+            ((e.clientX - rect.left) / rect.width) * 2 - 1,
+            -((e.clientY - rect.top) / rect.height) * 2 + 1
+        )
+
+        this.raycaster.setFromCamera(this.mouse, this.camera);
+
+        const hits = this.raycaster.intersectObjects(this.state.scene.children, true);
+
+        return hits;
 
     }
 
