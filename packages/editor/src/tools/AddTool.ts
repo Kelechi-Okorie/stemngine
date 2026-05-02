@@ -110,7 +110,7 @@ export class AddTool implements Tool {
 
     public spawnObject(type: string) {
 
-        this.context.simulationManager.addEntity(/* type */ 'cube', this.context);
+        this.context.simulationManager.addEntity(type, this.context);
 
     }
 

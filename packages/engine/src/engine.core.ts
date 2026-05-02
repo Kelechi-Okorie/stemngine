@@ -44,6 +44,7 @@ export { SphereGeometry } from './geometries/SphereGeometry';
 
 // helpers
 export { BoxHelper } from './helpers/BoxHelper';
+export { GridHelper } from './helpers/GridHelper';
 
 // lights
 export { AmbientLight } from './lights/AmbientLight';

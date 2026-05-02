@@ -1,5 +1,5 @@
 // TODO: use imports from the build
-import { BufferGeometry, Camera, DirectionalLight, Group, LineBasicMaterial, MeshPhongMaterial, OrthographicCamera, Scene, Vector3, Line, isOrthographicCamera, isPerspectiveCamera } from "@stemngine/engine";
+import { BufferGeometry, Camera, DirectionalLight, Group, LineBasicMaterial, MeshPhongMaterial, OrthographicCamera, Scene, Vector3, Line, isOrthographicCamera, isPerspectiveCamera, GridHelper, Layers } from "@stemngine/engine";
 import { PerspectiveCamera, Plane, PlaneGeometry } from "@stemngine/engine";
 import { WebGLRenderer } from "@stemngine/engine";
 import { BoxGeometry } from "@stemngine/engine";
@@ -24,6 +24,7 @@ import { ToolManager } from "../tools/ToolManager";
 import { cursor3D } from "../assets/icons/3dcursor";
 import { Cursor3D } from "../viewport/renderer/Cursor3D";
 import { ViewportGizmo } from "../viewport/renderer/ViewportGizmo";
+import { Grid } from "../viewport/renderer/Grid";
 
 export class ViewportEditor implements Editor {
     public name: string;
@@ -40,6 +41,8 @@ export class ViewportEditor implements Editor {
     public readonly camera: Camera;
     private cursor: Cursor3D;
     private viewportGizmo: ViewportGizmo;
+
+    public grid!: Grid;
 
     constructor(name: string, context: EditorContext) {
 
@@ -58,8 +61,8 @@ export class ViewportEditor implements Editor {
         const bottom = -5;
         const near = 0.1;
         const far = 1000
-        this.camera = new OrthographicCamera(left, right, top, bottom, near, far);
-        // this.camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        // this.camera = new OrthographicCamera(left, right, top, bottom, near, far);
+        this.camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
         this.camera.position.z = 15;
         this.camera.position.x = 2;
@@ -84,6 +87,10 @@ export class ViewportEditor implements Editor {
     public mount(container: HTMLElement) {
 
         container.appendChild(this.renderer.domElement);
+
+        const grid = new Grid();
+        this.state.scene.add(grid.grid);
+        this.grid = grid;
 
         // TODO: may have to be inside the select tool
         const orbitControl = new OrbitControls(this.camera as OrthographicCamera, this.renderer.domElement);
@@ -127,14 +134,17 @@ export class ViewportEditor implements Editor {
 
     public update(dt: number) {
 
-        // 1. 3D cursor
+        // 1. grid
+        this.grid.update(this.camera);
+
+        // 2. 3D cursor
         this.cursor.update(this.camera, this.renderer);
 
-        // 2. render
+        // 3. render
         this.renderer.setViewport(0, 0, this.width, this.height);
         this.renderer.render(this.state.scene, this.camera);
 
-        // 3. viewport gizmo
+        // 4. viewport gizmo
         const context = {
             mainCamera: this.camera,
             renderer: this.renderer,

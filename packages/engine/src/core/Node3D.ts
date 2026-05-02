@@ -17,7 +17,7 @@ import { EventDispatcher } from "./EventDispatcher";
 
 let _node3DId = 0;
 
-type UserDataValue = string | number | null | UserDataValue[] | { [key: string]: UserDataValue };
+type UserDataValue = any;
 
 interface Node3DOutputJSON {
   meta: {

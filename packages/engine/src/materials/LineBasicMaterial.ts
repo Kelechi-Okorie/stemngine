@@ -100,6 +100,8 @@ export class LineBasicMaterial extends Material {
 
     this.setValues(parameters);
 
+    // console.log(this)
+
   }
 
   public copy(source: LineBasicMaterial): this {

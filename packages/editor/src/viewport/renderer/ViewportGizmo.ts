@@ -1,5 +1,4 @@
-import { BufferGeometry, Camera, DoubleSide, Group, Line, LineBasicMaterial, MeshBasicMaterial, Scene, Vector3, WebGLRenderer, Mesh, CanvasTexture, SpriteMaterial, Sprite, OrthographicCamera } from "@stemngine/engine";
-import { RingGeometry } from "../../../../engine/src/geometries/RingGeometry";
+import { BufferGeometry, Camera, DoubleSide, Group, Line, LineBasicMaterial, MeshBasicMaterial, Scene, Vector3, WebGLRenderer, Mesh, CanvasTexture, SpriteMaterial, Sprite, OrthographicCamera, Material } from "@stemngine/engine";
 
 type context = {
     mainCamera: Camera,
@@ -19,6 +18,8 @@ export class ViewportGizmo {
     private size = 100;
     private margin = 10;
 
+    public materials: Material[] = [];
+
     constructor() {
 
         this.scene = new Scene();
@@ -35,6 +36,7 @@ export class ViewportGizmo {
 
     }
 
+    // TODO: make sure to push all materials into a repo and dispose on dispose
     private create(): Group {
 
         const group = new Group();
@@ -61,10 +63,13 @@ export class ViewportGizmo {
 
             // TODO: check if creating canvas is costly and find cheaper way
             const canvas = document.createElement('canvas');
-            canvas.width = 128;
-            canvas.height = 128;
+
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = 128 * dpr;
+            canvas.height = 128 * dpr;
 
             const ctx = canvas.getContext('2d')!;
+            ctx.scale(dpr, dpr);
 
             const cx = 64;
             const cy = 64;
@@ -92,6 +97,9 @@ export class ViewportGizmo {
             }
 
             const texture = new CanvasTexture(canvas);
+            // texture.minFilter = LinearFilter;
+            // texture.magFilter = LinearFilter;
+            // texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
 
             const sprite = new Sprite(
                 new SpriteMaterial({ map: texture, transparent: true })
@@ -196,5 +204,11 @@ export class ViewportGizmo {
         );
 
         renderer.render(this.scene, this.camera);
+    }
+
+    public dispose() {
+
+        this.materials.forEach((mat) => mat.dispose());
+
     }
 }

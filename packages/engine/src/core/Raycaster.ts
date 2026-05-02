@@ -148,7 +148,7 @@ export class Raycaster {
    * @param {Vector3} origin - The origin vector where the ray casts from.
    * @param {Vector3} direction - The (normalized) direction vector that gives direction to the ray.
    */
-  set(origin: Vector3, direction: Vector3) {
+  public set(origin: Vector3, direction: Vector3) {
 
     // direction is assumed to be normalized (for accurate distance calculations)
 
