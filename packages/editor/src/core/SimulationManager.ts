@@ -1,6 +1,7 @@
-import { BoxGeometry, MeshBasicMaterial, Mesh, World, Simulation, ParticleSystem, SimBindingManager } from "@stemngine/engine";
+import { BoxGeometry, MeshBasicMaterial, Mesh, World, Simulation, ParticleSystem, SimBindingManager, GlobalEventDispatcher, SystemType } from "@stemngine/engine";
 
 import { EditorContext } from "../Interfaces";
+import { ViewportEditorEventType } from "../editors/ViewportEditor";
 
 export class SimulationManager {
 
@@ -45,6 +46,14 @@ export class SimulationManager {
                 world.addSystem(0, ps);
 
                 context.state.scene.add(mesh);
+
+                GlobalEventDispatcher.instance.dispatchEvent({
+                    type: ViewportEditorEventType.ENTITY_CREATED,
+                    entity: particle,
+                    visual: mesh,   // TODO: may be removed
+                    position: mesh.position.clone,  // TODO: may be removed
+                    source: 'user'
+                });
 
                 // 👇 store mapping
                 // mesh.userData['entity'] = particle;

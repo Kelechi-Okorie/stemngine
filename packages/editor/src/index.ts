@@ -1,6 +1,6 @@
 import { App } from "./core/App";
 
-const container = document.getElementById('container');
+const container = document.getElementById('root');
 
 if (container === null) {
 

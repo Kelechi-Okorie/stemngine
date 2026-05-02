@@ -1,7 +1,7 @@
-import { Vector3 } from "@stemngine/engine";
 import { SimulationManager } from "./core/SimulationManager";
 import { State } from "./core/State";
 import { ToolManager } from "./tools/ToolManager";
+import { StyleManager } from "./core/StyleManager";
 
 /**
  * future editors
@@ -16,7 +16,7 @@ export interface Editor {
     mount(container: HTMLElement): void;
     resize: (width: number, height: number) => void;
     update(state: any): void;   // TODO: this should not be any
-    destroy(): void;
+    unmount(): void;
 }
 
 export type Region =
@@ -67,8 +67,7 @@ export interface EditorContext {
     simulationManager: SimulationManager,
     state: State,
     toolManager: ToolManager;
-    // addObject(type: string): void;
-    // applyForce(id: string, force: Vector3): void;
+    styleManager: StyleManager;
 
     select(id: string): void;
     getSelection(): any;

@@ -128,6 +128,9 @@ export { Scene } from './scenes/Scene';
 export { createCanvasElement } from './utils';
 
 // Simulations
+// interface
+export { SystemType } from './simulations/Interfaces';
+
 export { SimPropertyBinding } from './simulations/core/SimPropertyBinding';
 export { SimBindingManager } from './simulations/core/SimBindingManager';
 export { Simulation } from './simulations/Simulation';

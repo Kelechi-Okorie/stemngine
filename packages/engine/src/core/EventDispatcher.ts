@@ -6,7 +6,6 @@ export interface BaseEvent {
 }
 
 
-
 type EventListener<E extends BaseEvent> = (event: E) => void;
 
 /**

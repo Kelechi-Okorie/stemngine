@@ -1,7 +1,6 @@
 // import { ParticleSystem } from "./domains/physics/ParticleSystem";
 import { SystemType, SimObject } from "./Interfaces";
 import { GlobalEventDispatcher } from "../core/GlobalEventDispatcher";
-// import { BaseEvent } from "../core/EventDispatcher";
 import { System } from "./core/System";
 
 // TODO: check if to add feature for removing systems

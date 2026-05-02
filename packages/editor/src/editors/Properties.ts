@@ -86,7 +86,6 @@ export class Properties implements Editor {
 
     }
 
-
     private buildUIFromSchema(obj: any, schema: Record<string, ParameterSchema>): Node {
 
         const folder = new Folder(obj.name);
@@ -175,7 +174,7 @@ export class Properties implements Editor {
 
     }
 
-    public destroy() {
+    public unmount() {
 
         console.log('destroying the properties panel')
     }

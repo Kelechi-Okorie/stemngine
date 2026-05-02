@@ -8,6 +8,7 @@ import { Clock, Scene, SimBindingManager, Vector3 } from "@stemngine/engine";
 import { SimulationManager } from "./SimulationManager";
 import { GlobalEventDispatcher } from "@stemngine/engine";
 import { ToolManager } from "../tools/ToolManager";
+import { StyleManager } from "./StyleManager";
 
 export class App {
 
@@ -50,7 +51,8 @@ export class App {
         const context: EditorContext = {
             simulationManager: this.simulationManager,
             state: this.state,
-            toolManager: new ToolManager(/* this.context */),
+            toolManager: new ToolManager(),
+            styleManager: StyleManager.instance,
 
             select: (id: string) => console.log('test'),
             getSelection: () => console.log('get selection'),
@@ -93,7 +95,7 @@ export class App {
         btn.style.cursor = 'pointer';
         btn.style.zIndex = '100';
 
-        this.container.appendChild(btn)
+        this.container.appendChild(btn);
 
     }
 

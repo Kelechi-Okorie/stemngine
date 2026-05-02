@@ -102,6 +102,7 @@ export class Grid {
     });
 
     this.grid = new Mesh(geometry, this.material);
+    this.grid.name = "3D viewport grid";
     this.grid.layers.set(LAYERS.HELPERS);
 
   }

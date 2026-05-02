@@ -1,5 +1,35 @@
 import { addIcon } from '../assets/icons/addIcon';
 import { EditorContext, Tool } from '../Interfaces';
+import addToolStyle from '../assets/css/addToolStyle';
+
+const OBJECTS = [
+    // physics - state carriers
+    {name: "Particle", type: "particle"},
+    {name: "Rigid Body", type: "rigid_body"},
+
+    // physics - constraints / relations
+    {name: "Distance", type: "distance"},
+    {name: "Fixed Point", type: "fixed_point"},
+    {name: "Joint (hinge, slider)", type: "joint"},
+
+    // physics - forces
+    {name: "Gravity", type: "gravity"},
+    {name: "Spring", type: "spring"},
+    {name: "External", type: "external"},
+
+    // math - objects
+    {name: "Point", type: "point"},
+    {name: "Scalar", type: "scalar"},
+    {name: "Vector", type: "vector"},
+
+    // math - mappings
+    {name: "Function f(x)", type: "function"},
+    {name: "Parametric curve", type: "parametric_curve"},
+
+    // math relations
+    {name: "Equation", type: "equation"},
+    {name: "Constraint", type: "con"}
+];
 
 export class AddTool implements Tool {
 
@@ -7,18 +37,14 @@ export class AddTool implements Tool {
     public icon = addIcon;
     private context: EditorContext;
     private overlay: HTMLElement | null = null;
-    private container: HTMLElement | null = null;
+    private container: HTMLElement | null = null;   // TODO: container should be the thing that holds the canvas
     public btn!: HTMLElement;
-
-    public objects = [
-        { name: "Cube", type: "cube" },
-        { name: "Sphere", type: "sphere" },
-        { name: "Plane", type: "plane" }
-    ];
 
     constructor(context: EditorContext) {
 
         this.context = context;
+
+        context.styleManager.registerStyle('add-tool', addToolStyle)
 
     }
 
@@ -37,39 +63,29 @@ export class AddTool implements Tool {
     public createAddMenu(container: HTMLElement) {
 
         const overlay = document.createElement('div');
+        overlay.dataset.name = 'the overlay'
 
-        overlay.style.position = 'absolute';
-        overlay.style.top = '50%';
-        overlay.style.left = '50%';
-        overlay.style.transform = 'translate(-50%, -50%)';
-        overlay.style.width = '300px';
-        overlay.style.background = '#1e1e1e';
-        overlay.style.borderRadius = '8px';
-        overlay.style.padding = '10px';
-        overlay.style.zIndex = '200';
-        overlay.style.boxShadow = '0 10px 30px rgba(0,0,0,0.5)';
+        overlay.classList.add('add-tool');
 
         const input = document.createElement('input');
         input.name = 'add-object';
         input.placeholder = 'Search objects...';
-        input.style.width = '100%';
-        input.style.marginBottom = '4px';
 
         input.addEventListener('input', () => {
 
             const query = input.value.toLowerCase();
 
-            const filtered = this.objects.filter(o => o.name.toLocaleLowerCase().includes(query));
+            const filtered = OBJECTS.filter(o => o.name.toLocaleLowerCase().includes(query));
 
-            this.renderList(list, filtered);
+            this.renderList(listElement, filtered);
         })
 
-        const list = document.createElement('div');
+        const listElement = document.createElement('div');
 
-        this.renderList(list, this.objects);
+        this.renderList(listElement, OBJECTS);
 
         overlay.appendChild(input);
-        overlay.appendChild(list);
+        overlay.appendChild(listElement);
 
         this.overlay = overlay;
         this.container = container;
@@ -78,7 +94,7 @@ export class AddTool implements Tool {
 
         input.focus();
 
-        return { overlay, input, list };
+        return { overlay, input, listElement };
     }
 
     public renderList(listEl: HTMLElement, items: { name: string, type: string }[]) {
@@ -89,14 +105,10 @@ export class AddTool implements Tool {
 
             const row = document.createElement('div');
             row.innerText = item.name;
-            row.style.padding = '6px';
-            row.style.cursor = 'pointer';
-            row.style.color = '#ffffff';
-            row.style.cursor = 'pointer';
-            // row.style.
+            row.classList.add('menu-row');
 
             row.onclick = () => {
-                this.spawnObject(item.type);
+                // this.spawnObject(item.type);
 
                 // prevent double-click spam
                 // close after spawn succeeds
@@ -104,7 +116,7 @@ export class AddTool implements Tool {
             }
 
             listEl.appendChild(row);
-        })
+        });
 
     }
 

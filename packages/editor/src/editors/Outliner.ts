@@ -1,15 +1,16 @@
 // TODO: use the build
 
-
+import { Layers } from "@stemngine/engine";
 import { State } from "../core/State";
-import { Editor, EditorContext } from "../Interfaces";
+import { Editor, EditorContext, LAYERS } from "../Interfaces";
 
 interface Node {
     id: number;
     name: string;
     type: string;
     visible: boolean;
-    children: Node[]
+    children: Node[];
+    layers: Layers;
 }
 
 /**
@@ -30,13 +31,17 @@ export class Outliner implements Editor {
 
     public name: string;
     private state: State;
+    private layers: Layers;
 
     constructor(name: string, context: EditorContext) {
 
-        const { state  } = context;
+        const { state } = context;
 
         this.name = name;
         this.state = state;
+
+        this.layers = new Layers();
+        this.layers.set(LAYERS.DEFAULT);
 
     }
 
@@ -50,6 +55,13 @@ export class Outliner implements Editor {
     }
 
     public renderNode(node: Node, parent: HTMLElement, depth: number) {
+
+        if (!node.layers.test(this.layers)) {
+
+            return;
+
+        }
+
 
         const row = document.createElement('div');
 
@@ -90,7 +102,7 @@ export class Outliner implements Editor {
 
     }
 
-    public destroy() {
+    public unmount() {
 
         console.log('destroying the outliner')
     }
