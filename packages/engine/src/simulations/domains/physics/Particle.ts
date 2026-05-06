@@ -1,6 +1,6 @@
 import { generateUUID } from "../../../math/MathUtils";
 import { Vector3 } from "../../../math/Vector3";
-import { Representation } from "../../Interfaces";
+import { SimulationModel } from "../../Interfaces";
 
 export type ParticleOptions = {
     name?: string;
@@ -21,7 +21,7 @@ let particleId = 0;
  * - independent particles (fluids/smoke)
  * - structured particles (cloth/constraints)
  */
-export class Particle implements Representation {
+export class Particle implements SimulationModel {
 
     /**
      * The id of the particle
@@ -34,9 +34,9 @@ export class Particle implements Representation {
     public name: string;
 
     /**
-     * Type of this particle
+     * Type of this entity
      */
-    public type: string = 'Particle';
+    public type: string = 'particle';
 
     /**
      * The UUID of this particle

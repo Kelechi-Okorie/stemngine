@@ -2,6 +2,7 @@ import { SimulationManager } from "./core/SimulationManager";
 import { State } from "./core/State";
 import { ToolManager } from "./tools/ToolManager";
 import { StyleManager } from "./core/StyleManager";
+import { SimulationModel } from "@stemngine/engine";
 
 /**
  * future editors
@@ -75,3 +76,24 @@ export interface EditorContext {
     on(event: string, handler: Function): void; // TODO: change Function
     emit(event: string, payload?: any): void;
 }
+
+export type VisualRepresentation = {
+    id: string;
+    entityId: string;   // TODO: will be removed
+    entity: Entity;
+    kind: 'point' | 'vector' | 'trajectory';    // TODO: to be removed
+    color?: number;
+    size?: number;
+}
+
+export type RendererCapability = {
+    supports: {
+        kinds: string[];
+    };
+
+    create: (rep: VisualRepresentation, entity: any) => any;
+    update?: (rep: VisualRepresentation, entity: any, visual: any) => void;
+    remove?: (visual: any) => void;
+}
+
+export type Entity = SimulationModel;

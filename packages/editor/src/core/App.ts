@@ -3,12 +3,14 @@ import { ViewportEditor } from "../editors/ViewportEditor";
 import { Outliner } from "../editors/Outliner";
 import { Properties } from "../editors/Properties";
 import { State, StateConfig } from '../core/State';
-import { SelectionManager } from "../pane/SelectionManager";
+import { SelectionManager } from "./SelectionManager";
 import { Clock, Scene, SimBindingManager, Vector3 } from "@stemngine/engine";
 import { SimulationManager } from "./SimulationManager";
 import { GlobalEventDispatcher } from "@stemngine/engine";
 import { ToolManager } from "../tools/ToolManager";
 import { StyleManager } from "./StyleManager";
+import { PresentationManager } from "./PresentationManager";
+import { Renderer3DSystem } from "../renderers/Renderer3DSystem";
 
 export class App {
 
@@ -23,6 +25,7 @@ export class App {
 
     private simulationManager: SimulationManager;
     private bindingManager: SimBindingManager;
+    // private presentationManager: PresentationManager;
 
     private clock: Clock;
 
@@ -46,7 +49,8 @@ export class App {
 
         this.state = new State(stateConfig)
 
-        this.simulationManager = new SimulationManager(this.bindingManager);
+        this.simulationManager = new SimulationManager(/* this.bindingManager */);
+        // this.presentationManager = new PresentationManager(this.state.scene, this.bindingManager);
 
         const context: EditorContext = {
             simulationManager: this.simulationManager,
@@ -60,6 +64,9 @@ export class App {
             emit: GlobalEventDispatcher.instance.dispatchEvent.bind(GlobalEventDispatcher.instance),
             on: GlobalEventDispatcher.instance.addEventListener.bind(GlobalEventDispatcher.instance),
         }
+
+        const renderer3D = new Renderer3DSystem(context, this.bindingManager)
+
 
         const viewport = new ViewportEditor('3D viewport', context);
         this.addViewport(viewport);
@@ -94,6 +101,11 @@ export class App {
         btn.style.top = '10px';
         btn.style.cursor = 'pointer';
         btn.style.zIndex = '100';
+
+        // btn.addEventListener('click', () => {
+        //     console.log(this.bindingManager);
+        //     console.log(this.simulationManager.world)
+        // }, false)
 
         this.container.appendChild(btn);
 
@@ -252,7 +264,6 @@ export class App {
 
     }
 
-
     /**
      * for divider
      * - larger invisible hit area (better ux)
@@ -373,10 +384,7 @@ export class App {
 
         }
 
-        // 2. simulation -> renderer binding - only if playing
-        if (this.isPlaying) {
-            this.bindingManager.update();
-        }
+        this.bindingManager.update();
 
         // 3. render all viewports
         for (const vp of this.viewports) {

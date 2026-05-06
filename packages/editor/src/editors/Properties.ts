@@ -11,7 +11,7 @@ import { ColorControl } from "../pane/controls/ColorControl";
 import { Folder } from "../pane/nodes/Folder";
 import { Node } from "../pane/nodes/Node";
 import { ControlNode } from "../pane/nodes/ControlNode";
-import { SelectionManager } from "../pane/SelectionManager";
+import { SelectionManager } from "../core/SelectionManager";
 import { ParameterSchema, findSchema } from "../core/Schemas";
 import { makeReactive } from "../pane/bindings/extras";
 
@@ -34,9 +34,9 @@ export class Properties implements Editor {
         this.state = state;
         this.selectionManager = selectionManager;
 
-        this.selectionManager.subscribe((obj) => {
+        this.selectionManager.subscribe((entity) => {
 
-            this.rebuild(obj);
+            this.rebuild(entity, context);
 
         });
 
@@ -66,15 +66,20 @@ export class Properties implements Editor {
 
     }
 
-    private rebuild(obj: any) {
+    private rebuild(entity: any, context: EditorContext) {
 
         this.panel.element.innerHTML = '';
 
-        if (!obj) return;
+        if (!entity) return;
 
-        const schema = findSchema(obj);
+        const simulationManager = context.simulationManager;
 
-        const ui = this.buildUIFromSchema(obj, schema);
+        const systemType = simulationManager.getEntitySystemType(entity.uuid);
+        if(systemType === undefined) return;
+        
+        const schema = findSchema(systemType);
+
+        const ui = this.buildUIFromSchema(entity, schema);
 
         this.panel.add(ui);
 
@@ -86,18 +91,18 @@ export class Properties implements Editor {
 
     }
 
-    private buildUIFromSchema(obj: any, schema: Record<string, ParameterSchema>): Node {
+    private buildUIFromSchema(entity: any, schema: Record<string, ParameterSchema>): Node {
 
-        const folder = new Folder(obj.name);
+        const folder = new Folder(entity.name);
 
         for (const key in schema) {
 
             const paramSchema = schema[key];
-            const binding = this.createBinding(obj, key);
+            const binding = this.createBinding(entity, key);
 
             if (paramSchema.children) {
 
-                const childUI = this.buildUIFromSchema(obj[key], paramSchema.children);
+                const childUI = this.buildUIFromSchema(entity[key], paramSchema.children);
                 const subFolder = new Folder(paramSchema.label || key);
                 subFolder.add(childUI);
                 // continue;
@@ -127,7 +132,7 @@ export class Properties implements Editor {
                 case 'vector3':
                     // control = new Vector3Control(binding as IBinding<Vector3>);
 
-                    const vec = obj[key];
+                    const vec = entity[key];
 
                     subFolder = new Folder(paramSchema.label || key);
 

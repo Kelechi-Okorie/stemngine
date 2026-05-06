@@ -27,11 +27,6 @@ import { ViewportGizmo } from "../viewport/renderer/ViewportGizmo";
 import { Grid } from "../viewport/renderer/Grid";
 import { RaycasterIntersection } from "../../../engine/src/core/Raycaster";
 
-export enum ViewportEditorEventType {
-    ENTITY_CREATED = 'entity:created',
-    ENTITY_REMOVED = 'entity:removed',
-}
-
 export class ViewportEditor implements Editor {
     public name: string;
     private width!: number;
@@ -71,7 +66,7 @@ export class ViewportEditor implements Editor {
         const near = 0.1;
         const far = 1000
         // this.camera = new OrthographicCamera(left, right, top, bottom, near, far);
-        this.camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        this.camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, near, far);
 
         this.camera.position.x = 2;
         this.camera.position.y = 7;

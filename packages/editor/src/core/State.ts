@@ -1,6 +1,6 @@
 // TODO: remember to use the build versions
 import { Scene, Vector3 } from "@stemngine/engine";
-import { SelectionManager } from "../pane/SelectionManager";
+import { SelectionManager } from "./SelectionManager";
 
 export type StateConfig = {
     scene: Scene;

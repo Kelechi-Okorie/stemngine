@@ -1,8 +1,9 @@
 // TODO: use the build
 
-import { Layers } from "@stemngine/engine";
+import { GlobalEventDispatcher, Layers } from "@stemngine/engine";
 import { State } from "../core/State";
-import { Editor, EditorContext, LAYERS } from "../Interfaces";
+import { Editor, EditorContext, Entity, LAYERS } from "../Interfaces";
+import { EntityEvent, EntityEventType } from "../core/SimulationManager";
 
 interface Node {
     id: number;
@@ -30,24 +31,30 @@ interface Node {
 export class Outliner implements Editor {
 
     public name: string;
-    private state: State;
+    private context: EditorContext;
     private layers: Layers;
+    private container!: HTMLElement;
 
     constructor(name: string, context: EditorContext) {
 
-        const { state } = context;
-
         this.name = name;
-        this.state = state;
+        this.context = context;
 
         this.layers = new Layers();
         this.layers.set(LAYERS.DEFAULT);
+
+        GlobalEventDispatcher.instance.addEventListener(
+            EntityEventType.ENTITY_CREATED,
+            this.onEntityCreated.bind(this)
+        );
 
     }
 
     public mount(container: HTMLElement) {
 
-        this.renderNode(this.state.scene, container, 0);
+        // this.renderNode(this.context.state.scene, container, 0);
+        this.container = container;
+        this.renderEntities();
     }
 
     public resize(width: number, height: number) {
@@ -61,7 +68,6 @@ export class Outliner implements Editor {
             return;
 
         }
-
 
         const row = document.createElement('div');
 
@@ -84,7 +90,7 @@ export class Outliner implements Editor {
 
         row.onclick = () => {
 
-            this.state.selectionManager.set(node);
+            this.context.state.selectionManager.set(node);
             // this.reRenderAll(); // TODO: global refresh - be careful here
         }
 
@@ -96,6 +102,50 @@ export class Outliner implements Editor {
         });
     }
 
+    public renderEntities() {
+
+        const entities = this.context.simulationManager.getAllEntities();
+
+        entities.forEach(entity => {
+            this.renderEntity(entity)
+        })
+    }
+
+    public renderEntity(entity: Entity) {
+
+        const row = document.createElement('div');
+
+        const depth = 0;
+
+        row.style.paddingLeft = `${depth * 12}px`;  // TODO: use variable for magic number
+        row.style.display = 'flex';
+        row.style.alignItems = 'center';
+
+        row.innerText = entity.name;
+
+        const eye = document.createElement("span");
+        // eye.innerText = entity.visible ? "👁" : "🚫"; // TODO: make better
+
+        // eye.onclick = (e) => {
+        //     e.stopPropagation();
+        //     entity.visible = !entity.visible;
+        //     // rerenderAll();   // TODO: global refresh - be careful here
+        // };
+
+        row.appendChild(eye);
+
+        row.onclick = () => {
+
+            this.context.state.selectionManager.set(entity);
+
+            // this.context.state.selectionManager.set(entity);
+            // this.reRenderAll(); // TODO: global refresh - be careful here
+        }
+
+        this.container.appendChild(row);
+
+    }
+
     public update() {
 
         console.log('updataing the outliner');
@@ -105,6 +155,14 @@ export class Outliner implements Editor {
     public unmount() {
 
         console.log('destroying the outliner')
+    }
+
+    private onEntityCreated(e: EntityEvent): void {
+
+        const { type, entity, source } = e;
+
+        this.renderEntity(entity);
+
     }
 
 }

@@ -1,7 +1,7 @@
 import { Particle, ParticleOptions } from "./Particle";
 import { GlobalEventDispatcher } from "../../../core/GlobalEventDispatcher";
 import { System } from "../../core/System";
-import { SystemType } from "../../Interfaces";
+import { SimulationModel, SystemType } from "../../Interfaces";
 
 /**
  * TODO:
@@ -11,7 +11,6 @@ import { SystemType } from "../../Interfaces";
  * - looging
  * - etc
  */
-
 
 /**
  * Factories + memory managers for particles
@@ -30,9 +29,7 @@ export class ParticleSystem extends System {
 
     }
 
-    public createParticle(options: ParticleOptions): Particle {
-
-        const particle = new Particle(options);
+    public add(particle: Particle): Particle {
 
         particle.index = this.particles.length;
 
@@ -51,7 +48,7 @@ export class ParticleSystem extends System {
     // TODO: check if to cache instead and reuse later instead of removing
     // swap and pop removal O(1);
     // avoids O(n) search and O(n) splice
-    public removeParticle(particle: Particle) {
+    public remove(particle: Particle) {
 
         const index = particle.index;
         const last = this.particles.length - 1;
@@ -61,6 +58,18 @@ export class ParticleSystem extends System {
         lastParticle.index = index;
 
         this.particles.pop();
+
+    }
+
+    public getByIndex(index: number): SimulationModel | undefined {
+
+        throw new Error('get particle by index not implemented');
+
+    }
+
+    public getAll(): SimulationModel[] {
+
+        return this.particles;
 
     }
 

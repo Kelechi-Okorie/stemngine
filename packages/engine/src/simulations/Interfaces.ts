@@ -5,19 +5,19 @@ import { World } from "./World";
 export enum SystemType {
     // core mechanical
     ParticleSystem,
-    MassAggregateSystem,
-    RigidBodySystem,
-    SoftBodySystem,
+    // MassAggregateSystem,
+    // RigidBodySystem,
+    // SoftBodySystem,
 
-    // field domain
-    FluidSystem,
-    ThermalFieldSystem,
-    EMFieldSystem,
+    // // field domain
+    // FluidSystem,
+    // ThermalFieldSystem,
+    // EMFieldSystem,
 
-    // interaction domain
-    ConstraintSystem,
-    ContactSystem,
-    ForceFieldSystem
+    // // interaction domain
+    // ConstraintSystem,
+    // ContactSystem,
+    // ForceFieldSystem
 }
 
 export enum SolverType {
@@ -35,9 +35,6 @@ export enum SolverType {
 export interface Solver {
     name: string;
 
-    // reads: string[];    // data dependencies
-    // writes: string[];   // output
-
     reads: Set<string>;
     writes: Set<string>;
 
@@ -47,6 +44,7 @@ export interface Solver {
 }
 
 /**
+ * Simulation Representation
  * Each scale model implements this
  * 
  * Example
@@ -54,25 +52,10 @@ export interface Solver {
  * - ContinuumRepresentation
  * - FieldRepresentation
  */
-export interface Representation {
+export interface SimulationModel {
     id: number;
     name: string;
     type: string;
     uuid: string;
     objectId?: number;
-}
-
-// TODO: should be moved to its own class
-/**
- * Contains an id for representations to reference
- * 
- */
-export class SimObject {
-    id: string;
-
-    constructor(id: string) {
-
-        this.id = id;
-
-    }
 }

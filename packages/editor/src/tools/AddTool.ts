@@ -1,34 +1,35 @@
 import { addIcon } from '../assets/icons/addIcon';
 import { EditorContext, Tool } from '../Interfaces';
 import addToolStyle from '../assets/css/addToolStyle';
+import { RepresentationStore } from '../core/RepresentationStore';
 
 const OBJECTS = [
     // physics - state carriers
-    {name: "Particle", type: "particle"},
-    {name: "Rigid Body", type: "rigid_body"},
+    { name: "Particle", type: "particle" },
+    { name: "Rigid Body", type: "rigid_body" },
 
     // physics - constraints / relations
-    {name: "Distance", type: "distance"},
-    {name: "Fixed Point", type: "fixed_point"},
-    {name: "Joint (hinge, slider)", type: "joint"},
+    { name: "Distance", type: "distance" },
+    { name: "Fixed Point", type: "fixed_point" },
+    { name: "Joint (hinge, slider)", type: "joint" },
 
     // physics - forces
-    {name: "Gravity", type: "gravity"},
-    {name: "Spring", type: "spring"},
-    {name: "External", type: "external"},
+    { name: "Gravity", type: "gravity" },
+    { name: "Spring", type: "spring" },
+    { name: "External", type: "external" },
 
     // math - objects
-    {name: "Point", type: "point"},
-    {name: "Scalar", type: "scalar"},
-    {name: "Vector", type: "vector"},
+    { name: "Point", type: "point" },
+    { name: "Scalar", type: "scalar" },
+    { name: "Vector", type: "vector" },
 
     // math - mappings
-    {name: "Function f(x)", type: "function"},
-    {name: "Parametric curve", type: "parametric_curve"},
+    { name: "Function f(x)", type: "function" },
+    { name: "Parametric curve", type: "parametric_curve" },
 
     // math relations
-    {name: "Equation", type: "equation"},
-    {name: "Constraint", type: "con"}
+    { name: "Equation", type: "equation" },
+    { name: "Constraint", type: "con" }
 ];
 
 export class AddTool implements Tool {
@@ -108,7 +109,7 @@ export class AddTool implements Tool {
             row.classList.add('menu-row');
 
             row.onclick = () => {
-                // this.spawnObject(item.type);
+                this.spawnObject(item);
 
                 // prevent double-click spam
                 // close after spawn succeeds
@@ -120,9 +121,21 @@ export class AddTool implements Tool {
 
     }
 
-    public spawnObject(type: string) {
+    public spawnObject(config: Record<string, string>) {
 
-        this.context.simulationManager.addEntity(type, this.context);
+        const position = this.context.state.cursor.position;
+        config = {...config, position}
+
+        const entity = this.context.simulationManager.addEntity(config);
+
+        RepresentationStore.add({
+            id: entity.uuid,
+            entityId: entity.uuid,
+            entity,
+            kind: 'point', // default view for this tool
+            color: 0x00ff00,
+            size: 1
+        });
 
     }
 

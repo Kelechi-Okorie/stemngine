@@ -1,4 +1,4 @@
-import { Representation } from "../../Interfaces";
+import { SimulationModel } from "../../Interfaces";
 
 
 export class MassAggregate {

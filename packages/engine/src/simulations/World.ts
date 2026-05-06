@@ -1,5 +1,4 @@
-// import { ParticleSystem } from "./domains/physics/ParticleSystem";
-import { SystemType, SimObject } from "./Interfaces";
+import { SystemType } from "./Interfaces";
 import { GlobalEventDispatcher } from "../core/GlobalEventDispatcher";
 import { System } from "./core/System";
 
@@ -20,15 +19,10 @@ export class World {
 
     public addSystem(type: SystemType, system: System): void {
 
-        if (this.systems.has(type)) {
+        if (this.systems.has(type)) return;
 
-            console.log(`World: System type ${type} and name ${system.name} already exists`);
-
-            return;
-        }
-
-        system.attachWorld(this);
         this.systems.set(type, system);
+        system.attachWorld(this);
 
         GlobalEventDispatcher.instance.dispatchEvent({
             type: 'solversystemadd',
