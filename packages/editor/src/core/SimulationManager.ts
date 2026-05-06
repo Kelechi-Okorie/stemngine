@@ -102,23 +102,23 @@ export class SimulationManager {
         
         throw new Error('not implemented');
 
-        const systemType = this.entitySystemTypeMap.get(entityId);
-        if (!systemType) {
+        // const systemType = this.entitySystemTypeMap.get(entityId);
+        // if (!systemType) {
 
-            // TODO: find better way
-            throw new Error('System type does not exist');
+        //     // TODO: find better way
+        //     throw new Error('System type does not exist');
 
-        }
+        // }
 
-        const system = this.world.getSystem(systemType);
-        if (!system) {
+        // const system = this.world.getSystem(systemType);
+        // if (!system) {
 
-            // TODO: find better way
-            throw new Error('Entity does not exist in system');
+        //     // TODO: find better way
+        //     throw new Error('Entity does not exist in system');
 
-        }
+        // }
 
-        const entity = system.get(entityId);
+        // const entity = system.get(entityId);
 
     }
 

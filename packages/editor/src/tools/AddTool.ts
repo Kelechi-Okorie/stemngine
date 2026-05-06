@@ -123,9 +123,9 @@ export class AddTool implements Tool {
 
     }
 
-    public spawnObject(config: Record<string, string>) {
+    public spawnObject(config: Record<string, any>) {
 
-        const position = this.context.state.cursor.position;
+        const position = this.context.state.cursor.position.clone();
         config = {...config, position}
 
         const entity = this.context.simulationManager.addEntity(config);
