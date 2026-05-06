@@ -1,4 +1,4 @@
-import { PlaneGeometry, ShaderMaterial, Mesh,  Camera, Matrix4, Material } from "@stemngine/engine";
+import { PlaneGeometry, ShaderMaterial, Mesh, Camera, Matrix4, Material } from "@stemngine/engine";
 import { LAYERS } from "../../Interfaces";
 
 /**
@@ -93,21 +93,34 @@ export class Grid {
         
         if (alpha < 0.01) discard;
 
+        float xDist = abs(worldPos.x);
+        float zDist = abs(worldPos.z);
+
+        // anti-alised line
+        float xAxis = 1.0 - smoothstep(0.0, fwidth(worldPos.z), zDist);
+        float zAxis = 1.0 - smoothstep(0.0, fwidth(worldPos.x), xDist);
+
         float dist = length(worldPos.xz);
         float fade = exp(-dist * 0.02); // TODO: tweak
         alpha *= fade;
 
-        gl_FragColor = vec4(vec3(0.7), alpha);
+        vec3 axisColorX = vec3(1.0, 0.0, 0.0);
+        vec3 axisColorZ = vec3(0.0, 0.0, 1.0);
+        
+        vec3 color = vec3(0.7);
+        color = mix(color, axisColorX, xAxis);
+        color = mix(color, axisColorZ, zAxis);
+
+        // gl_FragColor = vec4(vec3(0.7), alpha);
+        gl_FragColor = vec4(color, alpha);
       }
     `;
 
     this.material = new ShaderMaterial({
       uniforms: {
         uCameraMatrixWorld: { value: new Matrix4() },
-        uProjectionMatrix: {value: new Matrix4()},
-        uProjectionMatrixInverse: { value: new Matrix4() },
-        uScale: { value: 1.0 },
-        uLineWidth: { value: 0.02 }
+        uProjectionMatrix: { value: new Matrix4() },
+        uProjectionMatrixInverse: { value: new Matrix4() }
       },
       vertexShader,
       fragmentShader,
