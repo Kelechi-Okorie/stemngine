@@ -1,6 +1,4 @@
-import { Vector2, Raycaster } from "@stemngine/engine";
-
-import { Tool, LAYERS, EditorContext } from "../Interfaces";
+import { Tool, EditorContext } from "../Interfaces";
 import { mousePointerIcon } from "../assets/icons/mousePointerIcon";
 import { ViewportEditor } from "../editors/ViewportEditor";
 import { RepresentationStore } from "../core/RepresentationStore";
@@ -12,6 +10,8 @@ export class SelectTool implements Tool {
     public btn!: HTMLElement;
 
     private context: EditorContext;
+
+    public allows: Record<string, boolean> = {orbitControls: true};
 
     constructor(context: EditorContext) {
 

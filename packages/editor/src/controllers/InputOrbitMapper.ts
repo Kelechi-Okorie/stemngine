@@ -149,7 +149,7 @@ export class InputOrbitMapper {
   }
 
   private onPointerDown = (event: PointerEvent) => {
-    // if (!this.enabled) return;
+    if (!this.controls.enabled) return;
 
     /**
      * Pointers is an array tracking all active pointers (for multitouch support)
@@ -226,7 +226,7 @@ export class InputOrbitMapper {
    * @param event - PointerEvent
    */
   private onPointerMove = (event: PointerEvent): void => {
-    // if (!this.enabled) return;
+    if (!this.controls.enabled) return;
 
     if (event.pointerType === 'touch') {
 
@@ -523,7 +523,11 @@ export class InputOrbitMapper {
   private onMouseWheel = (event: WheelEvent): void => {
 
     // TODO: check if this line should be uncommented
-    // if (this.enabled === false || this.enableZoom == false || this.state !== _STATE.NONE) return;
+    if (
+      this.controls.enabled === false ||
+      this.controls.enableZoom == false ||
+      this.state !== this.controls._STATE.NONE
+    ) return;
 
     /**
      * stops browser scroll / page zoom
@@ -548,7 +552,7 @@ export class InputOrbitMapper {
   }
 
   private onKeyDown(event: KeyboardEvent) {
-    // if (this.enabled == false) return;
+    if (this.controls.enabled == false) return;
 
     this.controls.handleKeyDown(event);
   }
@@ -759,7 +763,7 @@ export class InputOrbitMapper {
    */
   private onContextMenu(event: Event) {
 
-    // if (this.enabled === false) return;
+    if (this.controls.enabled === false) return;
 
     event.preventDefault();
   }

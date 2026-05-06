@@ -59,6 +59,7 @@ export interface Tool {
     name: string;
     icon: string;
     btn: HTMLElement;
+    allows: Record<string, boolean>
     onMouseDown?: (e: MouseEvent, obj: any) => void;
     onMouseMove?: (e: MouseEvent, obj: any) => void;
     onMouseUp?: (e: MouseEvent, obj: any) => void;

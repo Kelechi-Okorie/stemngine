@@ -11,6 +11,8 @@ export class CursorTool implements Tool {
     private context: EditorContext;
     public btn!: HTMLElement;
 
+    public allows: Record<string, boolean> = {};
+
     constructor(context: EditorContext) {
 
         this.context = context;

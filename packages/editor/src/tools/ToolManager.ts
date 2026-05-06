@@ -1,10 +1,20 @@
 import { ViewportEditor } from "../editors/ViewportEditor";
 import { EditorContext, Tool } from "../Interfaces";
 
+enum EventTypes {
+    TOOL_SET = 'TOOL:SET'
+}
+
+type Listener = (tool: Tool) => void;
+
+export { EventTypes as ToolManagerEventTypes};
+export type ToolManagerEventListener = Listener;
 
 export class ToolManager {
 
     public currentTool!: Tool; // TODO: currentTool should not be null
+
+    private listeners = new Map<EventTypes, Listener[]>();
 
     constructor() {
 
@@ -18,6 +28,8 @@ export class ToolManager {
 
         tool.btn.style.backgroundColor = 'green';
         this.currentTool = tool;
+
+        this.emit(EventTypes.TOOL_SET, tool);
 
     }
 
@@ -35,6 +47,41 @@ export class ToolManager {
     public onClick(e: MouseEvent, viewportEditor: ViewportEditor): void {
 
         this.currentTool.onClick?.(e, viewportEditor);
+
+    }
+
+    public on(type: EventTypes, fn: Listener): void {
+
+        if (!this.listeners.has(type)) {
+            this.listeners.set(type, []);
+        }
+
+        this.listeners.get(type)!.push(fn);
+
+    }
+
+    public emit(type: EventTypes, tool: Tool): void {
+
+        const list = this.listeners.get(type);
+
+        if (!list) return;
+
+        for (const fn of list) fn(tool);
+
+    }
+
+    public remove(type: EventTypes, fn: Listener): void {
+
+        const list = this.listeners.get(type);
+
+        if (!list) return;
+
+        // TODO: check if this is costly
+        const index = list.indexOf(fn);
+
+        if (index !== -1) {
+            list.splice(index, 1);
+        }
 
     }
 

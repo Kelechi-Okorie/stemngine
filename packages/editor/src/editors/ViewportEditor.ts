@@ -12,7 +12,7 @@ import { Vector2 } from "@stemngine/engine";
 import { Node3D, TextureLoader } from "@stemngine/engine";
 
 import { State } from "../core/State";
-import { Editor, EditorContext, LAYERS } from '../Interfaces';
+import { Editor, EditorContext, LAYERS, Tool } from '../Interfaces';
 import { BoxHelper } from "@stemngine/engine";
 import { EffectComposer } from "../rendering/postprocessing/EffectComposer";
 import { RenderPass } from "../rendering/postprocessing/RenderPass";
@@ -20,7 +20,7 @@ import { OutlinePass } from "../rendering/postprocessing/OutlinePass";
 import { TestPass } from "../rendering/postprocessing/TestPass";    // TODO: remove
 import { attachGizmo, createAxis } from "../rendering/gizmos";
 import { Toolbar } from "../tools/Toolbar";
-import { ToolManager } from "../tools/ToolManager";
+import { ToolManager, ToolManagerEventTypes } from "../tools/ToolManager";
 import { cursor3D } from "../assets/icons/3dcursor";
 import { Cursor3D } from "../viewport/renderer/Cursor3D";
 import { ViewportGizmo } from "../viewport/renderer/ViewportGizmo";
@@ -45,6 +45,8 @@ export class ViewportEditor implements Editor {
 
     private raycaster = new Raycaster();
     private mouse = new Vector2();
+
+    private orbitControl: OrbitControls;
 
     public grid!: Grid;
 
@@ -75,7 +77,9 @@ export class ViewportEditor implements Editor {
 
         this.name = name;
 
-        this.toolbar = new Toolbar(this.context)
+        this.toolbar = new Toolbar(this.context);
+
+        this.orbitControl = new OrbitControls(this.camera as OrthographicCamera, this.renderer.domElement);
 
         // this.state.renderer.domElement.addEventListener('mousemove', (e) => {
         //     this.onMouseMove(e, this.state.renderer.domElement);
@@ -102,7 +106,7 @@ export class ViewportEditor implements Editor {
 
 
         // TODO: may have to be inside the select tool
-        const orbitControl = new OrbitControls(this.camera as OrthographicCamera, this.renderer.domElement);
+        // TODO: take care of the as OrthographicCamera
 
         this.toolbar.create(container);
 
@@ -128,6 +132,8 @@ export class ViewportEditor implements Editor {
         });
 
         this.cursor.attach(this.state.scene);
+
+        this.context.toolManager.on(ToolManagerEventTypes.TOOL_SET, this.updateInteractiveMode.bind(this));
 
     }
 
@@ -166,7 +172,10 @@ export class ViewportEditor implements Editor {
     }
 
     public unmount(): void {
-        console.log('release all acquired resources')
+        console.log('release all acquired resources');
+
+        this.context.toolManager.remove(ToolManagerEventTypes.TOOL_SET, this.updateInteractiveMode)
+
     }
 
     private highlightObject(selected: Mesh | null) {
@@ -226,7 +235,7 @@ export class ViewportEditor implements Editor {
     }
 
     public getIntersectionPoint(e: MouseEvent): Vector3 | null {
-        
+
         // try objects first
         const hits = this.intersect(e);
 
@@ -285,6 +294,12 @@ export class ViewportEditor implements Editor {
 
         return hits;
 
+    }
+
+    public updateInteractiveMode(tool: Tool) {
+
+        // this.orbitControl.enabled = tool.name === "select";
+        this.orbitControl.enabled = tool.allows['orbitControls'];
     }
 
 }
