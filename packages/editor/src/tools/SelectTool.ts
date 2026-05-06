@@ -1,14 +1,22 @@
 import { Vector2, Raycaster } from "@stemngine/engine";
 
-import { Tool, LAYERS } from "../Interfaces";
+import { Tool, LAYERS, EditorContext } from "../Interfaces";
 import { mousePointerIcon } from "../assets/icons/mousePointerIcon";
 import { ViewportEditor } from "../editors/ViewportEditor";
+import { RepresentationStore } from "../core/RepresentationStore";
 
 export class SelectTool implements Tool {
 
     public readonly name = 'select';
     public readonly icon = mousePointerIcon;
     public btn!: HTMLElement;
+
+    private context: EditorContext;
+
+    constructor(context: EditorContext) {
+
+        this.context = context;
+    }
 
     public onClick(e: MouseEvent): void {
 
@@ -23,7 +31,18 @@ export class SelectTool implements Tool {
 
         if (intersect) {
 
-            state.selectionManager.set(intersect);
+            const renderIndex = this.context.renderIndex;
+            const mesh = intersect.object;
+
+            const repId = renderIndex.getRepId(mesh);
+
+            if (repId === undefined) return;
+
+            const rep = RepresentationStore.getById(repId);
+            
+            if (rep === undefined) return;
+
+            state.selectionManager.set(rep.entity);
 
         } else {
 
@@ -31,5 +50,5 @@ export class SelectTool implements Tool {
         }
 
     }
-    
+
 }

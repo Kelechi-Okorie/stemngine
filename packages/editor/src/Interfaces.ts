@@ -3,6 +3,7 @@ import { State } from "./core/State";
 import { ToolManager } from "./tools/ToolManager";
 import { StyleManager } from "./core/StyleManager";
 import { SimulationModel } from "@stemngine/engine";
+import { RenderIndex } from "./core/RenderIndex";
 
 /**
  * future editors
@@ -69,6 +70,7 @@ export interface EditorContext {
     state: State,
     toolManager: ToolManager;
     styleManager: StyleManager;
+    renderIndex: RenderIndex,
 
     select(id: string): void;
     getSelection(): any;
@@ -79,7 +81,7 @@ export interface EditorContext {
 
 export type VisualRepresentation = {
     id: string;
-    entityId: string;   // TODO: will be removed
+    entityId: string;
     entity: Entity;
     kind: 'point' | 'vector' | 'trajectory';    // TODO: to be removed
     color?: number;

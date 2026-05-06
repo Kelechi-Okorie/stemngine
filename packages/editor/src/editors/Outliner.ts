@@ -1,7 +1,6 @@
 // TODO: use the build
 
 import { GlobalEventDispatcher, Layers } from "@stemngine/engine";
-import { State } from "../core/State";
 import { Editor, EditorContext, Entity, LAYERS } from "../Interfaces";
 import { EntityEvent, EntityEventType } from "../core/SimulationManager";
 
@@ -138,7 +137,6 @@ export class Outliner implements Editor {
 
             this.context.state.selectionManager.set(entity);
 
-            // this.context.state.selectionManager.set(entity);
             // this.reRenderAll(); // TODO: global refresh - be careful here
         }
 

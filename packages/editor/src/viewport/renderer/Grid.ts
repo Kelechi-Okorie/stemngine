@@ -32,6 +32,7 @@ export class Grid {
       varying vec2 vUv;
       
       uniform mat4 uCameraMatrixWorld;
+      uniform mat4 uProjectionMatrix;
       uniform mat4 uProjectionMatrixInverse;
 
       void main() {
@@ -60,6 +61,17 @@ export class Grid {
 
         // 8 compute world position
         vec3 worldPos = rayOrigin + rayDir * t;
+
+        // project to clip space
+        vec4 clipPos = uProjectionMatrix * inverse(uCameraMatrixWorld) * vec4(worldPos, 1.0);
+
+        // perspective divide
+        float ndcDepth = clipPos.z / clipPos.w;
+
+        // convert from [-1, 1] -> [0, 1]
+        float depth = ndcDepth * 0.5 + 0.5;
+
+        gl_FragDepth = depth;
 
         vec2 base = worldPos.xz;
 
@@ -92,13 +104,16 @@ export class Grid {
     this.material = new ShaderMaterial({
       uniforms: {
         uCameraMatrixWorld: { value: new Matrix4() },
+        uProjectionMatrix: {value: new Matrix4()},
         uProjectionMatrixInverse: { value: new Matrix4() },
         uScale: { value: 1.0 },
         uLineWidth: { value: 0.02 }
       },
       vertexShader,
       fragmentShader,
-      transparent: true
+      transparent: true,
+      depthTest: true,
+      depthWrite: false
     });
 
     this.grid = new Mesh(geometry, this.material);
@@ -115,6 +130,7 @@ export class Grid {
     // camera.updateProjectionMatrix();  // TODO: check
 
     material.uniforms.uCameraMatrixWorld.value.copy(camera.matrixWorld);
+    material.uniforms.uProjectionMatrix.value.copy(camera.projectionMatrix);
     material.uniforms.uProjectionMatrixInverse.value.copy(camera.projectionMatrixInverse);
 
   }

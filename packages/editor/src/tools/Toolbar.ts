@@ -31,7 +31,7 @@ export class Toolbar {
 
         const toolManager = this.context.toolManager;
 
-        const selectTool = new SelectTool();
+        const selectTool = new SelectTool(this.context);
         const selectBtn = this.createButton(selectTool, () => {
 
             toolManager.setTool(selectTool);
@@ -84,29 +84,11 @@ export class Toolbar {
             btn.style.background = '#cccccc';
         };
 
-        // btn.onmouseleave = () => {
-
-        //     btn.style.background = '#2c2c2c';
-
-        // }
-
-        // btn.onmousedown = () => {
-
-        //     btn.style.background = '#1f1f1f';
-
-        // }
-
         btn.onmouseup = () => {
 
             btn.style.background = '#eeeeee';
 
         }
-
-        // btn.addEventListener('click', () => {
-
-        //     console.log('the objbtn is clicked');
-
-        // }, false);
 
         btn.onclick = onClick;
 

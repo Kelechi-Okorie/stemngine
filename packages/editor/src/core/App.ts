@@ -10,6 +10,7 @@ import { GlobalEventDispatcher } from "@stemngine/engine";
 import { ToolManager } from "../tools/ToolManager";
 import { StyleManager } from "./StyleManager";
 import { PresentationManager } from "./PresentationManager";
+import { RenderIndex } from "./RenderIndex";
 import { Renderer3DSystem } from "../renderers/Renderer3DSystem";
 
 export class App {
@@ -50,6 +51,8 @@ export class App {
         this.state = new State(stateConfig)
 
         this.simulationManager = new SimulationManager(/* this.bindingManager */);
+        const renderIndex = new RenderIndex();
+
         // this.presentationManager = new PresentationManager(this.state.scene, this.bindingManager);
 
         const context: EditorContext = {
@@ -57,6 +60,7 @@ export class App {
             state: this.state,
             toolManager: new ToolManager(),
             styleManager: StyleManager.instance,
+            renderIndex,
 
             select: (id: string) => console.log('test'),
             getSelection: () => console.log('get selection'),
@@ -65,8 +69,8 @@ export class App {
             on: GlobalEventDispatcher.instance.addEventListener.bind(GlobalEventDispatcher.instance),
         }
 
-        const renderer3D = new Renderer3DSystem(context, this.bindingManager)
-
+        // TODO: find better way tohandle
+        const renderer3D = new Renderer3DSystem(context, this.bindingManager);
 
         const viewport = new ViewportEditor('3D viewport', context);
         this.addViewport(viewport);

@@ -1,3 +1,5 @@
+import { MathUtils } from '@stemngine/engine';
+
 import { addIcon } from '../assets/icons/addIcon';
 import { EditorContext, Tool } from '../Interfaces';
 import addToolStyle from '../assets/css/addToolStyle';
@@ -129,7 +131,7 @@ export class AddTool implements Tool {
         const entity = this.context.simulationManager.addEntity(config);
 
         RepresentationStore.add({
-            id: entity.uuid,
+            id: MathUtils.generateUUID(),
             entityId: entity.uuid,
             entity,
             kind: 'point', // default view for this tool

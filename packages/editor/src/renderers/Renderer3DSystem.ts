@@ -1,13 +1,13 @@
 import { GlobalEventDispatcher, MeshBasicMaterial, Scene, SimBindingManager, SphereGeometry, Mesh, BoxGeometry } from "@stemngine/engine";
 import { RepresentationEvent, RepresentationStoreEventType } from "../core/RepresentationStore";
 import { EditorContext, VisualRepresentation } from "../Interfaces";
+import { RenderIndex } from "../core/RenderIndex";
 
 export class Renderer3DSystem {
 
     private scene: Scene;
     private bindingManager: SimBindingManager;
-
-    private visuals = new Map<string, any>();   // TODO: type better
+    private RenderIndex: RenderIndex;
 
     constructor(context: EditorContext, bindingManager: SimBindingManager) {
 
@@ -15,6 +15,8 @@ export class Renderer3DSystem {
 
         this.scene = state.scene;
         this.bindingManager = bindingManager;
+
+        this.RenderIndex = context.renderIndex;
 
         GlobalEventDispatcher.instance.addEventListener(
             RepresentationStoreEventType.REPRESENTATION_SET,
@@ -49,19 +51,22 @@ export class Renderer3DSystem {
             (entity as any).position    /// TODO: find a better way
         );
 
-        this.scene.add(mesh);
+        this.RenderIndex.set(representation.id, mesh);
 
-        this.visuals.set(representation.id, mesh);
+        this.scene.add(mesh);
 
     }
 
     private onRepRemoved(e: any) {  // TODO: type better
 
-        const mesh = this.visuals.get(e.representationId);
+        const repId = e.representationId;
+        const mesh = this.RenderIndex.getNode3D(repId);
         if (!mesh) return;
 
         this.scene.remove(mesh);
-        this.visuals.delete(e.representationId);
+
+        this.RenderIndex.delete(repId)
+        // TODO: check if true No need to delete from weakmap
 
     }
 
