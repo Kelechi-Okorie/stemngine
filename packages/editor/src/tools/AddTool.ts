@@ -1,7 +1,7 @@
 import { MathUtils } from '@stemngine/engine';
 
 import { addIcon } from '../assets/icons/addIcon';
-import { EditorContext, Tool } from '../Interfaces';
+import { Context, Tool } from '../Interfaces';
 import addToolStyle from '../assets/css/addToolStyle';
 import { RepresentationStore } from '../core/RepresentationStore';
 
@@ -38,14 +38,14 @@ export class AddTool implements Tool {
 
     public name = 'add';
     public icon = addIcon;
-    private context: EditorContext;
+    private context: Context;
     private overlay: HTMLElement | null = null;
     private container: HTMLElement | null = null;   // TODO: container should be the thing that holds the canvas
     public btn!: HTMLElement;
 
     public allows: Record<string, boolean> = {};
 
-    constructor(context: EditorContext) {
+    constructor(context: Context) {
 
         this.context = context;
 

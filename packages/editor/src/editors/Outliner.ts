@@ -1,7 +1,7 @@
 // TODO: use the build
 
 import { GlobalEventDispatcher, Layers } from "@stemngine/engine";
-import { Editor, EditorContext, Entity, LAYERS } from "../Interfaces";
+import { Editor, Context, Entity, LAYERS } from "../Interfaces";
 import { EntityEvent, EntityEventType } from "../core/SimulationManager";
 
 interface Node {
@@ -30,11 +30,11 @@ interface Node {
 export class Outliner implements Editor {
 
     public name: string;
-    private context: EditorContext;
-    private layers: Layers;
+    private context: Context;
+    private layers: Layers; // TODO: may be removed
     private container!: HTMLElement;
 
-    constructor(name: string, context: EditorContext) {
+    constructor(name: string, context: Context) {
 
         this.name = name;
         this.context = context;

@@ -1,14 +1,14 @@
 import { BufferGeometry, Camera, Group, Line, LineBasicMaterial, Material, Scene, Vector3, WebGLRenderer, isOrthographicCamera, isPerspectiveCamera } from "@stemngine/engine";
 
-import { EditorContext, LAYERS } from "../../Interfaces";
+import { Context, LAYERS } from "../../Interfaces";
 
 export class Cursor3D {
 
     private object: Group;
-    private context: EditorContext;
+    private context: Context;
     private material: Material;
 
-    constructor(context: EditorContext) {
+    constructor(context: Context) {
 
         this.context = context;
         this.object = new Group();

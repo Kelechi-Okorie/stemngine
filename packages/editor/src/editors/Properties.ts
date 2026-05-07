@@ -1,5 +1,5 @@
 import { State } from "../core/State";
-import { Editor, EditorContext } from "../Interfaces";
+import { Editor, Context } from "../Interfaces";
 import { Panel } from "../pane/Panel";
 import { IBinding } from "../Interfaces";
 import { ParameterBinding } from "../pane/bindings/ParameterBinding";
@@ -25,7 +25,7 @@ export class Properties implements Editor {
     private panel!: Panel;
     private selectionManager: SelectionManager;
 
-    constructor(name: string, context: EditorContext) {
+    constructor(name: string, context: Context) {
 
         const { state } = context;
         const { selectionManager } = state;
@@ -66,7 +66,7 @@ export class Properties implements Editor {
 
     }
 
-    private rebuild(entity: any, context: EditorContext) {
+    private rebuild(entity: any, context: Context) {
 
         this.panel.element.innerHTML = '';
 

@@ -1,4 +1,4 @@
-import { Tool, EditorContext } from "../Interfaces";
+import { Tool, Context } from "../Interfaces";
 import { mousePointerIcon } from "../assets/icons/mousePointerIcon";
 import { ViewportEditor } from "../editors/ViewportEditor";
 import { RepresentationStore } from "../core/RepresentationStore";
@@ -9,11 +9,11 @@ export class SelectTool implements Tool {
     public readonly icon = mousePointerIcon;
     public btn!: HTMLElement;
 
-    private context: EditorContext;
+    private context: Context;
 
     public allows: Record<string, boolean> = {orbitControls: true};
 
-    constructor(context: EditorContext) {
+    constructor(context: Context) {
 
         this.context = context;
     }

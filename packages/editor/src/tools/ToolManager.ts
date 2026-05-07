@@ -1,5 +1,5 @@
 import { ViewportEditor } from "../editors/ViewportEditor";
-import { EditorContext, Tool } from "../Interfaces";
+import { Context, Tool } from "../Interfaces";
 
 enum EventTypes {
     TOOL_SET = 'TOOL:SET'

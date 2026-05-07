@@ -2,7 +2,7 @@ import { ToolManager } from "./ToolManager";
 import { SelectTool } from "./SelectTool";
 import { AddTool } from "./AddTool";
 import { CursorTool } from "./CursorTool";
-import { EditorContext, Tool } from "../Interfaces";
+import { Context, Tool } from "../Interfaces";
 import { BrowserInputManager } from "../inputs/BrowserInputManager";
 import { State } from "../core/State";
 import { getMouseNDC } from "../viewport/renderer/interaction";
@@ -10,9 +10,9 @@ import { getMouseNDC } from "../viewport/renderer/interaction";
 export class Toolbar {
 
     // private toolManager: ToolManager;
-    private context: EditorContext;
+    private context: Context;
 
-    constructor(context: EditorContext/* toolManager: ToolManager */) { 
+    constructor(context: Context/* toolManager: ToolManager */) { 
 
         // this.toolManager = toolManager;
         this.context = context

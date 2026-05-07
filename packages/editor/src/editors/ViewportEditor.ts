@@ -12,7 +12,7 @@ import { Vector2 } from "@stemngine/engine";
 import { Node3D, TextureLoader } from "@stemngine/engine";
 
 import { State } from "../core/State";
-import { Editor, EditorContext, LAYERS, Tool } from '../Interfaces';
+import { Editor, Context, LAYERS, Tool } from '../Interfaces';
 import { BoxHelper } from "@stemngine/engine";
 import { EffectComposer } from "../rendering/postprocessing/EffectComposer";
 import { RenderPass } from "../rendering/postprocessing/RenderPass";
@@ -33,7 +33,7 @@ export class ViewportEditor implements Editor {
     private height!: number
     public readonly renderer: WebGLRenderer;
     public readonly state: State;
-    private context: EditorContext;
+    private context: Context;
 
     private highlightBox: BoxHelper | null = null;
     private selectedObject!: Mesh;  // TODO: should be a set
@@ -50,7 +50,7 @@ export class ViewportEditor implements Editor {
 
     public grid!: Grid;
 
-    constructor(name: string, context: EditorContext) {
+    constructor(name: string, context: Context) {
 
         this.renderer = new WebGLRenderer({ antialias: true });
         this.context = context;
@@ -93,6 +93,9 @@ export class ViewportEditor implements Editor {
 
         // TODO: may need to set near and far
         this.raycaster.layers.set(LAYERS.DEFAULT);
+
+        this.context.simulationRuntime.schedule('render', this.update);
+
 
     }
 
@@ -147,7 +150,7 @@ export class ViewportEditor implements Editor {
 
     }
 
-    public update(dt: number) {
+    public update = (dt: number) => {
 
         // 1. grid
         this.grid.update(this.camera);
@@ -174,7 +177,8 @@ export class ViewportEditor implements Editor {
     public unmount(): void {
         console.log('release all acquired resources');
 
-        this.context.toolManager.remove(ToolManagerEventTypes.TOOL_SET, this.updateInteractiveMode)
+        this.context.toolManager.remove(ToolManagerEventTypes.TOOL_SET, this.updateInteractiveMode);
+        this.context.simulationRuntime.unSchedule(this.update);
 
     }
 

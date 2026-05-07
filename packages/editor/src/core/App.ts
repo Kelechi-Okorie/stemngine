@@ -1,17 +1,18 @@
-import { Editor, EditorContext, Region } from "../Interfaces";
+import { Context, Region } from "../Interfaces";
 import { ViewportEditor } from "../editors/ViewportEditor";
 import { Outliner } from "../editors/Outliner";
 import { Properties } from "../editors/Properties";
-import { State, StateConfig } from '../core/State';
+import { Player } from "../editors/Player";
+import { State } from '../core/State';
 import { SelectionManager } from "./SelectionManager";
-import { Clock, Scene, SimBindingManager, Vector3 } from "@stemngine/engine";
+import { Scene, SimBindingManager, Vector3 } from "@stemngine/engine";
 import { SimulationManager } from "./SimulationManager";
 import { GlobalEventDispatcher } from "@stemngine/engine";
 import { ToolManager } from "../tools/ToolManager";
 import { StyleManager } from "./StyleManager";
-import { PresentationManager } from "./PresentationManager";
 import { RenderIndex } from "./RenderIndex";
 import { Renderer3DSystem } from "../renderers/Renderer3DSystem";
+import { SimulationRuntime } from "./SimulationRuntime";
 
 export class App {
 
@@ -26,20 +27,12 @@ export class App {
 
     private simulationManager: SimulationManager;
     private bindingManager: SimBindingManager;
-    // private presentationManager: PresentationManager;
-
-    private clock: Clock;
-
-    private viewports: Set<ViewportEditor> = new Set();
-
-    private isPlaying = false;
+    private simulationRuntime: SimulationRuntime;
 
     constructor(container: HTMLElement) {
 
         this.container = container;
         this.bindingManager = new SimBindingManager();
-
-        this.clock = new Clock();
 
         const stateConfig = {
             scene: new Scene(),
@@ -50,13 +43,13 @@ export class App {
 
         this.state = new State(stateConfig)
 
-        this.simulationManager = new SimulationManager(/* this.bindingManager */);
+        this.simulationManager = new SimulationManager();
+        this.simulationRuntime = new SimulationRuntime(this.simulationManager, this.bindingManager);
         const renderIndex = new RenderIndex();
 
-        // this.presentationManager = new PresentationManager(this.state.scene, this.bindingManager);
-
-        const context: EditorContext = {
+        const context: Context = {
             simulationManager: this.simulationManager,
+            simulationRuntime: this.simulationRuntime,
             state: this.state,
             toolManager: new ToolManager(),
             styleManager: StyleManager.instance,
@@ -73,30 +66,46 @@ export class App {
         const renderer3D = new Renderer3DSystem(context, this.bindingManager);
 
         const viewport = new ViewportEditor('3D viewport', context);
-        this.addViewport(viewport);
 
         this.region = {
             type: 'split',
             id: 'parent-id',
             direction: 'horizontal',
             ratio: 0.7,
+            // a: {
+            //     type: 'leaf',
+            //     id: 'a-1',
+            //     name: '3D viewport',
+            //     editor: viewport
+            // },
             a: {
-                type: 'leaf',
-                id: 'a-1',
-                name: '3D viewport',
-                editor: viewport
+                type: 'split',
+                id: 'a',
+                direction: 'vertical',
+                ratio: 0.7,
+                a: {
+                    type: 'leaf',
+                    id: 'a-1',
+                    name: '3D viewport',
+                    editor: viewport
+                },
+                b: {
+                    type: 'leaf',
+                    id: 'a-2',
+                    name: 'Player',
+                    editor: new Player('player', context)
+                }
+
             },
             b: {
                 type: 'split',
-                id: 'b-1',
+                id: 'b',
                 direction: 'vertical',
                 ratio: 0.3,
-                a: { type: 'leaf', id: 'a-2', name: 'outliner', editor: new Outliner('outliner', context) },
+                a: { type: 'leaf', id: 'b-1', name: 'outliner', editor: new Outliner('outliner', context) },
                 b: { type: 'leaf', id: 'b-2', name: 'properties', editor: new Properties('properties panel', context) }
             }
         }
-
-        requestAnimationFrame(this.loop);
 
         const btn = document.createElement('button');
         btn.innerText = 'button';
@@ -116,6 +125,8 @@ export class App {
     }
 
     public bootstrap() {
+
+        this.simulationRuntime.run();
 
         this.render();
 
@@ -367,44 +378,6 @@ export class App {
         window.removeEventListener('mousemove', onMove);
         window.removeEventListener('mouseup', onUp);
 
-    }
-
-    public addViewport(viewport: ViewportEditor) {
-
-        this.viewports.add(viewport);
-
-    }
-
-    // TODO: check with the engines animation loop
-    private loop = () => {
-
-        this.clock.tick();
-        const dt = this.clock.dt;
-
-        // 1.simulation - only if playing
-        if (this.isPlaying) {
-
-            this.simulationManager.step(dt);
-
-        }
-
-        this.bindingManager.update();
-
-        // 3. render all viewports
-        for (const vp of this.viewports) {
-
-            vp.update(dt);
-        }
-
-        requestAnimationFrame(this.loop);
-    }
-
-    public play() {
-        this.isPlaying = true;
-    }
-
-    public pause() {
-        this.isPlaying = false;
     }
 
 }

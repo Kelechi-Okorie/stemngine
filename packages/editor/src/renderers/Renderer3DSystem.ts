@@ -1,6 +1,6 @@
 import { GlobalEventDispatcher, MeshBasicMaterial, Scene, SimBindingManager, SphereGeometry, Mesh, BoxGeometry } from "@stemngine/engine";
 import { RepresentationEvent, RepresentationStoreEventType } from "../core/RepresentationStore";
-import { EditorContext, VisualRepresentation } from "../Interfaces";
+import { Context, VisualRepresentation } from "../Interfaces";
 import { RenderIndex } from "../core/RenderIndex";
 
 export class Renderer3DSystem {
@@ -9,7 +9,7 @@ export class Renderer3DSystem {
     private bindingManager: SimBindingManager;
     private RenderIndex: RenderIndex;
 
-    constructor(context: EditorContext, bindingManager: SimBindingManager) {
+    constructor(context: Context, bindingManager: SimBindingManager) {
 
         const { state } = context;
 

@@ -4,6 +4,7 @@ import { ToolManager } from "./tools/ToolManager";
 import { StyleManager } from "./core/StyleManager";
 import { SimulationModel } from "@stemngine/engine";
 import { RenderIndex } from "./core/RenderIndex";
+import { SimulationRuntime } from "./core/SimulationRuntime";
 
 /**
  * future editors
@@ -66,8 +67,9 @@ export interface Tool {
     onClick?: (e: MouseEvent, obj: any) => void;
 };
 
-export interface EditorContext {
+export interface Context {
     simulationManager: SimulationManager,
+    simulationRuntime: SimulationRuntime,
     state: State,
     toolManager: ToolManager;
     styleManager: StyleManager;

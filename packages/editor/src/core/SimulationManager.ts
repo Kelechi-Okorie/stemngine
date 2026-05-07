@@ -77,7 +77,7 @@ export class SimulationManager {
 
     }
 
-    public removeEntity(/* entityId: string */ entity: any) {   // TODO: type better
+    public removeEntity(entity: any) {   // TODO: type better
 
         const systemType = this.entitySystemTypeMap.get(entity.uuid);   // TODO: check
 
@@ -146,7 +146,7 @@ export class SimulationManager {
      * @param entityId 
      * @returns 
      */
-    getEntitySystemType(entityId: string): SystemType | undefined {
+    public getEntitySystemType(entityId: string): SystemType | undefined {
 
         return this.entitySystemTypeMap.get(entityId);
 
