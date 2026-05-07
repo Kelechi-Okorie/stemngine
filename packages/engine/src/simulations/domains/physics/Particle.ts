@@ -92,7 +92,7 @@ export class Particle implements SimulationModel {
     public damping: number;
 
     /**
-     * The index of this particle in the world particles or particle system array
+     * The index of this particle in the particle system array
      * this helps to achieve O(1) removal
      */
     public index!: number;

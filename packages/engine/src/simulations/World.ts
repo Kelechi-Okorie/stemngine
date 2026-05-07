@@ -15,9 +15,10 @@ import { System } from "./core/System";
  */
 export class World {
 
-    public systems: Map<SystemType, System> = new Map();    // TODO: check for better typing
+    // TODO: check correct typing for all System<any>
+    public systems = new Map<SystemType, System<any>>();
 
-    public addSystem(type: SystemType, system: System): void {
+    public addSystem(type: SystemType, system: System<any>): void {
 
         if (this.systems.has(type)) return;
 
@@ -47,8 +48,7 @@ export class World {
 
     }
 
-    // TODO: check this const ps = world.getSystem<ParticleSystem>(SystemType.PARTICLE);
-    public getSystem<T extends System>(key: SystemType): T | undefined {
+    public getSystem<T extends System<any>>(key: SystemType): T | undefined {
 
         return this.systems.get(key) as T | undefined;
 

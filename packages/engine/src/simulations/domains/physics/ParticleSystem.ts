@@ -2,6 +2,7 @@ import { Particle, ParticleOptions } from "./Particle";
 import { GlobalEventDispatcher } from "../../../core/GlobalEventDispatcher";
 import { System } from "../../core/System";
 import { SimulationModel, SystemType } from "../../Interfaces";
+import { Vector3 } from "../../../engine";
 
 /**
  * TODO:
@@ -12,10 +13,18 @@ import { SimulationModel, SystemType } from "../../Interfaces";
  * - etc
  */
 
+type ParticleSystemSnapshot = {
+    particles: {
+        id: number;
+        position: Vector3;
+        velocity: Vector3;
+    }[];
+};
+
 /**
- * Factories + memory managers for particles
+ * memory managers for particles
  */
-export class ParticleSystem extends System {
+export class ParticleSystem extends System<ParticleSystemSnapshot> {
 
     public readonly name: string = 'ParticleSystem';
     public readonly type: SystemType = SystemType.ParticleSystem;
@@ -28,6 +37,9 @@ export class ParticleSystem extends System {
         super(SystemType.ParticleSystem, 'ParticleSystem');
 
     }
+
+    public init(): void {}
+    public dispose(): void {}
 
     public add(particle: Particle): Particle {
 
@@ -51,10 +63,10 @@ export class ParticleSystem extends System {
     public remove(particle: Particle) {
 
         const index = particle.index;
-        const last = this.particles.length - 1;
+        const lastIndex = this.particles.length - 1;
 
-        const lastParticle = this.particles[last];
-        this.particles[index] = this.particles[last];
+        const lastParticle = this.particles[lastIndex];
+        this.particles[index] = lastParticle;
         lastParticle.index = index;
 
         this.particles.pop();
@@ -70,6 +82,34 @@ export class ParticleSystem extends System {
     public getAll(): SimulationModel[] {
 
         return this.particles;
+
+    }
+
+    snapshot(): ParticleSystemSnapshot {
+
+        return {
+            particles: this.particles.map(p => ({
+                id: p.id,
+                position: p.position.clone(),
+                velocity: p.velocity.clone(),
+            }))
+        };
+        
+    }
+
+    restore(snapshot: ParticleSystemSnapshot): void {
+
+        const map = new Map(snapshot.particles.map(p => [p.id, p]));
+
+        for (const p of this.particles) {
+
+            const s = map.get(p.id);
+            if (!s) continue;
+
+            p.position.copy(s.position);
+            p.velocity.copy(s.velocity);
+
+        }
 
     }
 
@@ -95,8 +135,8 @@ export class ParticleSystem extends System {
 
 }
 
-export function isParticleSystem(system: System | undefined): system is ParticleSystem {
+export function isParticleSystem(system: System<any> | undefined): system is ParticleSystem {
 
     return !!system && 'particles' in system;
-    
+
 }

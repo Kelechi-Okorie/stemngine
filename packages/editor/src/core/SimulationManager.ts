@@ -13,7 +13,12 @@ export type EntityEvent = {
     type: EntityEventType,
     entity: Entity,
     source: string  // TODO: source should be enum
-}
+};
+
+export type SimulationSnapshot = {
+    systems: Record<string, any>;
+    entitySystemTypeMap: Array<[string, SystemType]>;
+};
 
 export class SimulationManager {
 
@@ -99,7 +104,7 @@ export class SimulationManager {
     }
 
     public getEntity(entityId: string): Entity | undefined {
-        
+
         throw new Error('not implemented');
 
         // const systemType = this.entitySystemTypeMap.get(entityId);
@@ -151,6 +156,68 @@ export class SimulationManager {
         return this.entitySystemTypeMap.get(entityId);
 
     }
+
+    public snapshot(): SimulationSnapshot {
+
+        // const snapshots: Record<string, any> = {}
+        const systems: Record<string, any> = {};
+
+        for (const [type, system] of this.world.systems) {
+
+            systems[type] = system.snapshot();
+
+        }
+
+        const snapshots: SimulationSnapshot = {
+            systems,
+            entitySystemTypeMap: Array.from(this.entitySystemTypeMap.entries())
+        }
+
+        return snapshots;
+
+    }
+
+    public restore(snapshots: SimulationSnapshot) {
+
+        // 1. restore systems
+        for (const [type, system] of this.world.systems) {
+
+            const snapshot = snapshots.systems[type];
+
+            if (!snapshot) {
+
+                // system existed but has no snapshot
+                continue;
+
+            }
+
+            system.restore(snapshot)
+        }
+
+        // 2. restore entity registry mapping
+        // this.entitySystemTypeMap = new Map(snapshots.entitySystemTypeMap); // this assumes nothing else holds reference to entitySystemTypeMap
+
+        this.entitySystemTypeMap.clear();
+
+        for (const [k, v] of snapshots.entitySystemTypeMap) {
+
+            this.entitySystemTypeMap.set(k, v);
+
+        }
+
+    }
+
+    // Better future version:
+    // restore() {
+    //   this.world.resetSystemsFromSnapshot(snapshot.systems);
+    //   this.restoreentitySystemTypeMap(snapshot.entitySystemTypeMap);
+    // }
+
+    // That allows:
+
+    // plugin systems
+    // dynamic system creation
+    // versioned worlds
 
     public step(dt: number) {
 

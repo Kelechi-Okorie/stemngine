@@ -107,21 +107,6 @@ export class App {
             }
         }
 
-        const btn = document.createElement('button');
-        btn.innerText = 'button';
-        btn.style.position = 'absolute';
-        btn.style.right = '10px'
-        btn.style.top = '10px';
-        btn.style.cursor = 'pointer';
-        btn.style.zIndex = '100';
-
-        // btn.addEventListener('click', () => {
-        //     console.log(this.bindingManager);
-        //     console.log(this.simulationManager.world)
-        // }, false)
-
-        this.container.appendChild(btn);
-
     }
 
     public bootstrap() {

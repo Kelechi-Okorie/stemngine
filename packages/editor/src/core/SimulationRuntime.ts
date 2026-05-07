@@ -2,6 +2,7 @@ import { Clock, SimBindingManager } from "@stemngine/engine";
 import { SimulationManager } from "./SimulationManager";
 
 import { Editor } from "../Interfaces";
+import { SimulationSnapshot } from "./SimulationManager";
 
 enum EventTypes {
     PLAY = 'PLAY'
@@ -53,6 +54,19 @@ export class SimulationRuntime {
 
     private animationId!: number;
 
+    // TODO:
+    // Right now your system is:
+    // snapshot = physical world state only
+
+    // But a real simulation runtime is:
+    // snapshot = {
+    //     world state,
+    //     time state,
+    //     runtime state,
+    //     bindings state
+    // }
+    private snapshot: SimulationSnapshot | null = null;
+
     constructor(
         simulationManager: SimulationManager,
         bindingManager: SimBindingManager
@@ -81,6 +95,11 @@ export class SimulationRuntime {
 
         if (this.isPlaying) return;
 
+        if (!this.snapshot) {
+
+            this.createSnapshot();
+        }
+
         this.isPlaying = true;
 
     }
@@ -95,7 +114,13 @@ export class SimulationRuntime {
 
     public reset(): void {
 
-        // TODO:
+        if (!this.snapshot) return;
+
+        this.simulationManager.restore(this.snapshot);
+        this.bindingManager.update();
+
+        this.clock = new Clock();   // TODO: perhaps Clock should have a reset
+        this.isPlaying = false;
 
     }
 
@@ -108,7 +133,6 @@ export class SimulationRuntime {
 
         }
 
-        // this.functionToIndex.set(fn, list.length);
         this.functionToMeta.set(fn, { channel, index: list.length });
         list.push(fn);
 
@@ -152,6 +176,12 @@ export class SimulationRuntime {
             list[i](dt);
 
         }
+    }
+
+    public createSnapshot(): void {
+
+        this.snapshot = this.simulationManager.snapshot();
+
     }
 
     // TODO: check with the engines animation loop

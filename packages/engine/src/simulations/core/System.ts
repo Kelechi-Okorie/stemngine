@@ -1,15 +1,17 @@
 import { SimulationModel, SystemType } from "../Interfaces";
 import { World } from "../World";
 
+// TODO: find better ways to handle concrete implementations
+
 /**
  * Base class for all systems
  */
-export class System {
+export abstract class System<TSnapshot> {
 
     public readonly name: string;
     public readonly type: SystemType;
 
-    protected world!: World;
+    private world!: World;
 
     constructor(type: SystemType, name: string) {
 
@@ -19,29 +21,26 @@ export class System {
 
     public attachWorld(world: World) {
 
+        if (this.world) {
+
+            throw new Error('World already attached');
+
+        }
+
         this.world = world;
-        
-    }
-
-    public add(entity: any): SimulationModel {
-
-        throw new Error('Concrete system should implement add');
 
     }
 
-    public remove(entity: any) {
+    public abstract init?(): void;
+    public abstract dispose?(): void
 
-        throw new Error('Concrete systems should implement remove');
-    }
+    // TODO: should not be SimulationModel but a Generic type instead
+    public abstract add(entity: SimulationModel): SimulationModel;
+    public abstract remove(entity: SimulationModel): void;
+    public abstract getByIndex(index: number): SimulationModel | undefined ;
+    public abstract getAll(): SimulationModel[];
 
-    public get(index: number): SimulationModel | undefined {
-
-        throw new Error('Concrete systems should implement get');
-    }
-
-    public getAll(): SimulationModel[] {
-
-        throw new Error('Concrete systems should implement getAll');
-    }
+    public abstract snapshot(): TSnapshot;
+    public abstract restore(snapshot: TSnapshot): void;
 
 }

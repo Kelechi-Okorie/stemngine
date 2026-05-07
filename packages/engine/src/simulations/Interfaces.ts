@@ -57,5 +57,6 @@ export interface SimulationModel {
     name: string;
     type: string;
     uuid: string;
+    index: number;
     objectId?: number;
 }
