@@ -1,9 +1,11 @@
 import { World } from "../World";
 import { Vector3 } from "../../math/Vector3";
 import { Solver, SystemType } from "../Interfaces";
-import { isParticleSystem } from "../domains/physics/ParticleSystem";
+import { ParticleSystem } from "../domains/physics/ParticleSystem";
 
 const _v = /*@__PURE__*/ new Vector3();
+
+let _id = 0;
 
 /**
  * SymplecticeEulerIntegrator
@@ -23,6 +25,9 @@ const _v = /*@__PURE__*/ new Vector3();
  */
 export class SymplecticEulerIntegrator implements Solver {
 
+    public readonly id = `symplectic-euler-integrator-${_id++}`;
+    public readonly type = "integrator";
+
     public readonly name: string = 'SymplecticEulerIntegrator';
 
     public readonly reads: Set<string> = new Set([
@@ -40,6 +45,9 @@ export class SymplecticEulerIntegrator implements Solver {
         'particle.force'
     ]);
 
+    public enabled = true;
+
+    public params = {};
 
     /** Run integrator in 60 Hz */
     private fixedDt: number = 1 / 60;
@@ -66,15 +74,10 @@ export class SymplecticEulerIntegrator implements Solver {
 
         const fixedDt = this.fixedDt;
 
-        const particleSystem = world.systems.get(SystemType.ParticleSystem);
+        const ps = world.getSystem(SystemType.ParticleSystem) as ParticleSystem;
+        if (!ps) return;
 
-        if (!isParticleSystem(particleSystem)) {
-
-            return;
-
-        }
-        
-        const particles = particleSystem.particles;
+        const particles = ps.particles;
 
         while (this.acc >= fixedDt) {
 

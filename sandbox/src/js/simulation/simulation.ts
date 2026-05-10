@@ -76,49 +76,49 @@ let flag = true;
 // });
 
 const pane = new Pane();
-pane.addButton({title: 'select'}).on('click', () => {
-    particle = particle === particle1 ? particle2 : particle1;
-});
-pane.addButton({ title: 'up' }).on('click', () => {
+// pane.addButton({title: 'select'}).on('click', () => {
+//     particle = particle === particle1 ? particle2 : particle1;
+// });
+// pane.addButton({ title: 'up' }).on('click', () => {
 
-    addForce(new Vector3(0, 10, 0));
+//     addForce(new Vector3(0, 10, 0));
 
-});
-pane.addButton({ title: 'down' }).on('click', () => {
+// });
+// pane.addButton({ title: 'down' }).on('click', () => {
 
-    addForce(new Vector3(0, -10, 0));
+//     addForce(new Vector3(0, -10, 0));
 
-});
-pane.addButton({ title: 'left' }).on('click', () => {
+// });
+// pane.addButton({ title: 'left' }).on('click', () => {
 
-    addForce(new Vector3(-10, 0, 0));
+//     addForce(new Vector3(-10, 0, 0));
 
-});
-pane.addButton({ title: 'right' }).on('click', () => {
+// });
+// pane.addButton({ title: 'right' }).on('click', () => {
 
-    addForce(new Vector3(10, 0, 0));
+//     addForce(new Vector3(10, 0, 0));
 
-});
+// });
 
-pane.addButton({title: 'negate'}).on('click', () => {
+// pane.addButton({title: 'negate'}).on('click', () => {
 
-    negate();
-})
+//     negate();
+// })
 
-pane.addButton({title: 'reset'}).on('click', () => {
+// pane.addButton({title: 'reset'}).on('click', () => {
 
-    reset();
-});
+//     reset();
+// });
 
-pane.addButton({title: 'pause'}).on('click', () => {
-    pause();
-});
+// pane.addButton({title: 'pause'}).on('click', () => {
+//     pause();
+// });
 
-pane.addButton({title: 'button'}).on('click', () => {
-    // console.log(particleSystem);
-    // console.log(particle)
-    console.log({})
-});
+// pane.addButton({title: 'button'}).on('click', () => {
+//     // console.log(particleSystem);
+//     // console.log(particle)
+//     console.log({})
+// });
 
 const addForce = (force: Vector3): void => {
 

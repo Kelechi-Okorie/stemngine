@@ -1,7 +1,6 @@
 import { Clock, SimBindingManager } from "@stemngine/engine";
 import { SimulationManager } from "./SimulationManager";
 
-import { Editor } from "../Interfaces";
 import { SimulationSnapshot } from "./SimulationManager";
 
 enum EventTypes {
@@ -16,27 +15,22 @@ export type ToolManagerEventListener = Listener;
 type UpdateFunction = (dt: number) => void;
 
 type Channel =
-    | 'preSimulation'
-    | 'simulation'
-    | 'postSimulation'
-    | 'update'
-    | 'render';
+    | 'preSimulation'   // modify inputs before physics
+    | 'simulation'      // physic step
+    | 'postSimulation'  // read results, debugging
+    | 'update'          // editor/UI logic
+    | 'render';         // drawing
 
 export type SimulationRuntimeChannel = Channel;
 
-// Each channel should have a clear contract:
-
-// Channel	Purpose
-// preSimulation	modify inputs before physics
-// simulation	physics step (usually internal)
-// postSimulation	read results, debugging
-// update	editor/UI logic
-// render	drawing
-
 export class SimulationRuntime {
 
+    // real time (wall clock)
     private clock: Clock;
     public isPlaying = false;
+
+    // simulation time
+    private _time: number = 0;
 
     private simulationManager: SimulationManager;
     private bindingManager: SimBindingManager;
@@ -57,7 +51,6 @@ export class SimulationRuntime {
     // TODO:
     // Right now your system is:
     // snapshot = physical world state only
-
     // But a real simulation runtime is:
     // snapshot = {
     //     world state,
@@ -120,6 +113,7 @@ export class SimulationRuntime {
         this.bindingManager.update();
 
         this.clock = new Clock();   // TODO: perhaps Clock should have a reset
+        this._time = 0;
         this.isPlaying = false;
 
     }
@@ -184,6 +178,12 @@ export class SimulationRuntime {
 
     }
 
+    public get time(): number {
+
+        return this._time;
+
+    }
+
     // TODO: check with the engines animation loop
     private loop = () => {
 
@@ -196,6 +196,8 @@ export class SimulationRuntime {
         if (this.isPlaying) {
 
             this.simulationManager.step(dt);
+
+            this._time += dt;
 
         }
 

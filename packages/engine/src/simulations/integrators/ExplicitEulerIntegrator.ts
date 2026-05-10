@@ -1,14 +1,11 @@
 import { World } from "../World";
 import { Vector3 } from "../../math/Vector3";
 import { Solver, SystemType } from "../Interfaces";
-import { Particle } from "../domains/physics/Particle";
-import { isParticleSystem } from "../domains/physics/ParticleSystem";
-
-type IParticle = {
-    particles: Particle
-}
+import { ParticleSystem } from "../domains/physics/ParticleSystem";
 
 const _v = /*@__PURE__*/ new Vector3();
+
+let _id = 0;
 
 /**
  * ExplicitEulerIntegrator
@@ -29,8 +26,12 @@ const _v = /*@__PURE__*/ new Vector3();
  */
 export class ExplicitEulerIntegrator implements Solver {
 
+    public readonly id = `explicit-euler-integrator-${_id++}`;
+    public readonly type = "integrator";
+
     public readonly name: string = 'ExplicitEulerIntegrator';
 
+    // TODO: why set, may be too slow
     public readonly reads: Set<string> = new Set([
         'particle.position',
         'particle.velocity',
@@ -40,11 +41,16 @@ export class ExplicitEulerIntegrator implements Solver {
         'particle.damping'
     ]);
 
+    // TODO: why set, may be too slow
     public readonly writes: Set<string> = new Set([
         'particle.position',
         'particle.velocity',
         'particle.force'
     ]);
+
+    public enabled  = true;
+
+    public params = {};
 
     /** Run integrator in 60 Hz */
     private fixedDt: number = 1 / 60;
@@ -71,15 +77,10 @@ export class ExplicitEulerIntegrator implements Solver {
 
         const fixedDt = this.fixedDt;
 
-        const particleSystem = world.systems.get(SystemType.ParticleSystem);
+        const ps = world.getSystem(SystemType.ParticleSystem) as ParticleSystem;
+        if (!ps) return;
 
-        if (!isParticleSystem(particleSystem)) {
-
-            return;
-
-        }
-
-        const particles = particleSystem.particles;
+        const particles = ps.particles;
 
         while (this.acc >= fixedDt) {
 

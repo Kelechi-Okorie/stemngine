@@ -8,12 +8,16 @@ import { System } from "./System";
 import { ExplicitEulerIntegrator } from "../integrators/ExplicitEulerIntegrator";
 import { SymplecticEulerIntegrator } from "../integrators/SymplecticEulerIntegrator";
 
+import { GravitySolver } from "../solvers/GravitySolver";
+
 type SolverConstructor = new () => Solver;
 
-type SolverRegistry = Map<SystemType, {
-    default: SolverType,
-    solvers: Map<SolverType, SolverConstructor>
-}>;
+type SolverRegistry = Map<
+    SystemType,
+    {
+        default: SolverType,
+        solvers: Map<SolverType, SolverConstructor>
+    }>;
 
 /**
  * TODO: may need to remove or cache solver when a solver system is removed
@@ -27,13 +31,12 @@ type SolverRegistry = Map<SystemType, {
  */
 export class SolverManager {
 
-    // private static registry: Map<SystemType, Map<SolverType, SolverConstructor>> = new Map();
     public static registry: SolverRegistry = new Map()
 
     public solvers: Solver[] = [];
     private scheduler = new Scheduler();
 
-    public static SolverByName = []
+    public static SolverByName = [];
 
     constructor() {
 
@@ -41,6 +44,7 @@ export class SolverManager {
         // TODO: find a better way of doing this
         SolverManager.init();
 
+        // TODO: find better name for event
         GlobalEventDispatcher.instance.addEventListener('worldSystemAdded', this.onAddSystem);
 
     }
@@ -48,13 +52,27 @@ export class SolverManager {
     private static init() {
 
         // ParticleSystem
-        SolverManager.registry.set(SystemType.ParticleSystem, {
-            default: SolverType.ExplicitEulerIntegrator,    // TODO: default should be symplectic
-            solvers: new Map<SolverType, SolverConstructor>([
-                [SolverType.ExplicitEulerIntegrator, ExplicitEulerIntegrator],
-                [SolverType.SymplecticeEulerIntegrator, SymplecticEulerIntegrator]
-            ])
-        });
+        SolverManager.registry.set(
+            SystemType.ParticleSystem,
+            {
+                default: SolverType.ExplicitEulerIntegrator,    // TODO: default should be symplectic
+                solvers: new Map<SolverType, SolverConstructor>([
+                    [SolverType.ExplicitEulerIntegrator, ExplicitEulerIntegrator],
+                    [SolverType.SymplecticeEulerIntegrator, SymplecticEulerIntegrator]
+                ])
+            });
+
+        // TODO: find a better way
+        // add gravity solver
+        // SolverManager.registry.set(
+        //     SystemType.ParticleSystem,
+        //     {
+        //         default: SolverType.Gravity,
+        //         solvers: new Map<SolverType, SolverConstructor>([
+        //             [SolverType.Gravity, GravitySolver]
+        //         ])
+        //     }
+        // )
 
     }
 
@@ -81,6 +99,8 @@ export class SolverManager {
             };
 
             SolverManager.registry.set(systemType, systemEntry);
+
+            // TODO: should there be a return here
         }
 
         systemEntry.solvers.set(solverType, solverContructor);
@@ -94,7 +114,8 @@ export class SolverManager {
      * @param solverType 
      * @returns 
      */
-    public addSolver(system: System, solverType: SolverType): void {
+    public addSolver(system: System<any>, solverType: SolverType): void {
+
         // TODO: make solverType optional and use default solver for system type
 
         const systemEntry = SolverManager.registry.get(system.type);
@@ -135,7 +156,7 @@ export class SolverManager {
     public sync(world: World): void {
 
 
-        for ( let system of world.systems.values()) {
+        for (let system of world.systems.values()) {
 
             const systemEntry = SolverManager.registry.get(system.type);
             if (!systemEntry) {
@@ -152,7 +173,7 @@ export class SolverManager {
     }
 
     public onAddSystem = <E extends BaseEvent>(event: E) => {
-        
+
         const { systemType, target } = event;
 
         const systemEntry = SolverManager.registry.get(systemType);

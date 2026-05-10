@@ -1,4 +1,4 @@
-import { Particle, ParticleOptions } from "./Particle";
+import { Particle } from "./Particle";
 import { GlobalEventDispatcher } from "../../../core/GlobalEventDispatcher";
 import { System } from "../../core/System";
 import { SimulationModel, SystemType } from "../../Interfaces";
@@ -132,11 +132,5 @@ export class ParticleSystem extends System<ParticleSystemSnapshot> {
     //     }
 
     // }
-
-}
-
-export function isParticleSystem(system: System<any> | undefined): system is ParticleSystem {
-
-    return !!system && 'particles' in system;
 
 }
