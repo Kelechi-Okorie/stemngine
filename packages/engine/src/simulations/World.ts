@@ -16,9 +16,9 @@ import { System } from "./core/System";
 export class World {
 
     // TODO: check correct typing for all System<any>
-    public systems = new Map<SystemType, System<any>>();
+    public systems = new Map<SystemType, System<any, any>>();
 
-    public addSystem(type: SystemType, system: System<any>): void {
+    public addSystem(type: SystemType, system: System<any, any>): void {
 
         if (this.systems.has(type)) return;
 
@@ -48,7 +48,7 @@ export class World {
 
     }
 
-    public getSystem<T extends System<any>>(key: SystemType): T | undefined {
+    public getSystem<T extends System<any, any>>(key: SystemType): T | undefined {
 
         return this.systems.get(key) as T | undefined;
 

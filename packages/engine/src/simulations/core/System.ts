@@ -6,12 +6,16 @@ import { World } from "../World";
 /**
  * Base class for all systems
  */
-export abstract class System<TSnapshot> {
+export abstract class System<E extends SimulationModel, TSnapshot> {
 
     public readonly name: string;
     public readonly type: SystemType;
 
+    public abstract readonly capabilities: Set<string>;
+
     private world!: World;
+
+    public abstract entities: E[];
 
     constructor(type: SystemType, name: string) {
 
@@ -35,10 +39,10 @@ export abstract class System<TSnapshot> {
     public abstract dispose?(): void
 
     // TODO: should not be SimulationModel but a Generic type instead
-    public abstract add(entity: SimulationModel): SimulationModel;
-    public abstract remove(entity: SimulationModel): void;
-    public abstract getByIndex(index: number): SimulationModel | undefined ;
-    public abstract getAll(): SimulationModel[];
+    public abstract add(entity: E): E;
+    public abstract remove(entity: E): void;
+    public abstract getByIndex(index: number): E | undefined ;
+    public abstract getAll(): E[];
 
     public abstract snapshot(): TSnapshot;
     public abstract restore(snapshot: TSnapshot): void;

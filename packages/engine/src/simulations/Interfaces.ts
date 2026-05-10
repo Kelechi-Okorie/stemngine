@@ -1,4 +1,5 @@
 import { World } from "./World";
+import { System } from "./core/System";
 
 export enum SystemType {
     /** core mechanical */
@@ -30,6 +31,13 @@ export enum SolverType {
     Gravity
 }
 
+export type SolverScope =
+    | { type: "world" }
+    | { type: "system", systemType: SystemType }
+    | { type: "systems", systemTypes: SystemType[] }
+    | { type: "query", filter: (system: System<any, any>) => boolean }
+;
+
 type SolverParamType<T> = {
     value: T;
     min?: number;
@@ -55,11 +63,13 @@ export interface Solver {
 
     enabled: boolean;
 
+    scope:  SolverScope;
+
     params: Record<string, SolverParamType<any>>;    // editable in UI
 
     stage?: string; // optional stage grouping
 
-    step(dt: number, world: World): void;
+    step(dt: number, system: System<any, any>[], world?: World): void;
 }
 
 /**

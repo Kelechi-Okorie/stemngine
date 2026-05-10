@@ -1,7 +1,7 @@
 import { World } from "../World";
 import { Vector3 } from "../../math/Vector3";
-import { Solver, SystemType } from "../Interfaces";
-import { ParticleSystem } from "../domains/physics/ParticleSystem";
+import { Solver } from "../Interfaces";
+import { System } from "../core/System";
 
 const _v = /*@__PURE__*/ new Vector3();
 
@@ -33,22 +33,27 @@ export class ExplicitEulerIntegrator implements Solver {
 
     // TODO: why set, may be too slow
     public readonly reads: Set<string> = new Set([
-        'particle.position',
-        'particle.velocity',
-        'particle.acceleration',
-        'particle.inverseMass',
-        'particle.force',
-        'particle.damping'
+        'position',
+        'velocity',
+        'acceleration',
+        'inverseMass',
+        'force',
+        'damping'
     ]);
 
     // TODO: why set, may be too slow
     public readonly writes: Set<string> = new Set([
-        'particle.position',
-        'particle.velocity',
-        'particle.force'
+        'position',
+        'velocity',
+        'force'
     ]);
 
-    public enabled  = true;
+    public enabled = true;
+
+    public scope = {
+        type: 'query',
+        filter: (system: System<any, any>) => system.capabilities.has('integratable:linear')
+    } as const;
 
     public params = {};
 
@@ -68,7 +73,7 @@ export class ExplicitEulerIntegrator implements Solver {
 
     constructor() { }
 
-    public step(dt: number, world: World) {
+    public step(dt: number, systems: System<any, any>[], world: World) {
 
         this.acc += dt;
 
@@ -77,39 +82,40 @@ export class ExplicitEulerIntegrator implements Solver {
 
         const fixedDt = this.fixedDt;
 
-        const ps = world.getSystem(SystemType.ParticleSystem) as ParticleSystem;
-        if (!ps) return;
-
-        const particles = ps.particles;
-
         while (this.acc >= fixedDt) {
 
-            for (let particle of particles) {
+            for (const system of systems) {
 
-                const { position, velocity, acceleration, inverseMass, forceAcc, damping } = particle;
+                const entities = system.entities;
 
-                // skip static objects
-                if (inverseMass === 0) continue;
+                for (const entity of entities) {
 
-                // update linear position
-                position.addScaledVector(velocity, fixedDt);
+                    const { position, velocity, acceleration, inverseMass, forceAcc, damping } = entity;
 
-                // work out the acceleration from the force
-                // TODO: check if to reset the forceAcc each frame
-                // might not need to clear acceleration each frame if it contains
-                // persistent forces (gravity, etc.)
-                const resultingAcc = _v.copy(acceleration);
-                resultingAcc.addScaledVector(forceAcc, inverseMass);
+                    // skip static objects
+                    if (inverseMass === 0) continue;
 
-                // update linear velocity from acceleration
-                velocity.addScaledVector(resultingAcc, fixedDt);
+                    // update linear position
+                    position.addScaledVector(velocity, fixedDt);
 
-                // impose drag
-                // TODO: check if this should be conditional
-                velocity.multiplyScalar(damping ** fixedDt);
+                    // work out the acceleration from the force
+                    // TODO: check if to reset the forceAcc each frame
+                    // might not need to clear acceleration each frame if it contains
+                    // persistent forces (gravity, etc.)
+                    const resultingAcc = _v.copy(acceleration);
+                    resultingAcc.addScaledVector(forceAcc, inverseMass);
 
-                forceAcc.clear();
+                    // update linear velocity from acceleration
+                    velocity.addScaledVector(resultingAcc, fixedDt);
 
+                    // impose drag
+                    // TODO: check if this should be conditional
+                    velocity.multiplyScalar(damping ** fixedDt);
+
+                    forceAcc.clear();
+
+
+                }
             }
 
             this.acc -= this.fixedDt

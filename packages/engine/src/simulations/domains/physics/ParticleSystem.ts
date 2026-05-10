@@ -21,16 +21,20 @@ type ParticleSystemSnapshot = {
     }[];
 };
 
+type Snapshot = ParticleSystemSnapshot;
+
 /**
  * memory managers for particles
  */
-export class ParticleSystem extends System<ParticleSystemSnapshot> {
+export class ParticleSystem extends System<Particle, Snapshot> {
 
     public readonly name: string = 'ParticleSystem';
     public readonly type: SystemType = SystemType.ParticleSystem;
 
+    public readonly capabilities = new Set(['mass', 'position', 'velocity', 'integratable:linear']);
+
     // dense array storage (for performance)
-    public particles: Particle[] = [];
+    public entities: Particle[] = [];
 
     constructor() {
 
@@ -43,9 +47,9 @@ export class ParticleSystem extends System<ParticleSystemSnapshot> {
 
     public add(particle: Particle): Particle {
 
-        particle.index = this.particles.length;
+        particle.index = this.entities.length;
 
-        this.particles.push(particle);
+        this.entities.push(particle);
 
         GlobalEventDispatcher.instance.dispatchEvent({
             type: 'worldSystemAdded',
@@ -63,32 +67,32 @@ export class ParticleSystem extends System<ParticleSystemSnapshot> {
     public remove(particle: Particle) {
 
         const index = particle.index;
-        const lastIndex = this.particles.length - 1;
+        const lastIndex = this.entities.length - 1;
 
-        const lastParticle = this.particles[lastIndex];
-        this.particles[index] = lastParticle;
+        const lastParticle = this.entities[lastIndex];
+        this.entities[index] = lastParticle;
         lastParticle.index = index;
 
-        this.particles.pop();
+        this.entities.pop();
 
     }
 
-    public getByIndex(index: number): SimulationModel | undefined {
+    public getByIndex(index: number): Particle | undefined {
 
         throw new Error('get particle by index not implemented');
 
     }
 
-    public getAll(): SimulationModel[] {
+    public getAll(): Particle[] {
 
-        return this.particles;
+        return this.entities;
 
     }
 
     snapshot(): ParticleSystemSnapshot {
 
         return {
-            particles: this.particles.map(p => ({
+            particles: this.entities.map(p => ({
                 id: p.id,
                 position: p.position.clone(),
                 velocity: p.velocity.clone(),
@@ -101,7 +105,7 @@ export class ParticleSystem extends System<ParticleSystemSnapshot> {
 
         const map = new Map(snapshot.particles.map(p => [p.id, p]));
 
-        for (const p of this.particles) {
+        for (const p of this.entities) {
 
             const s = map.get(p.id);
             if (!s) continue;
