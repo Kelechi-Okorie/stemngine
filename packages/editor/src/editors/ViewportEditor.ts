@@ -21,7 +21,6 @@ import { TestPass } from "../rendering/postprocessing/TestPass";    // TODO: rem
 import { attachGizmo, createAxis } from "../rendering/gizmos";
 import { Toolbar } from "../tools/Toolbar";
 import { ToolManager, ToolManagerEventTypes } from "../tools/ToolManager";
-import { cursor3D } from "../assets/icons/3dcursor";
 import { Cursor3D } from "../viewport/renderer/Cursor3D";
 import { ViewportGizmo } from "../viewport/renderer/ViewportGizmo";
 import { Grid } from "../viewport/renderer/Grid";

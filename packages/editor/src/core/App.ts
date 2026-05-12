@@ -13,6 +13,7 @@ import { StyleManager } from "./StyleManager";
 import { RenderIndex } from "./RenderIndex";
 import { Renderer3DSystem } from "../renderers/Renderer3DSystem";
 import { SimulationRuntime } from "./SimulationRuntime";
+import { registerBuiltInSolvers } from "@stemngine/engine";
 
 export class App {
 
@@ -110,6 +111,9 @@ export class App {
     }
 
     public bootstrap() {
+
+        // register solver plugins
+        registerBuiltInSolvers();
 
         this.simulationRuntime.run();
 

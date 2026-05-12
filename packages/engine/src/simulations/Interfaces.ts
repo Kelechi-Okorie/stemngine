@@ -55,7 +55,6 @@ type SolverParamType<T> = {
 export interface Solver {
     id: string;
     type: string;
-    
     name: string;
 
     reads: Set<string>;

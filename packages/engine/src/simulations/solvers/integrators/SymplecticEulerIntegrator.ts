@@ -1,37 +1,34 @@
-import { World } from "../World";
-import { Vector3 } from "../../math/Vector3";
-import { Solver } from "../Interfaces";
-import { System } from "../core/System";
+import { World } from "../../World";
+import { Vector3 } from "../../../math/Vector3";
+import { Solver } from "../../Interfaces";
+import { System } from "../../core/System";
 
 const _v = /*@__PURE__*/ new Vector3();
 
 let _id = 0;
 
 /**
- * ExplicitEulerIntegrator
+ * SymplecticeEulerIntegrator
  * 
  * v(t + dt) = v(t) + a(t) * dt
- * x(t + dt) = x(t) + a(t) *dt
+ * x(t + dt) = x(t) + v(t + dt) * dt
  * 
  * Characteristics:
- * - simple and fast
- * - easy to implement
- * - unstable for stiff systems or large time steps
- * - energy tends to increase -> system can blow up over time
+ * - also called Semi-Implicit Euler
+ * - more stable than Explicit Euler
+ * - conserves energy better for mechanical systems
+ * - slightly more accurate for stiff systems
  * 
  * Use cases:
- * - educational purposes
- * - very simple particle systems with small timesteps
- * - not recommended for production physics engines
+ * - most simple rigid-body and particle physics engines
+ * - when you need stability with small overhead
  */
-export class ExplicitEulerIntegrator implements Solver {
+export class SymplecticEulerIntegrator implements Solver {
 
-    public readonly id = `explicit-euler-integrator-${_id++}`;
+    public readonly id = `symplectic-euler-integrator-${_id++}`;
     public readonly type = "integrator";
+    public readonly name: string = 'SymplecticEulerIntegrator';
 
-    public readonly name: string = 'ExplicitEulerIntegrator';
-
-    // TODO: why set, may be too slow
     public readonly reads: Set<string> = new Set([
         'position',
         'velocity',
@@ -41,7 +38,6 @@ export class ExplicitEulerIntegrator implements Solver {
         'damping'
     ]);
 
-    // TODO: why set, may be too slow
     public readonly writes: Set<string> = new Set([
         'position',
         'velocity',
@@ -95,9 +91,6 @@ export class ExplicitEulerIntegrator implements Solver {
                     // skip static objects
                     if (inverseMass === 0) continue;
 
-                    // update linear position
-                    position.addScaledVector(velocity, fixedDt);
-
                     // work out the acceleration from the force
                     // TODO: check if to reset the forceAcc each frame
                     // might not need to clear acceleration each frame if it contains
@@ -108,17 +101,20 @@ export class ExplicitEulerIntegrator implements Solver {
                     // update linear velocity from acceleration
                     velocity.addScaledVector(resultingAcc, fixedDt);
 
+                    // update linear position
+                    position.addScaledVector(velocity, fixedDt);
+
                     // impose drag
                     // TODO: check if this should be conditional
                     velocity.multiplyScalar(damping ** fixedDt);
 
                     forceAcc.clear();
 
-
                 }
+
             }
 
-            this.acc -= this.fixedDt
+            this.acc -= this.fixedDt;
 
         }
 

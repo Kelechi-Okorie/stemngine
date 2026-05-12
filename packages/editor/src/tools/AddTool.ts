@@ -117,7 +117,11 @@ export class AddTool implements Tool {
 
                 // prevent double-click spam
                 // close after spawn succeeds
-                requestAnimationFrame(() => this.closeMenu());
+                requestAnimationFrame(() => {
+
+                    this.closeMenu();
+
+                });
             }
 
             listEl.appendChild(row);

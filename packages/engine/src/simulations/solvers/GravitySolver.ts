@@ -2,6 +2,7 @@ import { Vector3 } from '../../math/Vector3';
 import { World } from "../World";
 import { Solver } from "../Interfaces"
 import { System } from "../core/System";
+import { MathUtils } from '../../engine';
 
 let _id = 0;
 
@@ -9,7 +10,6 @@ export class GravitySolver implements Solver {
 
     public readonly id = `gravity-solver-${_id++}`;
     public readonly type = "gravity";
-
     public readonly name: string = 'Gravity';
 
     private gravity = new Vector3(0, -9.81, 0);

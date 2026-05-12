@@ -127,19 +127,24 @@ export { Scene } from './scenes/Scene';
 // utils
 export { createCanvasElement } from './utils';
 
-// Simulations
+/** Simulations */
 // interface
 export { SystemType } from './simulations/Interfaces';
 export type { SimulationModel } from './simulations/Interfaces';
 
 export { SimPropertyBinding } from './simulations/core/SimPropertyBinding';
 export { SimBindingManager } from './simulations/core/SimBindingManager';
+export { SolverRegistry } from './simulations/core/SolverRegistry';
+export type { SolverDefinition } from './simulations/core/SolverRegistry';
 export { Simulation } from './simulations/Simulation';
 export { World } from './simulations/World';
 
 export { Particle } from './simulations/domains/physics/Particle';
 export type { ParticleOptions } from './simulations/domains/physics/Particle';
 export { ParticleSystem } from './simulations/domains/physics/ParticleSystem';
+
+// plugins
+export { registerBuiltInSolvers } from './simulations/plugins/registerSolvers'
 
 // textures
 export { CanvasTexture } from './textures/CanvasTexture';

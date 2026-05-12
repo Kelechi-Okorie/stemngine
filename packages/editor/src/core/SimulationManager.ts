@@ -1,7 +1,8 @@
-import { World, Simulation, ParticleSystem, GlobalEventDispatcher, SystemType, Particle } from "@stemngine/engine";
+import { World, Simulation, ParticleSystem, GlobalEventDispatcher, SystemType, Particle, SolverRegistry } from "@stemngine/engine";
 
 import { Entity } from "../Interfaces";
 import { makeReactive } from "../pane/bindings/extras";
+import { SolverManager } from "../../../engine/src/simulations/core/SolverManager";
 
 export enum EntityEventType {
     ENTITY_CREATED = 'entity:created',
@@ -25,8 +26,10 @@ export class SimulationManager {
     // TODO: may need to add id and other things
     public name = 'simulation manager';
 
-    private world: World
-    private simulation: Simulation;
+    public world: World
+    public simulation: Simulation;
+    public SolverRegistryInstance = SolverRegistry.getInstance();
+    public solverManager: SolverManager;
 
     // <entity.uuid, SystemType>
     private entitySystemTypeMap = new Map<string, SystemType>();
@@ -35,6 +38,7 @@ export class SimulationManager {
 
         this.world = new World();
         this.simulation = new Simulation(this.world);
+        this.solverManager = this.simulation.kernel.solverManager
 
     }
 

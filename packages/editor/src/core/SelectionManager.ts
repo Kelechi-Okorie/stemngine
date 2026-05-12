@@ -1,19 +1,19 @@
 
 export class SelectionManager {
 
-    private selected: any = null;
+    private _selected: any = null;
     private listeners: ((obj: any) => void)[] = [];
 
     public set(obj: any) {
 
-        this.selected = obj;
+        this._selected = obj;
         this.emit();
 
     }
 
     public get() {
 
-        return this.selected;
+        return this._selected;
 
     }
 
@@ -27,7 +27,7 @@ export class SelectionManager {
 
         for (const fn of this.listeners) {
 
-            fn(this.selected);
+            fn(this._selected);
 
         }
 

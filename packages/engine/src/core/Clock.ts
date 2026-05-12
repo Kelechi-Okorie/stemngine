@@ -1,6 +1,5 @@
 /**
  * Class responsible for clocking the system
- * and tracking simulation time
  *
  * The clock provides:
  * - { @link Clock.time } -> total elapsed time since the clock was created (seconds)
@@ -96,6 +95,7 @@ export class Clock {
    * Updates both accumulated {@link Clock.time} and {@link Clock.deltaTime}
    */
   public tick(timestamp?: number): void {
+    
     const now = timestamp || performance.now();
     let rawDelta = (now - this.lastTime) / 1000; // convert ms to s
 

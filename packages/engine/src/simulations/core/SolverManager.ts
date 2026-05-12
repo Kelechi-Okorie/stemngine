@@ -1,23 +1,9 @@
 import { EventDispatcher, BaseEvent } from "../../core/EventDispatcher";
 import { GlobalEventDispatcher } from "../../core/GlobalEventDispatcher";
-import { SystemType, SolverType, Solver, SolverScope } from "../Interfaces";
+import { Solver } from "../Interfaces";
 import { Scheduler } from "../Scheduler";
 import { World } from "../World";
 import { System } from "./System";
-
-import { ExplicitEulerIntegrator } from "../integrators/ExplicitEulerIntegrator";
-import { SymplecticEulerIntegrator } from "../integrators/SymplecticEulerIntegrator";
-
-import { GravitySolver } from "../solvers/GravitySolver";
-
-type SolverConstructor = new () => Solver;
-
-type SolverRegistry = Map<
-    SystemType,
-    {
-        default: SolverType,
-        solvers: Map<SolverType, SolverConstructor>
-    }>;
 
 /**
  * TODO: may need to remove or cache solver when a solver system is removed
@@ -31,26 +17,20 @@ type SolverRegistry = Map<
  */
 export class SolverManager {
 
-    public static registry: SolverRegistry = new Map();
-
     private world: World;
 
-    public solvers: Solver[] = [];
-    private solverIndexMap = new Map<Solver, number>();
+    private _solvers: Solver[] = [];
+
+    // <solver.name, index>
+    private solverIndexMap = new Map<string, number>();
 
     public targets = new Map<Solver, System<any, any>[]>();
 
     private scheduler = new Scheduler();
 
-    public static SolverByName = [];
-
     constructor(world: World) {
 
         this.world = world;
-
-        // Add all the known solvers to the registry
-        // TODO: find a better way of doing this
-        // SolverManager.init();
 
         // TODO: find better name for event
         // GlobalEventDispatcher.instance.addEventListener('worldSystemAdded', this.onAddSystem);
@@ -68,64 +48,8 @@ export class SolverManager {
 
     }
 
-    private static init() {
-
-        // ParticleSystem
-        // SolverManager.registry.set(
-        //     SystemType.ParticleSystem,
-        //     {
-        //         default: SolverType.ExplicitEulerIntegrator,    // TODO: default should be symplectic
-        //         solvers: new Map<SolverType, SolverConstructor>([
-        //             [SolverType.ExplicitEulerIntegrator, ExplicitEulerIntegrator],
-        //             [SolverType.SymplecticeEulerIntegrator, SymplecticEulerIntegrator]
-        //         ])
-        //     }
-        // );
-
-        // TODO: find a better way
-        // add gravity solver
-        // SolverManager.registry.set(
-        //     SystemType.ParticleSystem,
-        //     {
-        //         default: SolverType.Gravity,
-        //         solvers: new Map<SolverType, SolverConstructor>([
-        //             [SolverType.Gravity, GravitySolver]
-        //         ])
-        //     }
-        // )
-
-    }
-
-    /**
-     * Add a given solver to the registry for a given system
-     * 
-     * @param systemType 
-     * @param solverType 
-     * @param solverContructor 
-     */
-    public static registerSolver(
-        systemType: SystemType,
-        solverType: SolverType,
-        solverContructor: SolverConstructor
-    ) {
-
-        let systemEntry = SolverManager.registry.get(systemType);
-
-        if (!systemEntry) {
-
-            systemEntry = {
-                default: solverType,
-                solvers: new Map<SolverType, SolverConstructor>()
-            };
-
-            SolverManager.registry.set(systemType, systemEntry);
-
-            // TODO: should there be a return here
-        }
-
-        systemEntry.solvers.set(solverType, solverContructor);
-
-    }
+    // TODO: marked for deletion
+    private static init() { }
 
     /**
      * Add a solver to the solvers array for a given world system
@@ -136,54 +60,30 @@ export class SolverManager {
      */
     public add(solver: Solver): void {
 
-        const index = this.solverIndexMap.get(solver);
+        const index = this.solverIndexMap.get(solver.name);
 
-        if (index === undefined) {
+        if (index !== undefined) {
 
             console.warn('solver already exists');
             return;
 
         } else {
 
-            const index = this.solvers.length;
+            const index = this._solvers.length;
 
-            this.solvers.push(solver);
-            this.solverIndexMap.set(solver, index);
+            this._solvers.push(solver);
+            this.solverIndexMap.set(solver.name, index);
 
             const targets = this.resolveTargets(solver);
             this.targets.set(solver, targets);
 
         }
 
-
-        // TODO: make solverType optional and use default solver for system type
-
-        // const systemEntry = SolverManager.registry.get(system.type);
-
-        // if (!systemEntry) {
-
-        //     console.warn(`SolverManager: No solvers registered for system type ${system.type}`);
-        //     return;
-
-        // }
-
-        // const SolverCtor = systemEntry.solvers.get(solverType);
-
-        // if (!SolverCtor) {
-
-        //     console.warn(`SolverManager: No solver of type ${solverType} for system type ${system.type}`);
-        //     return;
-
-        // }
-
-        // const solver = new SolverCtor();
-        // this.solvers.push(solver);
-
     }
 
     public remove(solver: Solver) {
 
-        const index = this.solverIndexMap.get(solver);
+        const index = this.solverIndexMap.get(solver.name);
 
         if (index === undefined) {
 
@@ -191,22 +91,22 @@ export class SolverManager {
 
         } else {
 
-            const lastIndex = this.solvers.length - 1;
+            const lastIndex = this._solvers.length - 1;
 
-            const last = this.solvers[lastIndex];
-            this.solvers[index] = last;
+            const last = this._solvers[lastIndex];
+            this._solvers[index] = last;
 
-            this.solverIndexMap.set(last, index);
+            this.solverIndexMap.set(last.name, index);
 
-            this.solvers.pop();
-            this.solverIndexMap.delete(solver);
+            this._solvers.pop();
+            this.solverIndexMap.delete(solver.name);
             this.targets.delete(solver);
         }
     }
 
     public schedule(): Solver[] {
 
-        return this.scheduler.schedule(this.solvers);
+        return this.scheduler.schedule(this._solvers);
 
     }
 
@@ -260,7 +160,7 @@ export class SolverManager {
 
     private resolveAllTargets = () => {
 
-        for (const solver of this.solvers) {
+        for (const solver of this._solvers) {
 
             const targets = this.resolveTargets(solver);
             this.targets.set(solver, targets);
@@ -314,6 +214,12 @@ export class SolverManager {
         console.warn('no systems found for this solver');
 
         return [];
+    }
+
+    public getAll(): Solver[] {
+
+        return this._solvers;
+
     }
 
 }

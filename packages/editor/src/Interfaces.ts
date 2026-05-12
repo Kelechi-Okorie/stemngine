@@ -2,9 +2,10 @@ import { SimulationManager } from "./core/SimulationManager";
 import { State } from "./core/State";
 import { ToolManager } from "./tools/ToolManager";
 import { StyleManager } from "./core/StyleManager";
-import { SimulationModel } from "@stemngine/engine";
+import { SimulationModel, SolverRegistry } from "@stemngine/engine";
 import { RenderIndex } from "./core/RenderIndex";
 import { SimulationRuntime } from "./core/SimulationRuntime";
+import { Properties } from "./editors/Properties";
 
 /**
  * future editors
@@ -51,9 +52,9 @@ export interface IBinding<T> {
 };
 
 export const LAYERS = {
-  DEFAULT: 0,
-  HELPERS: 1,
-  GIZMOS: 2
+    DEFAULT: 0,
+    HELPERS: 1,
+    GIZMOS: 2
 };
 
 export interface Tool {
@@ -102,3 +103,18 @@ export type RendererCapability = {
 }
 
 export type Entity = SimulationModel;
+
+export interface Inspector {
+
+    id: string;
+    name: string;
+    icon: string;
+
+    // when should this inspector be visible?
+    // isAvailable(context: {id: string, name: string, render: () => void): boolean;
+
+    onClick(): void;
+
+    // render UI
+    render(selected?: any): void;
+}

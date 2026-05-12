@@ -1,12 +1,12 @@
 import { Tool } from "../Interfaces";
 import { Context } from "../Interfaces";
-import { cursor3D } from "../assets/icons/3dcursor";
+import { cursor3DIcon } from "../assets/icons/3dcursor";
 import { ViewportEditor } from "../editors/ViewportEditor";
 
 export class CursorTool implements Tool {
 
     public readonly name = 'cursor';
-    public readonly icon = cursor3D;
+    public readonly icon = cursor3DIcon;
 
     private context: Context;
     public btn!: HTMLElement;

@@ -8,6 +8,9 @@ export interface BaseEvent {
 
 type EventListener<E extends BaseEvent> = (event: E) => void;
 
+// TODO: EventDispatcher needs to be rewritten. it is unnecessarily complex.
+// look at BrowserInputManager
+
 /**
  * Class EventDispatcher allows to dispatch event objects on custom Javascript objects.
  *

@@ -1,7 +1,7 @@
 import { Particle } from "./Particle";
 import { GlobalEventDispatcher } from "../../../core/GlobalEventDispatcher";
 import { System } from "../../core/System";
-import { SimulationModel, SystemType } from "../../Interfaces";
+import { SystemType } from "../../Interfaces";
 import { Vector3 } from "../../../engine";
 
 /**
@@ -18,6 +18,7 @@ type ParticleSystemSnapshot = {
         id: number;
         position: Vector3;
         velocity: Vector3;
+        acceleration: Vector3;
     }[];
 };
 
@@ -96,6 +97,7 @@ export class ParticleSystem extends System<Particle, Snapshot> {
                 id: p.id,
                 position: p.position.clone(),
                 velocity: p.velocity.clone(),
+                acceleration: p.acceleration.clone()
             }))
         };
         
