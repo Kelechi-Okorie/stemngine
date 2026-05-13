@@ -54,8 +54,7 @@ export class SolverManager {
     /**
      * Add a solver to the solvers array for a given world system
      * 
-     * @param system 
-     * @param solverType 
+     * @param solver 
      * @returns 
      */
     public add(solver: Solver): void {
@@ -117,21 +116,6 @@ export class SolverManager {
      * @param world - the world
      */
     public sync(world: World): void {
-
-
-        // for (let system of world.systems.values()) {
-
-        //     const systemEntry = SolverManager.registry.get(system.type);
-        //     if (!systemEntry) {
-
-        //         console.warn(`SolverManager: No solvers registered for system type ${system.type} and name ${system.name}`);
-        //         continue;
-        //     }
-
-        //     const defaultSolverType = systemEntry.default;
-        //     this.addSolver(system, defaultSolverType);
-
-        // }
 
     }
 

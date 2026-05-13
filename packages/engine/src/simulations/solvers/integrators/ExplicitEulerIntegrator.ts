@@ -1,6 +1,6 @@
 import { World } from "../../World";
 import { Vector3 } from "../../../math/Vector3";
-import { Solver } from "../../Interfaces";
+import { Solver, SolverScope } from "../../Interfaces";
 import { System } from "../../core/System";
 
 const _v = /*@__PURE__*/ new Vector3();
@@ -49,12 +49,10 @@ export class ExplicitEulerIntegrator implements Solver {
 
     public enabled = true;
 
-    public scope = {
+    public scope: SolverScope = {
         type: 'query',
         filter: (system: System<any, any>) => system.capabilities.has('integratable:linear')
-    } as const;
-
-    public params = {};
+    };
 
     /** Run integrator in 60 Hz */
     private fixedDt: number = 1 / 60;
@@ -69,6 +67,11 @@ export class ExplicitEulerIntegrator implements Solver {
      * @defaultValue 0.25 (quarter of a second)
      */
     private maxAccumulatedTime: number = 0.25;
+
+    // public schema = [
+    //     number("fixedDt", { default: 1 / 60 }),
+    //     number("maxAccumulatedTime", { default: 0.25 })
+    // ];
 
     constructor() { }
 

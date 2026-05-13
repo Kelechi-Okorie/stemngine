@@ -1,7 +1,6 @@
 import { World, Simulation, ParticleSystem, GlobalEventDispatcher, SystemType, Particle, SolverRegistry } from "@stemngine/engine";
 
 import { Entity } from "../Interfaces";
-import { makeReactive } from "../pane/bindings/extras";
 import { SolverManager } from "../../../engine/src/simulations/core/SolverManager";
 
 export enum EntityEventType {
@@ -63,7 +62,6 @@ export class SimulationManager {
                 const particle = new Particle(config);
 
                 entity = ps.add(particle);
-                // entity = makeReactive(entity);
 
                 this.entitySystemTypeMap.set(entity.uuid, SystemType.ParticleSystem);
 

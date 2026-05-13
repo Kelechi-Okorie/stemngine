@@ -97,6 +97,7 @@ const particleSystem: Record<string, ParameterSchema> = {
 
     mass: {
         type: 'number',
+        label: 'Mass',
         min: 0,
         max: 100,
         step: 0.1
@@ -104,6 +105,7 @@ const particleSystem: Record<string, ParameterSchema> = {
 
     damping: {
         type: 'number',
+        label: 'Damping',
         min: 0,
         max: 1,
         step: 0.01

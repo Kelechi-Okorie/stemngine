@@ -1,6 +1,5 @@
 import { IBinding } from "../../Interfaces";
 
-
 export abstract class Control<T> {
 
     public element: HTMLElement;

@@ -1,8 +1,7 @@
 import { Vector3 } from '../../math/Vector3';
 import { World } from "../World";
-import { Solver } from "../Interfaces"
+import { FieldSchema, Solver, SolverScope } from "../Interfaces"
 import { System } from "../core/System";
-import { MathUtils } from '../../engine';
 
 let _id = 0;
 
@@ -12,24 +11,40 @@ export class GravitySolver implements Solver {
     public readonly type = "gravity";
     public readonly name: string = 'Gravity';
 
+    public enabled = true;
+
     private gravity = new Vector3(0, -9.81, 0);
 
     // TODO: why set, may be too slow
-    public readonly reads: Set<string> = new Set();
+    public readonly reads = new Set<string>();
 
     // TODO: why set, may be too slow
-    public readonly writes: Set<string> = new Set([
-        'acceleration'
-    ]);
+    public readonly writes = new Set<string>(['acceleration']);
 
-    public enabled = true;
-
-    public scope = {
+    public scope: SolverScope = {
         type: "query",
         filter: (system: System<any, any>) => system.capabilities.has('mass')
-    } as const;
+    };
 
-    public params = {};
+    public schema: FieldSchema[] = [
+        {
+            type: "boolean",
+            key: "enabled",
+            label: "Enabled"
+        },
+        {
+            type: "vector3",
+            key: "gravity",
+            label: "Gravity",
+            fields: {
+                y: {
+                    type: "number",
+                    key: "gravity.y",
+                    label: "value"
+                }
+            }
+        }
+    ];
 
     public step(dt: number, systems: System<any, any>[], world: World) {
 
@@ -48,37 +63,3 @@ export class GravitySolver implements Solver {
     }
 
 }
-
-// params = {
-//     gravityY: {
-//         value: -9.81,
-//         min: -50,
-//         max: 0,
-//         step: 0.1,
-//         label: "Gravity"
-//     }
-// };
-
-// step(dt, world) {
-//     const g = this.params.gravityY.value;
-
-//     for (const p of particles) {
-//         p.addForce(new Vector3(0, g, 0));
-//     }
-// }
-
-// 🧩 Now your UI becomes automatic
-// Your Properties panel can:
-// for (let key in solver.params) {
-//     const param = solver.params[key];
-
-//     createSlider({
-//         label: param.label,
-//         min: param.min,
-//         max: param.max,
-//         value: param.value,
-//         onChange: (v) => param.value = v
-//     });
-// }
-
-// No custom UI per solver needed.

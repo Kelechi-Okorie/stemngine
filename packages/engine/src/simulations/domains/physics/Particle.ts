@@ -26,7 +26,7 @@ export class Particle implements SimulationModel {
     /**
      * The id of the particle
      */
-    public id: number = particleId++;
+    public readonly id: number = particleId++;
 
     /**
      * Name of this particle

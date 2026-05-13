@@ -4,14 +4,13 @@ import { ParameterSchema, findSchema } from "../../core/Schemas";
 import { Node } from "../../pane/nodes/Node";
 import { Control } from "../../pane/controls/Control";
 import { ControlNode } from "../../pane/nodes/ControlNode";
-import { SliderControl } from "../../pane/controls/SliderControl";
+import { NumberControl } from "../../pane/controls/NumberControl";
 import { Folder } from "../../pane/nodes/Folder";
 import { IBinding } from "../../Interfaces";
 import { ParameterBinding } from "../../pane/bindings/ParameterBinding";
 import { CheckboxControl } from "../../pane/controls/CheckboxControl";
 import { ColorControl } from "../../pane/controls/ColorControl";
 import { squareIcon } from "../../assets/icons/square";
-
 
 export class ObjectInspector implements Inspector {
 
@@ -73,7 +72,7 @@ export class ObjectInspector implements Inspector {
         for (const key in schema) {
 
             const paramSchema = schema[key];
-            const binding = this.createBinding(entity, key);
+            const binding = this.createBinding(entity, key);    // TODO: add parameter binding type
 
             if (paramSchema.children) {
 
@@ -89,12 +88,8 @@ export class ObjectInspector implements Inspector {
             switch (paramSchema.type) {
 
                 case 'number':
-                    control = new SliderControl(
-                        binding as IBinding<number>, {
-                        min: paramSchema.min ?? 0,
-                        max: paramSchema.max ?? 10,
-                        step: paramSchema.step ?? 1
-                    });
+
+                    control = new NumberControl(binding as IBinding<number>)
                     break;
 
                 case 'bool':
@@ -102,27 +97,28 @@ export class ObjectInspector implements Inspector {
                     break;
 
                 case 'color':
+
                     control = new ColorControl(binding as IBinding<string>);
                     break;
+
                 case 'vector3':
-                    // control = new Vector3Control(binding as IBinding<Vector3>);
 
                     const vec = entity[key];
 
                     subFolder = new Folder(paramSchema.label || key);
 
                     subFolder.add(new ControlNode(
-                        new SliderControl(this.createBinding(vec, 'x') as IBinding<number>, { min: -10, max: 10, step: 1 }), 'x'
+                        new NumberControl(this.createBinding(vec, 'x') as IBinding<number>)
                     ));
                     folder.add(subFolder)
 
                     subFolder.add(new ControlNode(
-                        new SliderControl(this.createBinding(vec, 'y') as IBinding<number>, { min: -10, max: 10, step: 1 }), 'y'
+                        new NumberControl(this.createBinding(vec, 'y') as IBinding<number>)
                     ));
                     folder.add(subFolder)
 
                     subFolder.add(new ControlNode(
-                        new SliderControl(this.createBinding(vec, 'z') as IBinding<number>, { min: -10, max: 10, step: 1 }), 'z'
+                        new NumberControl(this.createBinding(vec, 'z') as IBinding<number>)
                     ));
 
                     folder.add(subFolder)
@@ -145,6 +141,7 @@ export class ObjectInspector implements Inspector {
 
             } else {
 
+                console.log({control, subFolder});
                 throw new Error('Editor Properties: buildUIFromSchema - unknown control type');
             }
 
