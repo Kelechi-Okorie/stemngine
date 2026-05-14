@@ -100,9 +100,9 @@ export class Grid {
         float xAxis = 1.0 - smoothstep(0.0, fwidth(worldPos.z), zDist);
         float zAxis = 1.0 - smoothstep(0.0, fwidth(worldPos.x), xDist);
 
-        float dist = length(worldPos.xz);
-        float fade = exp(-dist * 0.02); // TODO: tweak
-        alpha *= fade;
+        // float dist = length(worldPos.xz);
+        // float fade = exp(-dist * 0.02); // TODO: tweak
+        // alpha *= fade;
 
         vec3 axisColorX = vec3(1.0, 0.0, 0.0);
         vec3 axisColorZ = vec3(0.0, 0.0, 1.0);

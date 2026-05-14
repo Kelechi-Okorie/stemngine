@@ -37,8 +37,8 @@ class GridHelper extends LineSegments {
         const step = size / divisions;
         const halfSize = size / 2;
 
-        const vertices = [];
-        const colors: any[] = [];
+        const vertices: number[] = [];
+        const colors: number[] = [];
 
         for (let i = 0, j = 0, k = - halfSize; i <= divisions; i++, k += step) {
 
@@ -56,9 +56,9 @@ class GridHelper extends LineSegments {
 
         const geometry = new BufferGeometry();
         geometry.setAttribute('position', new Float32BufferAttribute(vertices, 3));
-        geometry.setAttribute('color', new Float32BufferAttribute(colors, 3));
+        // geometry.setAttribute('color', new Float32BufferAttribute(colors, 3));
 
-        const material = new LineBasicMaterial({ vertexColors: true, toneMapped: false, color: 0xdddddd });
+        const material = new LineBasicMaterial({ vertexColors: false, toneMapped: false, color: 0xeeeeee });
 
         super(geometry, material);
 

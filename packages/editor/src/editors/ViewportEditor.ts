@@ -25,6 +25,8 @@ import { Cursor3D } from "../viewport/renderer/Cursor3D";
 import { ViewportGizmo } from "../viewport/renderer/ViewportGizmo";
 import { Grid } from "../viewport/renderer/Grid";
 import { RaycasterIntersection } from "../../../engine/src/core/Raycaster";
+import { AxesHelper } from "../../../engine/src/helpers/AxesHelper";
+import { Axes } from "../viewport/renderer/Axes";
 
 export class ViewportEditor implements Editor {
     public name: string;
@@ -100,9 +102,16 @@ export class ViewportEditor implements Editor {
 
     public mount(container: HTMLElement) {
 
-        const grid = new Grid();
-        this.state.scene.add(grid.grid);
-        this.grid = grid;
+        // const grid = new Grid();
+        // this.state.scene.add(grid.grid);
+        // this.grid = grid;
+
+        const grid = new GridHelper(20, 20);
+        this.state.scene.add(grid);
+
+        const axes = new Axes()
+        this.state.scene.add(axes)
+
 
         container.appendChild(this.renderer.domElement);
 
@@ -133,7 +142,7 @@ export class ViewportEditor implements Editor {
 
         });
 
-        this.cursor.attach(this.state.scene);
+        // this.cursor.attach(this.state.scene);
 
         this.context.toolManager.on(ToolManagerEventTypes.TOOL_SET, this.updateInteractiveMode.bind(this));
 
@@ -152,10 +161,14 @@ export class ViewportEditor implements Editor {
     public update = (dt: number) => {
 
         // 1. grid
-        this.grid.update(this.camera);
+        // this.grid.update(this.camera);
+
+        // const distance = camera.position.length();
+        // const size = Math.pow(10, Math.floor(Math.log10(distance)));
+        // grid.scale.set(size, 1, size);
 
         // 2. 3D cursor
-        this.cursor.update(this.camera, this.renderer);
+        // this.cursor.update(this.camera, this.renderer);
 
         // 3. render
         this.renderer.setViewport(0, 0, this.width, this.height);
@@ -174,7 +187,6 @@ export class ViewportEditor implements Editor {
     }
 
     public unmount(): void {
-        console.log('release all acquired resources');
 
         this.context.toolManager.remove(ToolManagerEventTypes.TOOL_SET, this.updateInteractiveMode);
         this.context.simulationRuntime.unSchedule(this.update);

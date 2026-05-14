@@ -184,7 +184,7 @@ export class ViewportGizmo {
         const { mainCamera, renderer } = context;
 
         // rotate whole gizmo - match orientation
-        this.gizmo.quaternion.copy(mainCamera.quaternion);
+        this.gizmo.quaternion.copy(mainCamera.quaternion).invert();
 
     }
 
