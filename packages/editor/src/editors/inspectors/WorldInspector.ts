@@ -38,8 +38,6 @@ export class WorldInspector implements Inspector {
         const registrySolvers = this.SolverRegistryInstance.getAll();
         const solvers = this.solverManager.getAll();
 
-        console.log({ solvers, registrySolvers });
-
         this.content.innerHTML = ''
 
         for (const solver of solvers) {

@@ -15,6 +15,9 @@ export class ControlNode<T> extends Node {
             this.element.appendChild(labelEl);
         }
 
+        this.element.style.display = 'flex';
+        this.element.style.marginBottom = '5px';
+
         this.element.appendChild(control.element);
 
     }

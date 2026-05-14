@@ -16,7 +16,5 @@ export class ContainerNode extends Node {
     //     this.children.push(node);
     //     this.element.appendChild(node.element);
 
-    //     console.log('from container node')
-
     // }
 }

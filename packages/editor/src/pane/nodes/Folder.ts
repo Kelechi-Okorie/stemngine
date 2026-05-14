@@ -15,6 +15,7 @@ export class Folder extends ContainerNode {
         this.header.textContent = title;
         this.header.style.cursor = 'pointer';
         this.header.style.fontWeight = 'bold';
+        this.header.style.marginBottom = '8px';
 
         this.content = document.createElement('div');
         this.content.style.paddingLeft = '10px';
@@ -37,6 +38,5 @@ export class Folder extends ContainerNode {
         this.children.push(node);
         this.content.appendChild(node.element);
 
-        console.log('from folder')
     }
 }

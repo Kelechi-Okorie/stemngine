@@ -15,19 +15,14 @@ import { Folder } from "../nodes/Folder";
 
 function renderSchema(fields: FieldSchema[], target: any, folder: Folder) {
 
-
-
     for (const field of fields) {
 
         renderField(field, target, folder);
     }
 
-    // folder.appendChild(folder.element);
 }
 
-
 function renderField(field: FieldSchema, target: any, folder: Folder) {
-
 
     switch (field.type) {
 
@@ -46,6 +41,9 @@ function renderField(field: FieldSchema, target: any, folder: Folder) {
         case "object":
             renderObject(field, target, folder);
             break;
+
+        default:
+            throw new Error(`field type not found`)
     }
 }
 
