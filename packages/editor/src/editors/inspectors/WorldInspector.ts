@@ -1,12 +1,9 @@
 import { Inspector } from "../../Interfaces";
 import { Properties } from "../Properties";
 import { worldIcon } from "../../assets/icons/world";
-import { SolverDefinition, SolverRegistry, SolverManager, FieldSchema } from "@stemngine/engine";
-import { ParameterBinding } from "../../pane/bindings/ParameterBinding";
-import { NumberControl } from "../../pane/controls/NumberControl";
+import { SolverDefinition, SolverRegistry, SolverManager } from "@stemngine/engine";
+import { renderSchema } from "../../pane/controls/factories";
 import { Folder } from "../../pane/nodes/Folder";
-import { ControlNode } from "../../pane/nodes/ControlNode";
-import { CheckboxControl } from "../../pane/controls/CheckboxControl";
 
 export class WorldInspector implements Inspector {
 
@@ -38,8 +35,6 @@ export class WorldInspector implements Inspector {
 
     public render() {
 
-        console.log(this.parent);
-
         const registrySolvers = this.SolverRegistryInstance.getAll();
         const solvers = this.solverManager.getAll();
 
@@ -49,25 +44,17 @@ export class WorldInspector implements Inspector {
 
         for (const solver of solvers) {
 
-            const box = document.createElement('div');
+            const folder = new Folder(solver.name)
 
             // header
-            const header = document.createElement('div');
-            header.innerText = solver.name;
-
-            // params
-            const body = document.createElement('div');
 
             if (solver.schema) {
 
-                this.renderSchema(solver.schema, solver, body);
+                renderSchema(solver.schema, solver, folder);
 
             }
 
-            box.appendChild(header);
-            box.appendChild(body);
-
-            this.content.appendChild(box);
+            this.content.appendChild(folder.element);
 
         }
 
@@ -164,117 +151,4 @@ export class WorldInspector implements Inspector {
 
     }
 
-    private renderSchema(fields: FieldSchema[], target: any, parent: HTMLElement) {
-
-        const folder = new Folder(target.name ?? 'Unnamed');
-
-        for (const field of fields) {
-
-            this.renderField(field, target, folder);
-        }
-
-        parent.appendChild(folder.element);
-    }
-
-    private renderField(field: FieldSchema, target: any, folder: Folder) {
-
-
-        switch (field.type) {
-
-            case "number":
-                this.renderNumber(field, target, folder);
-                break;
-
-            case "boolean":
-                this.renderBoolean(field, target, folder);
-                break;
-
-            case "vector3":
-                this.renderVector3(field, target, folder);
-                break;
-
-            case "object":
-                this.renderObject(field, target, folder);
-                break;
-        }
-    }
-
-    private renderNumber(field: any, target: any, folder: Folder) {
-
-        const { obj, key } = resolvePath(target, field.key);
-        const binding = new ParameterBinding<number>(obj, key);
-
-        const control = new NumberControl(binding);
-
-        folder.add(new ControlNode(control, field.label))
-
-    }
-
-    private renderBoolean(field: any, target: any, folder: Folder) {
-
-        const { obj, key } = resolvePath(target, field.key);
-
-        const binding = new ParameterBinding<boolean>(obj, key);
-        const control = new CheckboxControl(binding);
-        folder.add(new ControlNode(control, field.name));
-
-    }
-
-    private renderVector3(field: any, target: any, folder: Folder) {
-
-        const subFolder = new Folder(field.label);
-
-        const axes = ["x", "y", "z"] as const;
-
-        for (const axis of axes) {
-
-            const subField = field.fields?.[axis];
-
-            if (!subField) continue; // axis locked or hidden
-
-            const path = `${field.key}.${axis}`;
-            const { obj, key } = resolvePath(target, path);
-
-            const binding = new ParameterBinding<number>(obj, key);
-
-            const control = new NumberControl(binding);
-
-            subFolder.add(new ControlNode(control, subField.label))
-
-        }
-
-        folder.add(subFolder);
-
-    }
-
-    private renderObject(field: any, target: any, folder: Folder) {
-
-        const subFolder = new Folder(field.label);
-
-        const { obj } = resolvePath(target, field.key);
-
-        this.renderSchema(field.fields, obj, subFolder.element);
-
-        folder.add(subFolder);
-    }
-
-}
-
-export function resolvePath(target: any, path: string) {
-
-    const parts = path.split(".");
-    let obj = target;
-
-    for (let i = 0; i < parts.length - 1; i++) {
-
-        obj = obj[parts[i]];
-
-        if (obj === undefined || obj === null) {
-            throw new Error(`Invalid path: ${path}`);
-        }
-    }
-
-    const key = parts[parts.length - 1];
-
-    return { obj, key };
 }

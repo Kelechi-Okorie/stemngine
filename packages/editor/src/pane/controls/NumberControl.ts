@@ -25,10 +25,7 @@ export class NumberControl extends Control<number> {
 
         });
 
-        const div = document.createElement('div');
-        div.appendChild(this.input);
-
-        this.element.appendChild(div);
+        this.element.appendChild(this.input);
 
         // initialize
         this.updateView(this.binding.get());
@@ -37,7 +34,7 @@ export class NumberControl extends Control<number> {
     protected updateView(value: number): void {
         
         // avoid overwritting user typing unnecessarily
-        if (Number(this.input) !== value) {
+        if (this.input.valueAsNumber !== value) {
 
             this.input.value = String(value);
 

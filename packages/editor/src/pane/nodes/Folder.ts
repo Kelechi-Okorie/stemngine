@@ -30,10 +30,13 @@ export class Folder extends ContainerNode {
         this.element.appendChild(this.content);
     }
 
+    // TODO: may be removed. parent already has add
     public add(node: Node) {
 
         // TODO: remember to also remove children
         this.children.push(node);
         this.content.appendChild(node.element);
+
+        console.log('from folder')
     }
 }
