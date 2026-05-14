@@ -102,11 +102,8 @@ export class ViewportEditor implements Editor {
 
     public mount(container: HTMLElement) {
 
-        // const grid = new Grid();
-        // this.state.scene.add(grid.grid);
-        // this.grid = grid;
-
         const grid = new GridHelper(20, 20);
+        grid.layers.set(LAYERS.HELPERS);
         this.state.scene.add(grid);
 
         const axes = new Axes()

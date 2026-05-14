@@ -1,6 +1,7 @@
 import { PlaneGeometry, ShaderMaterial, Mesh, Camera, Matrix4, Material } from "@stemngine/engine";
 import { LAYERS } from "../../Interfaces";
 
+// TODO: you can make grid a group
 /**
  * Screen-space grids
  * 

@@ -1,6 +1,6 @@
 import { generateUUID } from "../../../math/MathUtils";
 import { Vector3 } from "../../../math/Vector3";
-import { SimulationModel } from "../../Interfaces";
+import { FieldSchema, SimulationModel } from "../../Interfaces";
 
 export type ParticleOptions = {
     name?: string;
@@ -74,9 +74,9 @@ export class Particle implements SimulationModel {
      * it is more usefule to have objects with infinite mass (immovable)
      * than zero mass (completely unstable numerical simulation)
     */
-    public inverseMass: number;
+    public inverseMass: number; // TODO: confirm that inverse mass is updated when mass changes
 
-    public mass: number;
+    private _mass: number;
 
     /**
      * The force accumulated on the object in the current frame
@@ -97,6 +97,65 @@ export class Particle implements SimulationModel {
      */
     public index!: number;
 
+    public schema: FieldSchema[] = [
+        {
+            type: "vector3",
+            key: "position",
+            label: "Position",
+            fields: {
+                x: {
+                    type: "number",
+                    key: "position.x",
+                    label: "value"
+                },
+                y: {
+                    type: "number",
+                    key: "position.y",
+                    label: "value"
+                },
+                z: {
+                    type: "number",
+                    key: "position.z",
+                    label: "value"
+                }
+            }
+
+        },
+        {
+            type: "vector3",
+            key: "velocity",
+            label: "Velocity",
+            fields: {
+                x: {
+                    type: "number",
+                    key: "velocity.x",
+                    label: "value"
+                },
+                y: {
+                    type: "number",
+                    key: "velocity.y",
+                    label: "value"
+                },
+                z: {
+                    type: "number",
+                    key: "velocity.z",
+                    label: "value"
+                }
+            }
+
+        },
+        {
+            type: "number",
+            key: "mass",
+            label: "Mass"
+        },
+        {
+            type: "number",
+            key: "damping",
+            label: "Damping"
+        }
+    ]
+
     constructor(options: ParticleOptions) {
 
         const { name, objectId, position, velocity, acceleration, mass, damping } = options;
@@ -112,18 +171,18 @@ export class Particle implements SimulationModel {
         if (mass === 0) {
 
             this.inverseMass = 0;   // infinite mass (immovable)
-            this.mass = Infinity;
+            this._mass = Infinity;
 
         } else if (mass !== undefined) {
 
-            this.mass = mass;
+            this._mass = mass;
             this.inverseMass = 1 / mass;
 
         } else {
 
-            this.mass = 1;
+            this._mass = 1;
             this.inverseMass = 1;
-            
+
         }
     }
 
@@ -131,6 +190,23 @@ export class Particle implements SimulationModel {
 
         this.forceAcc.add(force);
 
+    }
+
+    public get mass(): number {
+        return this._mass;
+    }
+
+    public set mass(value: number) {
+
+        if (value === 0) {
+            // infinite mass (immovable)
+            this._mass = Infinity;
+            this.inverseMass = 0;
+
+        } else {
+            this._mass = value;
+            this.inverseMass = 1 / value;
+        }
     }
 
 }

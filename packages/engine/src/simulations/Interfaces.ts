@@ -111,4 +111,5 @@ export interface SimulationModel {
     uuid: string;
     index: number;
     objectId?: number;
+    schema?: FieldSchema[];
 }

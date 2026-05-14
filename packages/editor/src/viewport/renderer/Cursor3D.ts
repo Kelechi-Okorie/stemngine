@@ -2,6 +2,7 @@ import { BufferGeometry, Camera, Group, Line, LineBasicMaterial, Material, Scene
 
 import { Context, LAYERS } from "../../Interfaces";
 
+// TODO: make 3d cursor a group remove all those layers = helper
 export class Cursor3D {
 
     private object: Group;
