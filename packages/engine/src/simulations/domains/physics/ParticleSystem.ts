@@ -3,6 +3,7 @@ import { GlobalEventDispatcher } from "../../../core/GlobalEventDispatcher";
 import { System } from "../../core/System";
 import { SystemType } from "../../Interfaces";
 import { Vector3 } from "../../../engine";
+import { ParticleExport } from "./Particle";
 
 /**
  * TODO:
@@ -24,12 +25,18 @@ type ParticleSystemSnapshot = {
 
 type Snapshot = ParticleSystemSnapshot;
 
+type ParticleSystemExport = {
+    name: string;
+    type: SystemType;
+    entities: ParticleExport[]
+}
+
 /**
  * memory managers for particles
  */
 export class ParticleSystem extends System<Particle, Snapshot> {
 
-    public readonly name: string = 'ParticleSystem';
+    public name: string = 'ParticleSystem';
     public readonly type: SystemType = SystemType.ParticleSystem;
 
     public readonly capabilities = new Set(['mass', 'position', 'velocity', 'integratable:linear']);
@@ -37,14 +44,21 @@ export class ParticleSystem extends System<Particle, Snapshot> {
     // dense array storage (for performance)
     public entities: Particle[] = [];
 
-    constructor() {
+    constructor(config?: ParticleSystemExport) {
 
         super(SystemType.ParticleSystem, 'ParticleSystem');
 
+        if (config) {
+
+            const { name } = config;
+            this.name = name;
+
+        }
+
     }
 
-    public init(): void {}
-    public dispose(): void {}
+    public init(): void { }
+    public dispose(): void { }
 
     public add(particle: Particle): Particle {
 
@@ -100,7 +114,7 @@ export class ParticleSystem extends System<Particle, Snapshot> {
                 acceleration: p.acceleration.clone()
             }))
         };
-        
+
     }
 
     restore(snapshot: ParticleSystemSnapshot): void {
@@ -114,9 +128,35 @@ export class ParticleSystem extends System<Particle, Snapshot> {
 
             p.position.copy(s.position);
             p.velocity.copy(s.velocity);
+            p.acceleration.copy(s.acceleration);
 
         }
 
+    }
+
+    public export(): ParticleSystemExport {
+
+        const entities = this.entities.map(e => e.export());
+
+        return {
+            name: this.name,
+            type: this.type,
+            entities
+        }
+
+    }
+
+    /**
+     * 
+     * `js
+     * const system = new ParticleSystem().import(config);
+     * `
+     * @param config 
+     */
+    public import(config: Record<string, any>): void {
+
+        throw new Error('not implemented');
+        
     }
 
     /**

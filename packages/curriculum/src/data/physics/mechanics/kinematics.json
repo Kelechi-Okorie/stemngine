@@ -1,0 +1,14 @@
+{
+    "id": "physics.mechanics.kinematics",
+    "name": "Kinematics",
+    "parent": "physics.mechanics",
+    "children": [
+        "physics.mechanics.displacement",
+        "physics.mechanics.velocity",
+        "physics.mechanics.acceleration",
+        "physics.mechanics.projectile_motion"
+    ],
+    "dependsOn": [],
+    "subject": "physics",
+    "domain": "mechanics"
+}

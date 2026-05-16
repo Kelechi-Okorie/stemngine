@@ -1,0 +1,10 @@
+[
+    {
+        "id": "physics",
+        "name": "Physics",
+        "children": [
+            "physics.mechanics"
+        ],
+        "dependsOn": []
+    }
+]

@@ -14,6 +14,7 @@ import { RenderIndex } from "./RenderIndex";
 import { Renderer3DSystem } from "../renderers/Renderer3DSystem";
 import { SimulationRuntime } from "./SimulationRuntime";
 import { registerBuiltInSolvers } from "@stemngine/engine";
+import { exportDefinition } from "../io/exportDefinition";
 
 export class App {
 
@@ -107,6 +108,38 @@ export class App {
                 b: { type: 'leaf', id: 'b-2', name: 'properties', editor: new Properties('properties panel', context) }
             }
         }
+
+        
+        const btn = document.createElement('button');
+        btn.innerText = 'button';
+        btn.style.position = 'absolute';
+        btn.style.right = '10px'
+        btn.style.top = '10px';
+        btn.style.cursor = 'pointer';
+        btn.style.zIndex = '100';
+
+        btn.addEventListener('click', () => {
+
+            const file = exportDefinition(this.simulationManager);  // definition
+            console.log(file);
+
+            const json = JSON.stringify(file, null, 2);
+            const blob = new Blob([json], { type: "application/json"});
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'simulation.json'; // or dynamic name
+            a.click();
+
+            URL.revokeObjectURL(url);
+
+        }, false);
+
+        const body = document.querySelector('body')!;
+        body.appendChild(btn)
+
+
 
     }
 

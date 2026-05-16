@@ -1,9 +1,16 @@
 import { Vector3 } from '../../math/Vector3';
 import { World } from "../World";
-import { FieldSchema, Solver, SolverScope } from "../Interfaces"
+import { FieldSchema, Solver, SolverScope } from "../Interfaces";
 import { System } from "../core/System";
 
 let _id = 0;
+
+export type GravityExport = {
+    name: string;
+    type: string;
+    enabled: boolean;
+    gravity: number[];
+}
 
 export class GravitySolver implements Solver {
 
@@ -59,7 +66,35 @@ export class GravitySolver implements Solver {
                 // apply acceleration directly
                 entity.acceleration.add(this.gravity);
             }
+
         }
+
+    }
+
+    public export(): GravityExport {
+
+        return {
+            name: this.name,
+            type: this.type,
+            enabled: this.enabled,
+            gravity: this.gravity.toArray()
+        };
+
+    }
+
+    /**
+     * 
+     * `js
+     * const g = new Gravity().import(config);
+     * `
+     * @param config 
+     */
+    public import(config: Record<string, any>): void {
+
+        const { enabled, gravity } = config;
+
+        this.enabled = enabled;
+        this.gravity = new Vector3().fromArray(gravity);
     }
 
 }

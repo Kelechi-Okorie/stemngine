@@ -1,0 +1,23 @@
+{
+  "id": "physics.mechanics.acceleration",
+  "name": "Acceleration",
+  "parent": "physics.mechanics.kinematics",
+  "children": [],
+  "dependsOn": ["physics.mechanics.velocity"],
+  "subject": "physics",
+  "domain": "mechanics",
+
+  "variables": [
+    { "id": "a", "name": "Acceleration", "symbol": "a", "unit": "m/s^2" },
+    { "id": "v", "name": "Velocity", "symbol": "v", "unit": "m/s" },
+    { "id": "t", "name": "Time", "symbol": "t", "unit": "s" }
+  ],
+
+  "equations": [
+    {
+      "id": "acceleration_eq",
+      "latex": "a = \\frac{v - u}{t}",
+      "variables": ["a", "u", "v", "t"]
+    }
+  ]
+}

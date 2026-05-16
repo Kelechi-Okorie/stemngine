@@ -132,11 +132,13 @@ export { createCanvasElement } from './utils';
 export { SystemType } from './simulations/Interfaces';
 export type { FieldSchema } from './simulations/Interfaces';
 export type { SimulationModel } from './simulations/Interfaces';
+export type { Solver } from './simulations/Interfaces';
 
 export { SimPropertyBinding } from './simulations/core/SimPropertyBinding';
 export { SimBindingManager } from './simulations/core/SimBindingManager';
 export { SolverManager } from "./simulations/core/SolverManager";
 export { SolverRegistry } from './simulations/core/SolverRegistry';
+export { System } from './simulations/core/System';
 export type { SolverDefinition } from './simulations/core/SolverRegistry';
 export { Simulation } from './simulations/Simulation';
 export { World } from './simulations/World';

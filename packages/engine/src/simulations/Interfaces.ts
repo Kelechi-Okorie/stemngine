@@ -92,6 +92,9 @@ export interface Solver {
 
     schema?: FieldSchema[];
 
+    export: () => Record<string, any>;
+    import: (config: Record<string, any>) => void;
+
     step(dt: number, system: System<any, any>[], world?: World): void;
 }
 
@@ -110,6 +113,8 @@ export interface SimulationModel {
     type: string;
     uuid: string;
     index: number;
-    objectId?: number;
+    objectId: number | null;    // TODO: should this be here? this only makes sense for particles
     schema?: FieldSchema[];
 }
+
+// export interface Entity = SimulationModel;

@@ -7,6 +7,16 @@ const _v = /*@__PURE__*/ new Vector3();
 
 let _id = 0;
 
+export type ExplicitEulerIntegratorExport = {
+    name: string;
+    type: string;
+    enabled: boolean;
+    // fixedDt: number;
+    // acc: number;
+    // maxAccumulatedTime: number;
+}
+
+
 /**
  * ExplicitEulerIntegrator
  * 
@@ -123,6 +133,30 @@ export class ExplicitEulerIntegrator implements Solver {
             this.acc -= this.fixedDt
 
         }
+
+    }
+
+    public export(): ExplicitEulerIntegratorExport {
+
+        return {
+            name: this.name,
+            type: this.type,
+            enabled: this.enabled,
+            // fixedDt: this.fixedDt,
+            // acc: this.acc,
+            // maxAccumulatedTime: this.maxAccumulatedTime
+        };
+
+    }
+
+    public import(config: Record<string, any>): void {
+
+        const { enabled, fixedDt, acc, maxAccumulatedTime } = config;
+
+        this.enabled = enabled;
+        // this.fixedDt = fixedDt,
+        // this.acc = acc;
+        // this.maxAccumulatedTime = maxAccumulatedTime;
 
     }
 

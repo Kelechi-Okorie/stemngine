@@ -4,13 +4,23 @@ import { FieldSchema, SimulationModel } from "../../Interfaces";
 
 export type ParticleOptions = {
     name?: string;
-    objectId?: number;
+    objectId: number | null;
     position?: Vector3;
     velocity?: Vector3;
     acceleration?: Vector3;
     mass?: number;
     damping?: number;
 };
+
+export type ParticleExport = {
+    name: string;
+    objectId: number | null;   // TODO: should not be number
+    position: number[];
+    velocity: number[];
+    acceleration: number[];
+    mass: number;
+    damping: number;
+}
 
 let particleId = 0;
 
@@ -46,7 +56,7 @@ export class Particle implements SimulationModel {
     /**
      * Id of the object that has this particle
      */
-    public objectId?: number
+    public objectId: number | null = null    // TODO: should not be number
 
     /**
      * Holds the linear position of the particle
@@ -207,6 +217,43 @@ export class Particle implements SimulationModel {
             this._mass = value;
             this.inverseMass = 1 / value;
         }
+    }
+
+    public export(): ParticleExport {
+
+        return {
+            name: this.name,
+            objectId: this.objectId,
+
+            mass: this._mass,
+
+            position: this.position.toArray(),
+            velocity: this.velocity.toArray(),
+            acceleration: this.acceleration.toArray(),
+
+            damping: this.damping
+        }
+
+    }
+
+    /**
+     * 
+     * `js
+     * const p = new Particle().import(config);
+     * `
+     * @param config 
+     */
+    public import(config: ParticleExport): void {
+
+        const {name, objectId, mass, position, velocity, acceleration, damping} = config;
+
+        this.name = name;
+        this.objectId = objectId;
+        this.mass = mass;
+        this.position = new Vector3().fromArray(position);
+        this.velocity = new Vector3().fromArray(velocity);
+        this.acceleration = new Vector3().fromArray(acceleration);
+        this.damping = damping;
     }
 
 }

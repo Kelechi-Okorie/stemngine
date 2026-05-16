@@ -2,10 +2,10 @@ import { SimulationManager } from "./core/SimulationManager";
 import { State } from "./core/State";
 import { ToolManager } from "./tools/ToolManager";
 import { StyleManager } from "./core/StyleManager";
-import { SimulationModel, SolverRegistry } from "@stemngine/engine";
+import { SimulationModel } from "@stemngine/engine";
 import { RenderIndex } from "./core/RenderIndex";
 import { SimulationRuntime } from "./core/SimulationRuntime";
-import { Properties } from "./editors/Properties";
+import { System } from "@stemngine/engine";
 
 /**
  * future editors
@@ -117,4 +117,33 @@ export interface Inspector {
 
     // render UI
     render(selected?: any): void;
+}
+
+// io/types.ts
+
+export type SimulationDefinition = {
+    id: string;
+
+    meta?: {
+        name?: string
+        version?: string
+    };
+
+    systems: System<any, any>[];
+    solvers: Record<string, any>
+
+    // systems: {
+    //     type: string
+    //     config?: any
+    // }[]
+
+    // entities: {
+    //     type: string
+    //     config: any
+    // }[]
+
+    // solvers: {
+    //     type: string
+    //     config?: any
+    // }[]
 }

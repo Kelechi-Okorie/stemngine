@@ -1,0 +1,92 @@
+{
+    "id": "physics.mechanics.projectile_motion",
+    "name": "Projectile Motion",
+    "parent": "physics.mechanics.kinematics",
+    "children": [],
+    "dependsOn": [
+        "physics.mechanics.velocity",
+        "physics.mechanics.acceleration"
+    ],
+    "subject": "physics",
+    "domain": "mechanics",
+    "variables": [
+        {
+            "id": "u",
+            "name": "Initial velocity",
+            "symbol": "u",
+            "unit": "m/s"
+        },
+        {
+            "id": "theta",
+            "name": "Angle",
+            "symbol": "\\theta",
+            "unit": "rad"
+        },
+        {
+            "id": "g",
+            "name": "Gravity",
+            "symbol": "g",
+            "unit": "m/s^2"
+        },
+        {
+            "id": "t",
+            "name": "Time",
+            "symbol": "t",
+            "unit": "s"
+        },
+        {
+            "id": "x",
+            "name": "Horizontal position",
+            "symbol": "x",
+            "unit": "m"
+        },
+        {
+            "id": "y",
+            "name": "Vertical position",
+            "symbol": "y",
+            "unit": "m"
+        }
+    ],
+    "equations": [
+        {
+            "id": "x_motion",
+            "latex": "x = u\\cos(\\theta)t",
+            "variables": [
+                "x",
+                "u",
+                "theta",
+                "t"
+            ]
+        },
+        {
+            "id": "y_motion",
+            "latex": "y = u\\sin(\\theta)t - \\frac{1}{2}gt^2",
+            "variables": [
+                "y",
+                "u",
+                "theta",
+                "t",
+                "g"
+            ]
+        }
+    ],
+    "simulation": {
+        "type": "interactive",
+        "model": "name of the process or equation",
+        "inputs": [
+            "u",
+            "theta",
+            "g"
+        ],
+        "outputs": [
+            "x",
+            "y"
+        ],
+        "manipulatable": [
+            "u",
+            "theta"
+        ],
+        "controls": ["c", "o", "n", "t"],
+        "visualization": "2d"
+    }
+}

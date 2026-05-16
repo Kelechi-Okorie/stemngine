@@ -1,4 +1,4 @@
-import { World, Simulation, ParticleSystem, GlobalEventDispatcher, SystemType, Particle, SolverRegistry } from "@stemngine/engine";
+import { World, Simulation, ParticleSystem, GlobalEventDispatcher, SystemType, Particle, SolverRegistry, ParticleOptions } from "@stemngine/engine";
 
 import { Entity } from "../Interfaces";
 import { SolverManager } from "../../../engine/src/simulations/core/SolverManager";
@@ -59,7 +59,7 @@ export class SimulationManager {
                     this.world.addSystem(SystemType.ParticleSystem, ps);
                 }
 
-                const particle = new Particle(config);
+                const particle = new Particle(config as unknown as ParticleOptions);    // TODO: type better
 
                 entity = ps.add(particle);
 

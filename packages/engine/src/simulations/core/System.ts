@@ -47,4 +47,7 @@ export abstract class System<E extends SimulationModel, TSnapshot> {
     public abstract snapshot(): TSnapshot;
     public abstract restore(snapshot: TSnapshot): void;
 
+    public abstract export(): Record<string, any>;
+    public abstract import(config: Record<string, any>): void
+
 }
