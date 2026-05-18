@@ -36,6 +36,7 @@ export class SolverRegistry {
         this.definitions.set(def.type, def);
     }
 
+    // TODO: type may not be best for creating. it may not be unique
     public create(type: string): Solver {
 
         const def = this.definitions.get(type);

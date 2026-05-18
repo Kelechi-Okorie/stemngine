@@ -9,5 +9,4 @@ if (container === null) {
 }
 
 const app = new App(container);
-
 app.bootstrap();

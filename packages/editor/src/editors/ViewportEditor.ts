@@ -29,7 +29,7 @@ import { AxesHelper } from "../../../engine/src/helpers/AxesHelper";
 import { Axes } from "../viewport/renderer/Axes";
 
 export class ViewportEditor implements Editor {
-    public name: string;
+    public name: string = '3D viewport';
     private width!: number;
     private height!: number
     public readonly renderer: WebGLRenderer;
@@ -51,7 +51,7 @@ export class ViewportEditor implements Editor {
 
     public grid!: Grid;
 
-    constructor(name: string, context: Context) {
+    constructor(context: Context) {
 
         this.renderer = new WebGLRenderer({ antialias: true });
         this.context = context;
@@ -76,8 +76,6 @@ export class ViewportEditor implements Editor {
         this.camera.position.z = 15;
         this.camera.lookAt(0, 0, 0);
 
-        this.name = name;
-
         this.toolbar = new Toolbar(this.context);
 
         this.orbitControl = new OrbitControls(this.camera as OrthographicCamera, this.renderer.domElement);
@@ -96,7 +94,6 @@ export class ViewportEditor implements Editor {
         this.raycaster.layers.set(LAYERS.DEFAULT);
 
         this.context.simulationRuntime.schedule('render', this.update);
-
 
     }
 

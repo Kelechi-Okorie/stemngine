@@ -1,34 +1,38 @@
 import { SimulationManager } from "../core/SimulationManager";
 import { SimulationDefinition } from "../Interfaces";
+import { SystemTypeFromId } from "@stemngine/engine";
 
 export function importDefinition(
+    simulationManager: SimulationManager,
     def: SimulationDefinition
-): SimulationManager {
+) {
 
-    const simulationManger = new SimulationManager();
+    const systemRegistryInstance = simulationManager.systemRegistryInstance;
+    const solverRegistryInstance = simulationManager.SolverRegistryInstance;
 
-    // 1. systems
-    def.systems.forEach(sys => {
-        
-        const systemInstance = createSystem(sys.type, sys.config);
-        simulationManger.world.addSystem(sys.type as any, systemInstance); // TODO: type better
+    // systems
+    def.systems.forEach(systemDef => {
+
+        // const 
+        const id = systemDef.id as string;
+        const type = SystemTypeFromId[id]
+        const system = systemRegistryInstance.create(id);
+
+        system.import(systemDef);
+
+        simulationManager.world.addSystem(type, system);
+    })
+
+    // solvers
+    def.solvers.forEach(solverDef => {
+
+        const type = solverDef.type;
+        const solver = solverRegistryInstance.create(type);
+
+        solver.import(solverDef);
+
+        simulationManager.solverManager.add(solver);
 
     });
 
-    // 2. entities
-    def.entities.forEach(entity => {
-
-        simulationManger.addEntity(entity.config);
-
-
-    });
-
-    //  3. solvers
-    def.solvers.forEach(solver => {
-
-        const solver  = crateSolver(solver.type, solver.config);
-
-    });
-
-    return simulationManger;
 }

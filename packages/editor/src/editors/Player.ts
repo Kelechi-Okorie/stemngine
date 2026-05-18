@@ -3,13 +3,11 @@ import { Context, Editor } from "../Interfaces";
 
 export class Player implements Editor {
 
-    public name: string;
+    public name: string = 'Player';
 
     private simulationRuntime: SimulationRuntime;
 
-    constructor(name: string, context: Context) {
-
-        this.name = name;
+    constructor(context: Context) {
 
         this.simulationRuntime = context.simulationRuntime;
     }

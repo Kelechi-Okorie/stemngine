@@ -1,9 +1,9 @@
-import { Particle } from "./Particle";
-import { GlobalEventDispatcher } from "../../../core/GlobalEventDispatcher";
-import { System } from "../../core/System";
-import { SystemType } from "../../Interfaces";
-import { Vector3 } from "../../../engine";
-import { ParticleExport } from "./Particle";
+import { Particle } from "../domains/physics/Particle";
+import { GlobalEventDispatcher } from "../../core/GlobalEventDispatcher";
+import { System } from "../core/System";
+import { SystemType, SystemTypeToId, SystemTypeFromId } from "../Interfaces";
+import { Vector3 } from "../../engine";
+import { ParticleExport } from "../domains/physics/Particle";
 
 /**
  * TODO:
@@ -27,7 +27,7 @@ type Snapshot = ParticleSystemSnapshot;
 
 type ParticleSystemExport = {
     name: string;
-    type: SystemType;
+    id: string;
     entities: ParticleExport[]
 }
 
@@ -36,7 +36,7 @@ type ParticleSystemExport = {
  */
 export class ParticleSystem extends System<Particle, Snapshot> {
 
-    public name: string = 'ParticleSystem';
+    public name: string = 'Particle System';
     public readonly type: SystemType = SystemType.ParticleSystem;
 
     public readonly capabilities = new Set(['mass', 'position', 'velocity', 'integratable:linear']);
@@ -140,7 +140,7 @@ export class ParticleSystem extends System<Particle, Snapshot> {
 
         return {
             name: this.name,
-            type: this.type,
+            id: SystemTypeToId[this.type],
             entities
         }
 
@@ -155,7 +155,19 @@ export class ParticleSystem extends System<Particle, Snapshot> {
      */
     public import(config: Record<string, any>): void {
 
-        throw new Error('not implemented');
+        const entities = config.entities;
+
+        entities.forEach(entityDef => {
+            const entity = new Particle();
+            this.add(entity)
+            entity.import(entityDef)
+        });
+
+        // console.log(entities);
+
+        // console.log(this)
+
+        // throw new Error('not implemented');
         
     }
 

@@ -1,8 +1,4 @@
 import { Context, Region } from "../Interfaces";
-import { ViewportEditor } from "../editors/ViewportEditor";
-import { Outliner } from "../editors/Outliner";
-import { Properties } from "../editors/Properties";
-import { Player } from "../editors/Player";
 import { State } from '../core/State';
 import { SelectionManager } from "./SelectionManager";
 import { Scene, SimBindingManager, Vector3 } from "@stemngine/engine";
@@ -15,15 +11,50 @@ import { Renderer3DSystem } from "../renderers/Renderer3DSystem";
 import { SimulationRuntime } from "./SimulationRuntime";
 import { registerBuiltInSolvers } from "@stemngine/engine";
 import { exportDefinition } from "../io/exportDefinition";
+import { buildRegion } from "../editors/templates/registry";
+import { templates } from "../editors/templates/registry";
+import { TemplateNode } from "../Interfaces";
+import { importDefinition } from "../io/importDefinition";
+
+// 🏗️ Correct structure
+// Think of your UI like this:
+// APP SHELL
+// ├── Top Bar (global controls)
+// ├── Main Area (welcome / editor / player)
+// └── Optional overlays (modals, loaders)
+
+type AppMode =
+    | { type: 'welcome' }
+    | { type: 'editor'; region: Region }
+    | { type: 'player'; simulation: any }
+    ;
+
+// Your new app lifecycle
+// Now it becomes:
+// BOOT
+//  ↓
+// WELCOME SCREEN
+//  ↓
+// New Project → buildRegion(template)
+//  ↓
+// EDITOR MODE
+//  ↓
+// (optional) PLAYER MODE
 
 export class App {
 
+    private mode!: AppMode;
+    private root: HTMLElement;
     private container: HTMLElement;
-    private region: Region;
+    private header!: HTMLElement;
+    private region!: Region;
+
     public state: State;
 
     private elementMap = new Map<string, HTMLElement>();
     private splitMap = new Map<string, { a: HTMLElement, b: HTMLElement, divider: HTMLElement }>();
+
+    private context: Context;
 
     private draggingRegion: Region | null = null;
 
@@ -31,9 +62,26 @@ export class App {
     private bindingManager: SimBindingManager;
     private simulationRuntime: SimulationRuntime;
 
-    constructor(container: HTMLElement) {
+    constructor(root: HTMLElement) {
 
+        this.root = root;
+        this.root.style.display = 'flex';
+        this.root.style.flexDirection = 'column';
+        this.root.style.height = '100vh';
+
+        this.createHeader();
+        this.header.style.height = '40px';
+        this.header.style.flexShrink = '0';
+
+        const container = document.createElement('div');
+        container.style.flex = '1';
+        container.style.minHeight = '0';
         this.container = container;
+
+        this.root.appendChild(this.container);
+
+        this.initApp();
+
         this.bindingManager = new SimBindingManager();
 
         const stateConfig = {
@@ -49,7 +97,7 @@ export class App {
         this.simulationRuntime = new SimulationRuntime(this.simulationManager, this.bindingManager);
         const renderIndex = new RenderIndex();
 
-        const context: Context = {
+        this.context = {
             simulationManager: this.simulationManager,
             simulationRuntime: this.simulationRuntime,
             state: this.state,
@@ -57,59 +105,16 @@ export class App {
             styleManager: StyleManager.instance,
             renderIndex,
 
-            select: (id: string) => console.log('test'),
-            getSelection: () => console.log('get selection'),
+            // TODO: may be removed
+            // select: (id: string) => console.log('test'),
+            // getSelection: () => console.log('get selection'),
 
-            emit: GlobalEventDispatcher.instance.dispatchEvent.bind(GlobalEventDispatcher.instance),
-            on: GlobalEventDispatcher.instance.addEventListener.bind(GlobalEventDispatcher.instance),
+            // emit: GlobalEventDispatcher.instance.dispatchEvent.bind(GlobalEventDispatcher.instance),
+            // on: GlobalEventDispatcher.instance.addEventListener.bind(GlobalEventDispatcher.instance),
         }
 
-        // TODO: find better way tohandle
-        const renderer3D = new Renderer3DSystem(context, this.bindingManager);
+        const renderer3D = new Renderer3DSystem(this.context, this.bindingManager);
 
-        const viewport = new ViewportEditor('3D viewport', context);
-
-        this.region = {
-            type: 'split',
-            id: 'parent-id',
-            direction: 'horizontal',
-            ratio: 0.7,
-            // a: {
-            //     type: 'leaf',
-            //     id: 'a-1',
-            //     name: '3D viewport',
-            //     editor: viewport
-            // },
-            a: {
-                type: 'split',
-                id: 'a',
-                direction: 'vertical',
-                ratio: 0.7,
-                a: {
-                    type: 'leaf',
-                    id: 'a-1',
-                    name: '3D viewport',
-                    editor: viewport
-                },
-                b: {
-                    type: 'leaf',
-                    id: 'a-2',
-                    name: 'Player',
-                    editor: new Player('player', context)
-                }
-
-            },
-            b: {
-                type: 'split',
-                id: 'b',
-                direction: 'vertical',
-                ratio: 0.3,
-                a: { type: 'leaf', id: 'b-1', name: 'outliner', editor: new Outliner('outliner', context) },
-                b: { type: 'leaf', id: 'b-2', name: 'properties', editor: new Properties('properties panel', context) }
-            }
-        }
-
-        
         const btn = document.createElement('button');
         btn.innerText = 'button';
         btn.style.position = 'absolute';
@@ -121,10 +126,9 @@ export class App {
         btn.addEventListener('click', () => {
 
             const file = exportDefinition(this.simulationManager);  // definition
-            console.log(file);
 
             const json = JSON.stringify(file, null, 2);
-            const blob = new Blob([json], { type: "application/json"});
+            const blob = new Blob([json], { type: "application/json" });
             const url = URL.createObjectURL(blob);
 
             const a = document.createElement('a');
@@ -139,6 +143,25 @@ export class App {
         const body = document.querySelector('body')!;
         body.appendChild(btn)
 
+        // Final mental model
+        // You now have a pipeline:
+        // Template (pure data)
+        //         ↓
+        // buildRegion()
+        //         ↓
+        // Runtime Layout (with editors)
+        //         ↓
+        // render() + layout()
+        // That’s clean architecture.
+
+        // this.region = buildRegion(templates.default, this.context);
+
+        // TODO: find better way to handle
+
+        // this.setMode({type: 'editor', region: buildRegion(templates.default, this.context)});
+        // const renderer3D = new Renderer3DSystem(this.context, this.bindingManager);
+
+        // this.renderHeader();
 
 
     }
@@ -169,18 +192,48 @@ export class App {
 
     public render() {
 
+
         this.elementMap.clear();
         this.splitMap.clear();
 
-        this.renderRegion(this.region, this.container);
+        this.container.innerHTML = '';
+
+        this.renderHeader();
+
+        // this.renderRegion(this.region, this.container);
+
+        if (this.mode.type === 'welcome') {
+
+            this.renderWelcome();
+            return;
+
+        }
+
+        if (this.mode.type === 'editor') {
+
+            this.region = this.mode.region;
+            this.renderRegion(this.region, this.container);
+            return;
+
+        }
+
+        if (this.mode.type === 'player') {
+
+            // TODO: later
+            return;
+
+        }
+
     }
 
     public layout() {
 
-        const width = window.innerWidth;
-        const height = window.innerHeight;
+        const { width, height } = this.getContainerSize();
+
+        if (this.mode.type !== 'editor') return;
 
         this.layoutRegion(this.region, width, height);
+
     }
 
     /**
@@ -276,7 +329,13 @@ export class App {
 
         const split = this.splitMap.get(region.id)!;
 
-        const wrapper = split.a.parentElement as HTMLElement;
+        const wrapper = split.a.parentElement;
+
+        if (wrapper === null) {
+
+            throw new Error('wrapper is null');
+
+        }
 
         wrapper.style.width = `${width}px`;
         wrapper.style.height = `${height}px`;
@@ -299,6 +358,211 @@ export class App {
 
         }
 
+    }
+
+    //  That becomes your:
+    // “New Project”
+    // “Switch Layout”
+    // “Reset Layout”
+    private loadTemplate(template: TemplateNode) {
+        // this.container.innerHTML = ''; // clear DOM
+
+        this.region = buildRegion(template, this.context);
+
+        this.render();
+        this.layout();
+    }
+
+    private renderWelcome() {
+
+        const wrapper = document.createElement('div');
+        wrapper.style.display = 'flex';
+        wrapper.style.flexDirection = 'column';
+        wrapper.style.justifyContent = 'center';
+        wrapper.style.alignItems = 'center';
+        wrapper.style.height = '100%';
+        wrapper.style.gap = '12px';
+
+        const title = document.createElement('h1');
+        title.innerText = 'STEMngine';
+
+        const newBtn = document.createElement('button');
+        newBtn.innerText = 'New Project';
+
+        const openBtn = document.createElement('button');
+        openBtn.innerText = 'Open Project';
+
+        const simBtn = document.createElement('button');
+        simBtn.innerText = 'Open Simulation';
+
+        newBtn.onclick = () => {
+
+            this.loadEditor(templates.default);
+        };
+
+        openBtn.onclick = () => {
+
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json,appliaction/json';
+
+            input.onchange = async (event) => {
+
+                const file = (event.target as HTMLInputElement).files?.[0];
+                if (!file) return;
+
+                const text = await file.text();
+                const json = JSON.parse(text);
+
+                importDefinition(this.simulationManager, json);
+
+                // TODO: this is where to plug importer
+                // this.loadEditorFromSimulation(json);
+            }
+
+            input.click();
+
+        }
+
+        // TODO: Bonus(high - value upgrade)
+        // You can also add drag & drop:
+
+        // this.container.ondrop = async (e) => {
+        //     e.preventDefault();
+
+        //     const file = e.dataTransfer?.files?.[0];
+        //     if (!file) return;
+
+        //     const text = await file.text();
+        //     const json = JSON.parse(text);
+
+        //     this.loadEditorFromSimulation(json);
+        // };
+
+        simBtn.onclick = () => {
+
+            console.log('TODO: simulate - may be removed later');
+
+        }
+
+        wrapper.appendChild(title);
+        wrapper.appendChild(newBtn);
+        wrapper.appendChild(openBtn);
+        wrapper.appendChild(simBtn);
+
+        this.container.appendChild(wrapper);
+
+    }
+
+    private loadEditor(template: TemplateNode) {
+
+        const region = buildRegion(template, this.context);
+
+        this.mode = {
+            type: 'editor',
+            region
+        };
+
+        this.render();
+        this.layout();
+    }
+
+    private initApp() {
+
+        this.mode = { type: 'welcome' };
+
+    }
+
+    private setMode(mode: AppMode) {
+
+        this.mode = mode;
+        this.render();
+
+        requestAnimationFrame(() => {
+            this.layout();
+        });
+
+    }
+
+    private createHeader() {
+        this.header = document.createElement('div');
+        this.header.style.height = '40px';
+        this.header.style.display = 'flex';
+        this.header.style.alignItems = 'center';
+        this.header.style.justifyContent = 'space-between';
+        this.header.style.padding = '0 10px';
+        this.header.style.borderBottom = '1px solid #333';
+
+        this.root.appendChild(this.header);
+
+    }
+
+    private renderHeader() {
+        this.header.innerHTML = '';
+
+        const left = document.createElement('div');
+        const right = document.createElement('div');
+
+        // App name / logo
+        const title = document.createElement('span');
+        title.innerText = 'STEMngine';
+
+        left.appendChild(title);
+
+        // Buttons depend on mode
+        if (this.mode.type === 'editor') {
+
+            const home = document.createElement('button');
+            home.innerText = 'Home';
+
+            home.onclick = () => {
+
+                this.setMode({ type: 'welcome' });
+                this.simulationManager.reset();
+                this.render();
+
+            }
+
+            const newBtn = document.createElement('button');
+            newBtn.innerText = 'New';
+
+            newBtn.onclick = () => {
+
+                // const region = buildRegion(templates.default, this.context);
+
+                // this.setMode({
+                //     type: 'editor',
+                //     region
+                // })
+
+                window.open(window.location.href, '_blank');
+
+            }
+
+            left.appendChild(home);
+            left.appendChild(newBtn);
+        }
+
+        if (this.mode.type === 'player') {
+
+            const exit = document.createElement('button');
+            exit.innerText = 'Exit Player';
+            exit.onclick = () => this.renderWelcome();
+
+            left.appendChild(exit);
+        }
+
+        right.innerText = 'v0.1'; // later: project name, save status, etc.
+
+        this.header.appendChild(left);
+        this.header.appendChild(right);
+    }
+
+    private getContainerSize(): { width: number, height: number } {
+        return {
+            width: this.container.clientWidth,
+            height: this.container.clientHeight
+        };
     }
 
     /**

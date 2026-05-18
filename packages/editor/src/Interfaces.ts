@@ -6,6 +6,7 @@ import { SimulationModel } from "@stemngine/engine";
 import { RenderIndex } from "./core/RenderIndex";
 import { SimulationRuntime } from "./core/SimulationRuntime";
 import { System } from "@stemngine/engine";
+import { editorRegistry } from "./editors/templates/registry";
 
 /**
  * future editors
@@ -23,6 +24,22 @@ export interface Editor {
     unmount(): void;
 }
 
+export type TemplateNode =
+    | {
+        type: 'leaf';
+        name: string;
+        editorType: keyof typeof editorRegistry;
+    }
+    | {
+        type: 'split';
+        direction: 'horizontal' | 'vertical';
+        ratio: number;
+        a: TemplateNode;
+        b: TemplateNode;
+    }
+    ;
+
+
 export type Region =
     | {
         type: 'split'
@@ -31,15 +48,12 @@ export type Region =
         ratio: number;  // 0 -> 1
         a: Region;
         b: Region;
-        // _wrapperA: HTMLElement;
-        // _wrapperB: HTMLElement;
     }
     | {
         type: 'leaf';
         id: string;
         name: string;
         editor: Editor;
-        // _wrapper: HTMLElement;   // store reference for layout
     }
 
 export type Listener<T> = (value: T) => void;
@@ -76,11 +90,12 @@ export interface Context {
     styleManager: StyleManager;
     renderIndex: RenderIndex,
 
-    select(id: string): void;
-    getSelection(): any;
+    // TODO: may be removed
+    // select(id: string): void;
+    // getSelection(): any;
 
-    on(event: string, handler: Function): void; // TODO: change Function
-    emit(event: string, payload?: any): void;
+    // on(event: string, handler: Function): void; // TODO: change Function
+    // emit(event: string, payload?: any): void;
 }
 
 export type VisualRepresentation = {
@@ -129,8 +144,8 @@ export type SimulationDefinition = {
         version?: string
     };
 
-    systems: System<any, any>[];
-    solvers: Record<string, any>
+    systems: {id: string, entities: Entity[]}[];
+    solvers: {type: string}[]
 
     // systems: {
     //     type: string
@@ -147,3 +162,4 @@ export type SimulationDefinition = {
     //     config?: any
     // }[]
 }
+

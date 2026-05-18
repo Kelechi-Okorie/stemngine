@@ -129,9 +129,10 @@ export { createCanvasElement } from './utils';
 
 /** Simulations */
 // interface
-export { SystemType } from './simulations/Interfaces';
+export { SystemType, SystemTypeToId, SystemTypeFromId } from './simulations/Interfaces';
 export type { FieldSchema } from './simulations/Interfaces';
 export type { SimulationModel } from './simulations/Interfaces';
+export type { Entity } from './simulations/Interfaces';
 export type { Solver } from './simulations/Interfaces';
 
 export { SimPropertyBinding } from './simulations/core/SimPropertyBinding';
@@ -145,10 +146,11 @@ export { World } from './simulations/World';
 
 export { Particle } from './simulations/domains/physics/Particle';
 export type { ParticleOptions } from './simulations/domains/physics/Particle';
-export { ParticleSystem } from './simulations/domains/physics/ParticleSystem';
+export { ParticleSystem } from './simulations/systems/ParticleSystem';
 
 // plugins
-export { registerBuiltInSolvers } from './simulations/plugins/registerSolvers'
+export { registerBuiltInSolvers } from './simulations/plugins/registerSolvers';
+export { registerBuiltInSystems } from './simulations/plugins/registerSystems';
 
 // textures
 export { CanvasTexture } from './textures/CanvasTexture';

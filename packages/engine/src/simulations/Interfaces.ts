@@ -1,7 +1,14 @@
-import { Vector3 } from "../math/Vector3";
 import { World } from "./World";
 import { System } from "./core/System";
 
+/**
+ * Runtime ID (fast)
+ * 
+ * Used for
+ * - map lookup
+ * performance
+ * engine internals
+ */
 export enum SystemType {
     /** core mechanical */
     ParticleSystem,
@@ -19,6 +26,19 @@ export enum SystemType {
     // ContactSystem,
     // ForceFieldSystem
 }
+
+/**
+ * Persistent ID (stable string)
+ */
+// convert string -> enum
+export const SystemTypeFromId: Record<string, SystemType> = {
+    particle_system: SystemType.ParticleSystem
+};
+
+// convert enum -> string
+export const SystemTypeToId: Record<SystemType, string> = {
+    [SystemType.ParticleSystem]: "particle_system"
+};
 
 export type SolverScope =
     | { type: "world" }
@@ -117,4 +137,4 @@ export interface SimulationModel {
     schema?: FieldSchema[];
 }
 
-// export interface Entity = SimulationModel;
+export type Entity = SimulationModel;

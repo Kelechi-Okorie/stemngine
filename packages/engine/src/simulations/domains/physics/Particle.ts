@@ -4,7 +4,7 @@ import { FieldSchema, SimulationModel } from "../../Interfaces";
 
 export type ParticleOptions = {
     name?: string;
-    objectId: number | null;
+    objectId?: number | null;
     position?: Vector3;
     velocity?: Vector3;
     acceleration?: Vector3;
@@ -166,12 +166,12 @@ export class Particle implements SimulationModel {
         }
     ]
 
-    constructor(options: ParticleOptions) {
+    constructor(options: ParticleOptions = {}) {
 
         const { name, objectId, position, velocity, acceleration, mass, damping } = options;
 
         this.name = name || `Particle_${this.id}`;
-        this.objectId = objectId;
+        this.objectId = objectId || null;
         this.position = position || new Vector3();
         this.velocity = velocity || new Vector3();
         this.acceleration = acceleration || new Vector3();

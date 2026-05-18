@@ -10,7 +10,7 @@ import { WorldInspector } from "./inspectors/WorldInspector";
  */
 export class Properties implements Editor {
 
-    public name: string;
+    public name: string = 'Properties';
     private state: State;
     public panel!: Panel;
     public context: Context;
@@ -23,13 +23,12 @@ export class Properties implements Editor {
 
     private inspectorRegistry: InspectorRegistry;
 
-    constructor(name: string, context: Context) {
+    constructor(context: Context) {
 
         const { state } = context;
 
         this.context = context;
 
-        this.name = name;
         this.state = state;
 
         this.inspectorRegistry = new InspectorRegistry();

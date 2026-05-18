@@ -2,6 +2,7 @@ import { World, Simulation, ParticleSystem, GlobalEventDispatcher, SystemType, P
 
 import { Entity } from "../Interfaces";
 import { SolverManager } from "../../../engine/src/simulations/core/SolverManager";
+import { SystemRegistry } from "../../../engine/src/simulations/core/SystemRegistry";
 
 export enum EntityEventType {
     ENTITY_CREATED = 'entity:created',
@@ -28,6 +29,7 @@ export class SimulationManager {
     public world: World
     public simulation: Simulation;
     public SolverRegistryInstance = SolverRegistry.getInstance();
+    public systemRegistryInstance = SystemRegistry.getInstance();
     public solverManager: SolverManager;
 
     // <entity.uuid, SystemType>
@@ -37,7 +39,7 @@ export class SimulationManager {
 
         this.world = new World();
         this.simulation = new Simulation(this.world);
-        this.solverManager = this.simulation.kernel.solverManager
+        this.solverManager = this.simulation.kernel.solverManager;
 
     }
 
@@ -207,6 +209,11 @@ export class SimulationManager {
 
         }
 
+    }
+
+    public reset = () => {
+
+        console.log('app cleared');
     }
 
     // Better future version:

@@ -29,14 +29,13 @@ interface Node {
  */
 export class Outliner implements Editor {
 
-    public name: string;
+    public name: string = 'Outliner';
     private context: Context;
     private layers: Layers; // TODO: may be removed
     private container!: HTMLElement;
 
-    constructor(name: string, context: Context) {
+    constructor(context: Context) {
 
-        this.name = name;
         this.context = context;
 
         this.layers = new Layers();
