@@ -12,7 +12,7 @@ export type ToolManagerEventListener = Listener;
 
 export class ToolManager {
 
-    public currentTool!: Tool; // TODO: currentTool should not be null
+    public currentTool: Tool | null = null; // TODO: currentTool should not be null
 
     private listeners = new Map<EventTypes, Listener[]>();
 
@@ -35,18 +35,18 @@ export class ToolManager {
 
     public onMouseDown(e: MouseEvent, viewportEditor: ViewportEditor) {
 
-        this.currentTool.onMouseDown?.(e, viewportEditor);
+        this.currentTool?.onMouseDown?.(e, viewportEditor);
 
     }
 
     public onMouseMove(e: MouseEvent, viewportEditor: ViewportEditor) {
 
-        this.currentTool.onMouseMove?.(e, viewportEditor)
+        this.currentTool?.onMouseMove?.(e, viewportEditor)
     }
 
     public onClick(e: MouseEvent, viewportEditor: ViewportEditor): void {
 
-        this.currentTool.onClick?.(e, viewportEditor);
+        this.currentTool?.onClick?.(e, viewportEditor);
 
     }
 
@@ -83,6 +83,20 @@ export class ToolManager {
             list.splice(index, 1);
         }
 
+    }
+
+    public reset(): void {
+
+        if (this.currentTool) {
+
+            this.currentTool.btn.style.backgroundColor = '#eeeeee'; // TODO:
+
+        }
+
+        this.currentTool = null;
+
+        // TODO: revisit later
+        // this.emit(EventTypes.TOOL_SET, null as any);
     }
 
 }

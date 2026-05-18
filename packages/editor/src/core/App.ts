@@ -62,7 +62,17 @@ export class App {
     private bindingManager: SimBindingManager;
     private simulationRuntime: SimulationRuntime;
 
+    private renderer3D: Renderer3DSystem;
+
     constructor(root: HTMLElement) {
+
+        // Renderer3DSystem (scene objects)
+        // SimBindingManager (live bindings)
+        // RenderIndex (mesh registry)
+        // SimulationRuntime (update loop)
+        // UI state (region tree, DOM cache)
+        // SelectionManager state
+        // ToolManager state (likely)
 
         this.root = root;
         this.root.style.display = 'flex';
@@ -113,10 +123,10 @@ export class App {
             // on: GlobalEventDispatcher.instance.addEventListener.bind(GlobalEventDispatcher.instance),
         }
 
-        const renderer3D = new Renderer3DSystem(this.context, this.bindingManager);
+        this.renderer3D = new Renderer3DSystem(this.context, this.bindingManager);
 
         const btn = document.createElement('button');
-        btn.innerText = 'button';
+        btn.innerText = 'export';
         btn.style.position = 'absolute';
         btn.style.right = '10px'
         btn.style.top = '10px';
@@ -125,23 +135,26 @@ export class App {
 
         btn.addEventListener('click', () => {
 
-            const file = exportDefinition(this.simulationManager);  // definition
+            // const file = exportDefinition(this.simulationManager);  // definition
 
-            const json = JSON.stringify(file, null, 2);
-            const blob = new Blob([json], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
+            // const json = JSON.stringify(file, null, 2);
+            // const blob = new Blob([json], { type: "application/json" });
+            // const url = URL.createObjectURL(blob);
 
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'simulation.json'; // or dynamic name
-            a.click();
+            // const a = document.createElement('a');
+            // a.href = url;
+            // a.download = 'simulation.json'; // or dynamic name
+            // a.click();
 
-            URL.revokeObjectURL(url);
+            // URL.revokeObjectURL(url);
+
+            console.log(this)
 
         }, false);
 
         const body = document.querySelector('body')!;
-        body.appendChild(btn)
+
+        body.appendChild(btn);
 
         // Final mental model
         // You now have a pipeline:
@@ -159,9 +172,6 @@ export class App {
         // TODO: find better way to handle
 
         // this.setMode({type: 'editor', region: buildRegion(templates.default, this.context)});
-        // const renderer3D = new Renderer3DSystem(this.context, this.bindingManager);
-
-        // this.renderHeader();
 
 
     }
@@ -416,6 +426,8 @@ export class App {
 
                 importDefinition(this.simulationManager, json);
 
+                this.loadEditor(templates.default);
+
                 // TODO: this is where to plug importer
                 // this.loadEditorFromSimulation(json);
             }
@@ -518,7 +530,7 @@ export class App {
             home.onclick = () => {
 
                 this.setMode({ type: 'welcome' });
-                this.simulationManager.reset();
+                this.reset();
                 this.render();
 
             }
@@ -563,6 +575,53 @@ export class App {
             width: this.container.clientWidth,
             height: this.container.clientHeight
         };
+    }
+
+    // Return the entire application to a clean editor state without reloading the page.
+    private reset() {
+
+        console.log('reseting the app');
+
+        // runtime reset
+        this.simulationRuntime.reset();
+
+        // 1. reset simulation
+        this.simulationManager.reset();
+
+        // 2. renderer cleanup
+        this.bindingManager.clear();
+
+        // 3. renderer mappings
+        this.context.renderIndex.reset();
+        this.renderer3D.reset();
+
+        // 4. UI cleanup state
+        this.elementMap.clear();
+        this.splitMap.clear();
+        this.container.innerHTML = '';
+
+        // You also need:
+        // stop dragging state
+        // clear region tree
+        // reset mode (optional)
+
+        // 5. selection + tools reset
+        this.state.selectionManager.clear();
+        this.context.toolManager.reset();
+
+
+        // Big-picture insight (this is the important part)
+        // Your App is currently acting as:
+        // a manual orchestrator of multiple subsystems
+        // But it should evolve into:
+        // a lifecycle manager (like Unity “scene reload”)
+        // So eventually your reset becomes:
+        // reset() {
+        //     disposeScene();
+        //     recreateRuntime();
+        //     rebuildUI();
+        // }
+
     }
 
     /**

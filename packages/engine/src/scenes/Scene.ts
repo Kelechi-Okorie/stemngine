@@ -156,7 +156,7 @@ export class Scene extends Node3D {
    * @param meta
    * @returns
    */
-  public toJSON(meta: { [key: string]: any}): {[key: string]: any} {
+  public toJSON(meta: { [key: string]: any }): { [key: string]: any } {
 
     const data = super.toJSON(meta);
 
@@ -171,6 +171,25 @@ export class Scene extends Node3D {
 
     return data;
 
+  }
+
+  public dispose() {
+
+
+    // this.traverse((obj: any) => {
+
+    //   obj.geometry?.dispose?.();
+    //   obj.material?.dispose?.();
+    //   obj.texture?.dispose?.();
+
+    // });
+
+    this.children.length = 0;
+
+    this.background = null;
+    this.environment = null;
+    this.fog = null;
+    this.overrideMaterial = null;
   }
 
 }

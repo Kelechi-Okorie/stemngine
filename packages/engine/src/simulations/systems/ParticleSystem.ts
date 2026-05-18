@@ -153,7 +153,7 @@ export class ParticleSystem extends System<Particle, Snapshot> {
      * `
      * @param config 
      */
-    public import(config: Record<string, any>): void {
+    public import(config: {entities: ParticleExport[]}): void {
 
         const entities = config.entities;
 
@@ -163,12 +163,18 @@ export class ParticleSystem extends System<Particle, Snapshot> {
             entity.import(entityDef)
         });
 
-        // console.log(entities);
+    }
 
-        // console.log(this)
+    public reset() {
 
-        // throw new Error('not implemented');
-        
+        // if later add pooling
+        //     for (const p of this.entities) {
+        //     // optionally return to pool
+        //     // particlePool.release(p);
+        // }
+
+        // clear all particles
+        this.entities.length = 0;
     }
 
     /**

@@ -4,7 +4,6 @@ import { System } from "./core/System";
 
 // TODO: check if to add feature for removing systems
 
-
 /**
  * This holds all simulation state
  * - rigid bodies
@@ -52,6 +51,15 @@ export class World {
 
         return this.systems.get(key) as T | undefined;
 
+    }
+
+    public reset = () => {
+
+        for (const [type, system] of this.systems) {
+
+            system.reset?.();
+
+        }
     }
 
 }

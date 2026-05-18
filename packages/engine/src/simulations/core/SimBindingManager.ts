@@ -13,6 +13,18 @@ export class SimBindingManager {
 
     }
 
+    public clear(): void {
+
+        for (const binding of this.bindings) {
+
+            binding.dispose();
+
+        }
+
+        this.bindings.length = 0;
+
+    }
+
     public update() {
 
         for (let binding of this.bindings) {

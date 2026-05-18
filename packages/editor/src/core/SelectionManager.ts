@@ -33,4 +33,10 @@ export class SelectionManager {
 
     }
 
+    public clear(): void {
+
+        this._selected = null;
+        this.emit();
+    }
+
 }

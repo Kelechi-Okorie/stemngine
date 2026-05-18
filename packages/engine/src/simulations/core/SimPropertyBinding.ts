@@ -19,7 +19,7 @@ export class SimPropertyBinding {
     private targetObject: any;
     private propertyName: string;
     // private propertyIndex: string | number;
-    public resolveProperty: any;
+    public resolvedProperty: any;
     public physicsProperty: any;
 
     public getValue = this._getValue_unbound;
@@ -48,18 +48,14 @@ export class SimPropertyBinding {
 
     constructor(
         targetObject: any,
-        // resolvedProperty: any,
         propertyName: string,
         physicsProperty: any
     ) {
 
         this.targetObject = targetObject;
-        // this.resolveProperty = resolvedProperty;
         this.propertyName = propertyName;
-        this.resolveProperty = targetObject[this.propertyName];
+        this.resolvedProperty = targetObject[this.propertyName];
         this.physicsProperty = physicsProperty;
-
-        // console.log(typeof targetObject, typeof resolvedProperty, typeof physicsProperty)
 
     }
 
@@ -105,13 +101,13 @@ export class SimPropertyBinding {
     // hasCopy  TODO: check if using array is more efficient
     private _setValue_hasCopy() {
 
-        this.resolveProperty.copy(this.physicsProperty);
+        this.resolvedProperty.copy(this.physicsProperty);
 
     }
 
     private _setValue_hasCopy_setNeedsUpdate() {
 
-        this.resolveProperty.copy(this.physicsProperty);
+        this.resolvedProperty.copy(this.physicsProperty);
         // confirm if we need to update on physics step
         // rumours have it that you only update on animation run
         this.targetObject.needsUpdate = true;
@@ -120,7 +116,7 @@ export class SimPropertyBinding {
 
     private _setValue_hasCopy_setMatrixWorldNeedsUpdate() {
 
-        this.resolveProperty.copy(this.physicsProperty);
+        this.resolvedProperty.copy(this.physicsProperty);
         // confirm if we need to update on physics step
         // rumours have it that you only update on animation run
         this.targetObject.matrixWorldNeedsUpdate = true;
@@ -142,7 +138,7 @@ export class SimPropertyBinding {
         this.getValue = this._getValue_unavailable;
         this.setValue = this._setValue_unavailable;
 
-        const property = this.resolveProperty;
+        const property = this.resolvedProperty;
 
         // determine the binding type
         let bindingType: number;
@@ -186,6 +182,16 @@ export class SimPropertyBinding {
         this.getValue = SimPropertyBinding.GetterByBindingType[bindingType];
         this.setValue = SimPropertyBinding.SetterByBindingTypeAndVersioning[bindingType][versioning];
 
+    }
+
+    public dispose(): void {
+
+        this.targetObject = null;
+        this.resolvedProperty = null;
+        this.physicsProperty = null;
+
+        this.setValue = this._setValue_unavailable;
+        this.getValue = this._getValue_unavailable;
     }
 
 }

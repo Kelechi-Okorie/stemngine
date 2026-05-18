@@ -20,7 +20,7 @@ export class State {
     public scene: Scene;
     public selectionManager: SelectionManager;
     public isDragging: boolean;   // TODO: use generic browser event listener
-    public cursor: Cursor; /*  = {position: new Vector3()} */;
+    public cursor: Cursor;
 
     constructor(stateConfig: StateConfig) {
 

@@ -211,9 +211,32 @@ export class SimulationManager {
 
     }
 
+    // clears states inside systems
     public reset = () => {
 
-        console.log('app cleared');
+        // 1. reset world
+        this.world.reset();
+
+        // 2. clear entity registry
+        this.entitySystemTypeMap.clear();
+
+        // 3. reset solver state
+        this.solverManager.reset();
+
+    }
+
+    // removes systems entirely
+    public clear() {
+
+        console.log('clearing');
+        
+    }
+
+    // full app teardown
+    public dispose() {
+
+        console.log('disposing');
+
     }
 
     // Better future version:

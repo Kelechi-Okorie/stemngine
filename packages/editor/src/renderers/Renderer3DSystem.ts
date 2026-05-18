@@ -2,6 +2,7 @@ import { GlobalEventDispatcher, MeshBasicMaterial, Scene, SimBindingManager, Sph
 import { RepresentationEvent, RepresentationStoreEventType } from "../core/RepresentationStore";
 import { Context, VisualRepresentation } from "../Interfaces";
 import { RenderIndex } from "../core/RenderIndex";
+import { disposeMaterial } from "../../../engine/src/materials/Material";
 
 export class Renderer3DSystem {
 
@@ -98,6 +99,37 @@ export class Renderer3DSystem {
 
         return mesh;
 
+    }
+
+    public reset(): void {
+
+        // remove all render objects from the scene
+        for (const repId of this.RenderIndex.getAll?.() ?? []) {
+
+            const mesh = this.RenderIndex.getNode3D(repId);
+            if (mesh) {
+
+                this.scene.remove(mesh);
+
+                // / optional but good practice if supported
+                if ('geometry' in mesh) {
+
+                    (mesh as Mesh).geometry.dispose();
+                }
+
+                if ('material' in mesh) {
+
+                    disposeMaterial((mesh as Mesh).material)
+                }
+
+            }
+        }
+
+        this.scene.dispose();
+
+        this.RenderIndex.reset();
+
+        this.bindingManager.clear();
     }
 
 }

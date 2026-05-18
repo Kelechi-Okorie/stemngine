@@ -35,16 +35,16 @@ export class SolverManager {
         // TODO: find better name for event
         // GlobalEventDispatcher.instance.addEventListener('worldSystemAdded', this.onAddSystem);
 
+        // TODO: marked for deletion
+        // GlobalEventDispatcher.instance.addEventListener(
+        //     'worldSystemAdded',
+        //     this.resolveAllTargets
+        // );
 
-        GlobalEventDispatcher.instance.addEventListener(
-            'worldSystemAdded',
-            this.resolveAllTargets
-        );
-
-        GlobalEventDispatcher.instance.addEventListener(
-            'worldSystemRemoved',
-            this.resolveAllTargets
-        );
+        // GlobalEventDispatcher.instance.addEventListener(
+        //     'worldSystemRemoved',
+        //     this.resolveAllTargets
+        // );
 
     }
 
@@ -203,6 +203,28 @@ export class SolverManager {
     public getAll(): Solver[] {
 
         return this._solvers;
+
+    }
+
+    public clearState(): void {
+
+        // 1. clear all solvers
+        this._solvers.length = 0;
+
+        // 2. clear indexing
+        this.solverIndexMap.clear();
+
+        // 3. clear cached solver targets
+        this.targets.clear();
+
+        // 4. reset scheduler (if it ever gains state)
+        // this.scheduler.reset();
+
+    }
+
+    public reset() {
+
+        this.clearState();
 
     }
 
