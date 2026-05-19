@@ -15,6 +15,7 @@ import { buildRegion } from "../editors/templates/registry";
 import { templates } from "../editors/templates/registry";
 import { TemplateNode } from "../Interfaces";
 import { importDefinition } from "../io/importDefinition";
+import { RepresentationStoreEventType } from "./RepresentationStore";
 
 // 🏗️ Correct structure
 // Think of your UI like this:
@@ -135,20 +136,18 @@ export class App {
 
         btn.addEventListener('click', () => {
 
-            // const file = exportDefinition(this.simulationManager);  // definition
+            const file = exportDefinition(this.simulationManager);  // definition
 
-            // const json = JSON.stringify(file, null, 2);
-            // const blob = new Blob([json], { type: "application/json" });
-            // const url = URL.createObjectURL(blob);
+            const json = JSON.stringify(file, null, 2);
+            const blob = new Blob([json], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
 
-            // const a = document.createElement('a');
-            // a.href = url;
-            // a.download = 'simulation.json'; // or dynamic name
-            // a.click();
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'simulation.json'; // or dynamic name
+            a.click();
 
-            // URL.revokeObjectURL(url);
-
-            console.log(this)
+            URL.revokeObjectURL(url);
 
         }, false);
 
@@ -425,11 +424,10 @@ export class App {
                 const json = JSON.parse(text);
 
                 importDefinition(this.simulationManager, json);
+                this.buildRepresentationsFromSimulation()
 
                 this.loadEditor(templates.default);
 
-                // TODO: this is where to plug importer
-                // this.loadEditorFromSimulation(json);
             }
 
             input.click();
@@ -580,8 +578,6 @@ export class App {
     // Return the entire application to a clean editor state without reloading the page.
     private reset() {
 
-        console.log('reseting the app');
-
         // runtime reset
         this.simulationRuntime.reset();
 
@@ -609,7 +605,6 @@ export class App {
         this.state.selectionManager.clear();
         this.context.toolManager.reset();
 
-
         // Big-picture insight (this is the important part)
         // Your App is currently acting as:
         // a manual orchestrator of multiple subsystems
@@ -621,6 +616,44 @@ export class App {
         //     recreateRuntime();
         //     rebuildUI();
         // }
+
+    }
+
+    private buildRepresentationsFromSimulation() {
+
+        const entities = this.simulationManager.getAllEntities();
+
+        for (const entity of entities) {
+
+            GlobalEventDispatcher.instance.dispatchEvent({
+                type: RepresentationStoreEventType.REPRESENTATION_SET,
+                representation: {
+                    id: entity.uuid,
+                    kind: 'point',  // TODO: or derive from entity type
+                    entity,
+                    color: 0xffff00,
+                    size: 1
+                }
+            });
+        }
+
+        // Better long-term design (VERY important)
+        // Right now you're manually rebuilding representations.
+        // You should evolve to:
+        // 👉 RepresentationStore as source of truth
+        // Instead of dispatching events directly, do:
+        // representationStore.set({
+        //     id,
+        //     kind,
+        //     entity
+        // });
+        // Then:
+        // store emits event
+        // renderer reacts
+        // 🧠 Even better: automatic sync
+        // Eventually you want:
+        // simulationManager.onEntityAdded → auto-create representation
+        // So import automatically populates visuals.
 
     }
 

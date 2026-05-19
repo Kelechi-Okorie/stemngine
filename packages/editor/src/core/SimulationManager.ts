@@ -33,7 +33,7 @@ export class SimulationManager {
     public solverManager: SolverManager;
 
     // <entity.uuid, SystemType>
-    private entitySystemTypeMap = new Map<string, SystemType>();
+    public entitySystemTypeMap = new Map<string, SystemType>();
 
     constructor() {
 
@@ -133,21 +133,7 @@ export class SimulationManager {
 
     public getAllEntities(): Entity[] {
 
-        let entities;
-
-        this.entitySystemTypeMap.forEach((v: SystemType, k: string) => {
-            const system = this.world.getSystem(v);
-            if (!system) {
-
-                // TODO: find better way to handle failure
-                throw new Error('the requested system does not exist');
-
-            }
-
-            entities = system.getAll();
-        });
-
-        return entities ?? [];
+        return this.world.getAllEntities();
     }
 
     /**

@@ -21,6 +21,13 @@ export function importDefinition(
         system.import(systemDef);
 
         simulationManager.world.addSystem(type, system);
+
+        const entities = system.getAll();
+
+        for (const entity of entities) {
+
+            simulationManager.entitySystemTypeMap.set(entity.uuid, type);
+        }
     })
 
     // solvers

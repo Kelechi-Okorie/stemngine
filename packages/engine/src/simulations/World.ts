@@ -1,4 +1,4 @@
-import { SystemType } from "./Interfaces";
+import { Entity, SystemType } from "./Interfaces";
 import { GlobalEventDispatcher } from "../core/GlobalEventDispatcher";
 import { System } from "./core/System";
 
@@ -60,6 +60,19 @@ export class World {
             system.reset?.();
 
         }
+    }
+
+    public getAllEntities(): Entity[] {
+
+        const result: Entity[] = [];
+
+        for (const system of this.systems.values()) {
+
+            result.push(...system.getAll());
+
+        }
+
+        return result;
     }
 
 }
