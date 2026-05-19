@@ -119,7 +119,7 @@ export class WebGLRenderer {
    * A canvas where the renderer draws its output.This is automatically created by the renderer
    * in the constructor (if not provided already); you just need to add it to your page like so:
    * ```js
-   * document.body.appendChild( renderer.domElement );
+   * container.body.appendChild( renderer.domElement );
    * ```
    *
    * @type {DOMElement}

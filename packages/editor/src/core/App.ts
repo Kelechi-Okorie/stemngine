@@ -16,8 +16,10 @@ import { templates } from "../editors/templates/registry";
 import { TemplateNode } from "../Interfaces";
 import { importDefinition } from "../io/importDefinition";
 import { RepresentationStoreEventType } from "./RepresentationStore";
+import rootStyle, { rootClass } from '../assets/css/rootStyle';
+// import { InteractionManager } from "./InteractionManager";
 
-// 🏗️ Correct structure
+// Correct structure
 // Think of your UI like this:
 // APP SHELL
 // ├── Top Bar (global controls)
@@ -45,7 +47,8 @@ type AppMode =
 export class App {
 
     private mode!: AppMode;
-    private root: HTMLElement;
+    private host: HTMLElement;
+    private root: HTMLElement;  // app container
     private container: HTMLElement;
     private header!: HTMLElement;
     public region!: Region;
@@ -62,10 +65,11 @@ export class App {
     public simulationManager: SimulationManager;
     private bindingManager: SimBindingManager;
     private simulationRuntime: SimulationRuntime;
+    // private interactions: InteractionManager;
 
     private renderer3D: Renderer3DSystem;
 
-    constructor(root: HTMLElement) {
+    constructor(host: HTMLElement) {
 
         // Renderer3DSystem (scene objects)
         // SimBindingManager (live bindings)
@@ -75,10 +79,23 @@ export class App {
         // SelectionManager state
         // ToolManager state (likely)
 
-        this.root = root;
-        this.root.style.display = 'flex';
-        this.root.style.flexDirection = 'column';
-        this.root.style.height = '100vh';
+        host.addEventListener('contextmenu', (e) => {
+
+            e.preventDefault();
+
+        });
+
+        this.host = host;
+
+        const shadow = host.attachShadow({ mode: 'open' }); // isolation boundary
+
+        const styleManager = new StyleManager(shadow);
+        styleManager.registerStyle(rootClass, rootStyle)
+
+        this.root = document.createElement('div');
+        this.root.classList.add(rootClass);
+        shadow.appendChild(this.root);
+
 
         this.createHeader();
         this.header.style.height = '40px';
@@ -107,14 +124,18 @@ export class App {
         this.simulationManager = new SimulationManager();
         this.simulationRuntime = new SimulationRuntime(this.simulationManager, this.bindingManager);
         const renderIndex = new RenderIndex();
+        // this.interactions = new InteractionManager();
+
+        // this.root.addEventListener('pointerdown', this.onGlobalPointerDown);
 
         this.context = {
             simulationManager: this.simulationManager,
             simulationRuntime: this.simulationRuntime,
             state: this.state,
             toolManager: new ToolManager(),
-            styleManager: StyleManager.instance,
+            styleManager,
             renderIndex,
+            // interactions: this.interactions,
 
             // TODO: may be removed
             // select: (id: string) => console.log('test'),
@@ -125,37 +146,6 @@ export class App {
         }
 
         this.renderer3D = new Renderer3DSystem(this.context, this.bindingManager);
-
-        const btn = document.createElement('button');
-        btn.innerText = 'export';
-        btn.style.position = 'absolute';
-        btn.style.right = '10px'
-        btn.style.top = '10px';
-        btn.style.cursor = 'pointer';
-        btn.style.zIndex = '100';
-
-        btn.addEventListener('click', () => {
-
-            // console.log(this); return;
-
-            const file = exportDefinition(this);  // definition
-
-            const json = JSON.stringify(file, null, 2);
-            const blob = new Blob([json], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
-
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'simulation.json'; // or dynamic name
-            a.click();
-
-            URL.revokeObjectURL(url);
-
-        }, false);
-
-        const body = document.querySelector('body')!;
-
-        body.appendChild(btn);
 
         // Final mental model
         // You now have a pipeline:
@@ -175,11 +165,30 @@ export class App {
         // this.setMode({type: 'editor', region: buildRegion(templates.default, this.context)});
 
 
+        const btn = document.createElement('button');
+        btn.innerText = 'button';
+        btn.style.position = 'absolute';
+        btn.style.right = '10px'
+        btn.style.top = '10px';
+        btn.style.cursor = 'pointer';
+        btn.style.zIndex = '100';
+
+        btn.addEventListener('click', () => {
+
+            console.log(this)
+        }, false);
+
+        const body = document.querySelector('body')!;
+        body.appendChild(btn)
+
+
+
+
     }
 
     public bootstrap() {
 
-        // register solver plugins
+        // register solver plugins  TODO: what of built in systems
         registerBuiltInSolvers();
 
         this.simulationRuntime.run();
@@ -211,8 +220,6 @@ export class App {
 
         this.renderHeader();
 
-        // this.renderRegion(this.region, this.container);
-
         if (this.mode.type === 'welcome') {
 
             this.renderWelcome();
@@ -239,10 +246,9 @@ export class App {
 
     public layout() {
 
-        const { width, height } = this.getContainerSize();
-
         if (this.mode.type !== 'editor') return;
 
+        const { width, height } = this.getContainerSize();
         this.layoutRegion(this.region, width, height);
 
     }
@@ -263,6 +269,8 @@ export class App {
 
         }
 
+        container.classList.add('container');
+
         // split
         // TODO: use prebuilt css instead
         const wrapper = document.createElement('div');
@@ -275,10 +283,37 @@ export class App {
         const b = document.createElement('div');
 
         // apply size ratios
-        a.style.flex = `${region.ratio} 1 0`;
-        b.style.flex = `${1 - region.ratio} 1 0`;
+        // a.style.flex = `${region.ratio} 1 0`;
+        // b.style.flex = `${1 - region.ratio} 1 0`;
 
-        const divider = this.createDivider(region);
+        // const dividerSize = 4; // px
+
+        // if (region.direction === 'horizontal') {
+        //     a.style.flex = `0 0 calc(${region.ratio * 100}% - ${dividerSize / 2}px)`;
+        //     b.style.flex = `0 0 calc(${(1 - region.ratio) * 100}% - ${dividerSize / 2}px)`;
+        // } else {
+        //     a.style.flex = `0 0 calc(${region.ratio * 100}% - ${dividerSize / 2}px)`;
+        //     b.style.flex = `0 0 calc(${(1 - region.ratio) * 100}% - ${dividerSize / 2}px)`;
+        // }
+
+        const divider = this.createDivider(region)!;
+
+        wrapper.style.display = 'flex';
+
+        a.style.flex = '1';
+        b.style.flex = '1';
+
+        // divider.style.flex = '0 0 4px';
+
+        a.style.minWidth = '0';
+        b.style.minWidth = '0';
+
+        a.style.flexGrow = `${region.ratio}`;
+        b.style.flexGrow = `${1 - region.ratio}`;
+
+        a.style.margin = '2px'
+        b.style.margin = '2px'
+
 
         if (divider === undefined) {
 
@@ -312,6 +347,8 @@ export class App {
         el.style.height = '100%';
         el.style.padding = '2px';
         el.style.position = 'relative';
+        el.style.border = '1px solid grey';
+        el.style.borderRadius = '16px;'
 
         container.appendChild(el);
 
@@ -538,8 +575,29 @@ export class App {
 
             }
 
+            const exportBtn = document.createElement('button');
+            exportBtn.innerText = 'Export';
+
+            exportBtn.onclick = () => {
+
+                const file = exportDefinition(this);  // definition
+
+                const json = JSON.stringify(file, null, 2);
+                const blob = new Blob([json], { type: "application/json" });
+                const url = URL.createObjectURL(blob);
+
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'simulation.json'; // or dynamic name
+                a.click();
+
+                URL.revokeObjectURL(url);
+
+            }
+
             left.appendChild(home);
             left.appendChild(newBtn);
+            left.appendChild(exportBtn);
         }
 
         if (this.mode.type === 'player') {
@@ -692,6 +750,25 @@ export class App {
         return divider;
 
     }
+
+    // private onGlobalPointerDown = (e: PointerEvent) => {
+
+    //     // 1. check overlays first
+    //     if (this.interactions.isInsideOverlay(e)) {
+    //         return;
+    //     }
+
+    //     // 2. close all overlays safely
+    //     this.closeAllOverlays();
+
+    // };
+
+    // private closeAllOverlays() {
+    //     // you implement this based on your system
+    //     this.closeMenu();
+    //     // this.closeInspector();
+    //     // this.closeTooltips();
+    // }
 
     private startDragging(region: Region, e: MouseEvent) {
 

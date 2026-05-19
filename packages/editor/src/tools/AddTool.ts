@@ -2,7 +2,7 @@ import { MathUtils } from '@stemngine/engine';
 
 import { addIcon } from '../assets/icons/addIcon';
 import { Context, Tool } from '../Interfaces';
-import addToolStyle from '../assets/css/addToolStyle';
+import addToolStyle, { addToolClass } from '../assets/css/addToolStyle';
 import { RepresentationStore } from '../core/RepresentationStore';
 
 const OBJECTS = [
@@ -45,11 +45,13 @@ export class AddTool implements Tool {
 
     public allows: Record<string, boolean> = {};
 
+    private outsideClickHandler?: (e: MouseEvent) => void;
+
     constructor(context: Context) {
 
         this.context = context;
 
-        context.styleManager.registerStyle('add-tool', addToolStyle)
+        context.styleManager.registerStyle(addToolClass, addToolStyle)
 
     }
 
@@ -70,7 +72,7 @@ export class AddTool implements Tool {
         const overlay = document.createElement('div');
         overlay.dataset.name = 'the overlay'
 
-        overlay.classList.add('add-tool');
+        overlay.classList.add(addToolClass);
 
         const input = document.createElement('input');
         input.name = 'add-object';
@@ -97,6 +99,18 @@ export class AddTool implements Tool {
 
         container.appendChild(overlay);
 
+        const onOutsideClick = (e: MouseEvent) => {
+
+            const path = e.composedPath();
+
+            if (!path.includes(overlay)) {
+                this.closeMenu();
+                document.removeEventListener('mousedown', onOutsideClick);
+            }
+        };
+
+        this.outsideClickHandler = onOutsideClick;
+
         input.focus();
 
         return { overlay, input, listElement };
@@ -112,7 +126,10 @@ export class AddTool implements Tool {
             row.innerText = item.name;
             row.classList.add('menu-row');
 
+
+
             row.onclick = () => {
+
                 this.spawnObject(item);
 
                 // prevent double-click spam
@@ -151,6 +168,12 @@ export class AddTool implements Tool {
 
         if (this.overlay?.parentNode) {
             this.overlay.parentNode.removeChild(this.overlay);
+        }
+
+        if (this.outsideClickHandler) {
+
+            document.removeEventListener('mousedown', this.outsideClickHandler);
+            this.outsideClickHandler = undefined;
         }
 
     }

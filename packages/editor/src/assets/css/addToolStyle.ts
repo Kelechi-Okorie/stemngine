@@ -31,3 +31,5 @@ const textContent = `
 `;
 
 export default textContent;
+
+export const addToolClass = 'add-tool';

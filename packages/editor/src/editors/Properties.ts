@@ -40,6 +40,7 @@ export class Properties implements Editor {
         // this is supposed to be the built properties panel
 
         this.container = container;
+        this.container.classList.add('properties-container')
         this.header = document.createElement('div');
         this.body = document.createElement('div');
 
@@ -84,11 +85,6 @@ export class Properties implements Editor {
     public renderBody() {
 
         this.renderTab();
-        // this.renderContent();
-
-        // const content = document.createElement('div');
-        // content.classList.add('editor-body-content');
-        // this.content = content;
         this.body.appendChild(this.content);
 
     }
@@ -122,7 +118,7 @@ export class Properties implements Editor {
             btn.onclick = inspector.onClick;
 
             tab.appendChild(btn);
-            
+
         }
 
         this.body.appendChild(tab);

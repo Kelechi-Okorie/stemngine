@@ -7,6 +7,7 @@ import { RenderIndex } from "./core/RenderIndex";
 import { SimulationRuntime } from "./core/SimulationRuntime";
 import { System } from "@stemngine/engine";
 import { editorRegistry } from "./editors/templates/registry";
+import { InteractionManager } from "./core/InteractionManager";
 
 /**
  * future editors
@@ -90,6 +91,7 @@ export interface Context {
     toolManager: ToolManager;
     styleManager: StyleManager;
     renderIndex: RenderIndex,
+    // interactions: InteractionManager,
 
     // TODO: may be removed
     // select(id: string): void;

@@ -1,26 +1,14 @@
 
 export class StyleManager {
 
-    private static _instance: StyleManager;
-
-    private static styleEl = document.createElement('style');
+    private styleEl: HTMLStyleElement;
 
     private registry = new Map<string, string>();
 
-    constructor() {
+    constructor(shadowRoot: ShadowRoot) {
 
-    }
-
-    public static get instance(): StyleManager {
-
-        if (!this._instance) {
-            this._instance = new StyleManager();
-
-            document.head.appendChild(StyleManager.styleEl);
-
-        }
-
-        return this._instance;
+        this.styleEl = document.createElement('style');
+        shadowRoot.appendChild(this.styleEl);
 
     }
 
@@ -46,7 +34,7 @@ export class StyleManager {
 
     private render() {
 
-        StyleManager.styleEl.textContent = Array.from(this.registry.values()).join('\n');
+        this.styleEl.textContent = Array.from(this.registry.values()).join('\n');
 
     }
 

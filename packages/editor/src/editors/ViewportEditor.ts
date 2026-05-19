@@ -80,16 +80,6 @@ export class ViewportEditor implements Editor {
 
         this.orbitControl = new OrbitControls(this.camera as OrthographicCamera, this.renderer.domElement);
 
-        // this.state.renderer.domElement.addEventListener('mousemove', (e) => {
-        //     this.onMouseMove(e, this.state.renderer.domElement);
-        // });
-
-        // this.state.selectionManager.subscribe((selectedObject) => {
-
-        //     this.highlightObject(selectedObject);
-
-        // });
-
         // TODO: may need to set near and far
         this.raycaster.layers.set(LAYERS.DEFAULT);
 

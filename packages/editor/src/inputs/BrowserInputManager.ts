@@ -89,7 +89,7 @@ export class BrowserInputManager {
     // document.addEventListener('keydown', e => this.emit('keydown', e));
 
     const doc = this.domElement.ownerDocument ?? document;
-    doc.addEventListener('keydown', this._keyDownListener, { passive: true, capture: true});
+    doc.addEventListener('keydown', this._keyDownListener, { passive: true, capture: true });
 
     this.domElement.style.touchAction = 'none'; // disable touch scroll
 
