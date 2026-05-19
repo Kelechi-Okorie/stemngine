@@ -48,7 +48,7 @@ export class App {
     private root: HTMLElement;
     private container: HTMLElement;
     private header!: HTMLElement;
-    private region!: Region;
+    public region!: Region;
 
     public state: State;
 
@@ -59,7 +59,7 @@ export class App {
 
     private draggingRegion: Region | null = null;
 
-    private simulationManager: SimulationManager;
+    public simulationManager: SimulationManager;
     private bindingManager: SimBindingManager;
     private simulationRuntime: SimulationRuntime;
 
@@ -136,7 +136,9 @@ export class App {
 
         btn.addEventListener('click', () => {
 
-            const file = exportDefinition(this.simulationManager);  // definition
+            // console.log(this); return;
+
+            const file = exportDefinition(this);  // definition
 
             const json = JSON.stringify(file, null, 2);
             const blob = new Blob([json], { type: "application/json" });
@@ -369,19 +371,6 @@ export class App {
 
     }
 
-    //  That becomes your:
-    // “New Project”
-    // “Switch Layout”
-    // “Reset Layout”
-    private loadTemplate(template: TemplateNode) {
-        // this.container.innerHTML = ''; // clear DOM
-
-        this.region = buildRegion(template, this.context);
-
-        this.render();
-        this.layout();
-    }
-
     private renderWelcome() {
 
         const wrapper = document.createElement('div');
@@ -423,10 +412,10 @@ export class App {
                 const text = await file.text();
                 const json = JSON.parse(text);
 
-                importDefinition(this.simulationManager, json);
+                importDefinition(this, json);
                 this.buildRepresentationsFromSimulation()
 
-                this.loadEditor(templates.default);
+                // this.loadEditor(templates.default);
 
             }
 
@@ -464,7 +453,7 @@ export class App {
 
     }
 
-    private loadEditor(template: TemplateNode) {
+    public loadEditor(template: TemplateNode) {
 
         const region = buildRegion(template, this.context);
 

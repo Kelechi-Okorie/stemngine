@@ -60,6 +60,8 @@ export class World {
             system.reset?.();
 
         }
+
+        this.systems.clear();
     }
 
     public getAllEntities(): Entity[] {

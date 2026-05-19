@@ -1,9 +1,12 @@
-import { SimulationManager } from "../core/SimulationManager";
+import { App } from "../core/App";
+import { regionToTemplate } from "../editors/templates/registry";
 import { SimulationDefinition } from "../Interfaces";
 
 export function exportDefinition(
-    simulationManager: SimulationManager
+    app: App
 ): SimulationDefinition {
+
+    const simulationManager = app.simulationManager;
 
     const name = "sim.generated";
 
@@ -22,7 +25,8 @@ export function exportDefinition(
             version: "1.0.0"
         },
         systems,
-        solvers
+        solvers,
+        regionTemplate: regionToTemplate(app.region)
     };
 
 }

@@ -54,6 +54,7 @@ export type Region =
         id: string;
         name: string;
         editor: Editor;
+        editorType: keyof typeof editorRegistry;
     }
 
 export type Listener<T> = (value: T) => void;
@@ -145,21 +146,8 @@ export type SimulationDefinition = {
     };
 
     systems: {id: string, entities: Entity[]}[];
-    solvers: {type: string}[]
+    // solvers: {type: string}[],
+    solvers: Record<string, any>,
+    regionTemplate: TemplateNode
 
-    // systems: {
-    //     type: string
-    //     config?: any
-    // }[]
-
-    // entities: {
-    //     type: string
-    //     config: any
-    // }[]
-
-    // solvers: {
-    //     type: string
-    //     config?: any
-    // }[]
 }
-

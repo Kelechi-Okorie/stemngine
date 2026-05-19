@@ -1,11 +1,13 @@
-import { SimulationManager } from "../core/SimulationManager";
+import { App } from "../core/App";
 import { SimulationDefinition } from "../Interfaces";
 import { SystemTypeFromId } from "@stemngine/engine";
 
 export function importDefinition(
-    simulationManager: SimulationManager,
+    app: App,
     def: SimulationDefinition
 ) {
+
+    const simulationManager = app.simulationManager;
 
     const systemRegistryInstance = simulationManager.systemRegistryInstance;
     const solverRegistryInstance = simulationManager.SolverRegistryInstance;
@@ -31,7 +33,7 @@ export function importDefinition(
     })
 
     // solvers
-    def.solvers.forEach(solverDef => {
+    def.solvers.forEach((solverDef: Record<string, any>) => {
 
         const type = solverDef.type;
         const solver = solverRegistryInstance.create(type);
@@ -41,5 +43,7 @@ export function importDefinition(
         simulationManager.solverManager.add(solver);
 
     });
+
+    app.loadEditor(def.regionTemplate)
 
 }
