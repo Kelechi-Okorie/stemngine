@@ -41,17 +41,17 @@ export class Outliner implements Editor {
         this.layers = new Layers();
         this.layers.set(LAYERS.DEFAULT);
 
-        GlobalEventDispatcher.instance.addEventListener(
-            EntityEventType.ENTITY_CREATED,
-            this.onEntityCreated.bind(this)
-        );
-
     }
 
     public mount(container: HTMLElement) {
 
-        // this.renderNode(this.context.state.scene, container, 0);
         this.container = container;
+
+        GlobalEventDispatcher.instance.addEventListener(
+            EntityEventType.ENTITY_CREATED,
+            this.onEntityCreated
+        );
+
         this.renderEntities();
     }
 
@@ -151,10 +151,14 @@ export class Outliner implements Editor {
 
     public unmount() {
 
-        console.log('destroying the outliner')
+        GlobalEventDispatcher.instance.removeEventListener(
+            EntityEventType.ENTITY_CREATED,
+            this.onEntityCreated
+        );
+
     }
 
-    private onEntityCreated(e: EntityEvent): void {
+    private onEntityCreated = (e: EntityEvent): void => {
 
         const { type, entity, source } = e;
 

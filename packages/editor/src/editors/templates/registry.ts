@@ -5,6 +5,8 @@ import { Outliner } from "../Outliner";
 import { Properties } from "../Properties";
 import { defaultTemplate } from "./default";
 import { generateUUID } from "../../../../engine/src/math/MathUtils";
+import { simulationTemplate } from "./simulation";
+import { ControlPanel } from "../ControlPanel";
 
 // Optional upgrade (important for your engine)
 // If your system becomes dynamic (like IDE layouts), consider adding:
@@ -43,7 +45,8 @@ export const editorRegistry = {
     viewport: (ctx: Context) => new ViewportEditor(ctx),
     player: (ctx: Context) => new Player(ctx),
     outliner: (ctx: Context) => new Outliner(ctx),
-    properties: (ctx: Context) => new Properties(ctx)
+    properties: (ctx: Context) => new Properties(ctx),
+    control_panel: (ctx: Context) => new ControlPanel(ctx)
 };
 
 export function createEditorInstance<T extends keyof typeof editorRegistry>(type: T, context: Context) {
@@ -110,11 +113,7 @@ export const templates = {
         name: 'viewport',
         editorType: 'viewport'
     },
-    simulationOnly: {
-        type: 'leaf',
-        name: 'player',
-        editorType: 'player'
-    }
+    simulation: simulationTemplate
 };
 
 // 3. Save layouts cleanly

@@ -26,11 +26,9 @@ import rootStyle, { rootClass } from '../assets/css/rootStyle';
 // ├── Main Area (welcome / editor / player)
 // └── Optional overlays (modals, loaders)
 
-type AppMode =
-    | { type: 'welcome' }
-    | { type: 'editor'; region: Region }
-    | { type: 'player'; simulation: any }
-    ;
+type Type = 'welcome' | 'editor' | 'simulation';
+
+type AppMode = { type: Type, region: Region };
 
 // Your new app lifecycle
 // Now it becomes:
@@ -109,9 +107,6 @@ export class App {
 
         this.root.appendChild(this.container);
 
-        // this.initApp();
-
-
         this.bindingManager = new SimBindingManager();
 
         const stateConfig = {
@@ -149,8 +144,7 @@ export class App {
 
         this.renderer3D = new Renderer3DSystem(this.context, this.bindingManager);
 
-        // this.loadEditor(templates.default);
-
+        this.initApp();
 
         // Final mental model
         // You now have a pipeline:
@@ -162,32 +156,6 @@ export class App {
         //         ↓
         // render() + layout()
         // That’s clean architecture.
-
-        // this.region = buildRegion(templates.default, this.context);
-
-        // TODO: find better way to handle
-
-        this.setMode({type: 'editor', region: buildRegion(templates.default, this.context)});
-
-
-        const btn = document.createElement('button');
-        btn.innerText = 'button';
-        btn.style.position = 'absolute';
-        btn.style.right = '10px'
-        btn.style.top = '10px';
-        btn.style.cursor = 'pointer';
-        btn.style.zIndex = '100';
-
-        btn.addEventListener('click', () => {
-
-            console.log(this)
-        }, false);
-
-        const body = document.querySelector('body')!;
-        body.appendChild(btn)
-
-
-
 
     }
 
@@ -217,7 +185,6 @@ export class App {
 
     public render() {
 
-
         this.elementMap.clear();
         this.splitMap.clear();
 
@@ -232,26 +199,15 @@ export class App {
 
         }
 
-        if (this.mode.type === 'editor') {
-
-            this.region = this.mode.region;
-            this.renderRegion(this.region, this.container);
-            return;
-
-        }
-
-        if (this.mode.type === 'player') {
-
-            // TODO: later
-            return;
-
-        }
+        this.region = this.mode.region;
+        this.renderRegion(this.region, this.container);
 
     }
 
     public layout() {
 
-        if (this.mode.type !== 'editor') return;
+        // TODO: find a better way
+        if (this.mode.type === 'welcome') return;
 
         const { width, height } = this.getContainerSize();
         this.layoutRegion(this.region, width, height);
@@ -408,7 +364,7 @@ export class App {
 
         newBtn.onclick = () => {
 
-            this.loadEditor(templates.default);
+            this.loadEditor('editor', templates.default);
         };
 
         openBtn.onclick = () => {
@@ -425,10 +381,10 @@ export class App {
                 const text = await file.text();
                 const json = JSON.parse(text);
 
-                importDefinition(this, json);
-                this.buildRepresentationsFromSimulation()
+                const template = importDefinition(this, json);
+                this.buildRepresentationsFromSimulation();
 
-                // this.loadEditor(templates.default);
+                this.loadEditor('editor', template);
 
             }
 
@@ -453,7 +409,27 @@ export class App {
 
         simBtn.onclick = () => {
 
-            console.log('TODO: simulate - may be removed later');
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json,appliaction/json';
+
+            input.onchange = async (event) => {
+
+                const file = (event.target as HTMLInputElement).files?.[0];
+                if (!file) return;
+
+                const text = await file.text();
+                const json = JSON.parse(text);
+
+                const template = importDefinition(this, json);
+                this.buildRepresentationsFromSimulation();
+
+                // TODO: loaded twice for simulation. find better way
+                this.loadEditor('simulation', templates.simulation);
+
+            }
+
+            input.click();
 
         }
 
@@ -462,16 +438,18 @@ export class App {
         wrapper.appendChild(openBtn);
         wrapper.appendChild(simBtn);
 
+        this.container.innerHTML = '';
+
         this.container.appendChild(wrapper);
 
     }
 
-    public loadEditor(template: TemplateNode) {
+    public loadEditor(type: Type, template: TemplateNode) {
 
         const region = buildRegion(template, this.context);
 
         this.mode = {
-            type: 'editor',
+            type,
             region
         };
 
@@ -481,7 +459,7 @@ export class App {
 
     private initApp() {
 
-        this.mode = { type: 'welcome' };
+        this.loadEditor('welcome', templates.default)
 
     }
 
@@ -529,7 +507,8 @@ export class App {
 
             home.onclick = () => {
 
-                this.setMode({ type: 'welcome' });
+                // TODO: find a better way
+                this.setMode({ type: 'welcome', region: buildRegion(templates.default, this.context) });
                 this.reset();
                 this.render();
 
@@ -539,13 +518,6 @@ export class App {
             newBtn.innerText = 'New';
 
             newBtn.onclick = () => {
-
-                // const region = buildRegion(templates.default, this.context);
-
-                // this.setMode({
-                //     type: 'editor',
-                //     region
-                // })
 
                 window.open(window.location.href, '_blank');
 
@@ -576,11 +548,14 @@ export class App {
             left.appendChild(exportBtn);
         }
 
-        if (this.mode.type === 'player') {
+        if (this.mode.type === 'simulation') {
+
+            // TODO: this is a duplicate from renderWelcome
 
             const exit = document.createElement('button');
-            exit.innerText = 'Exit Player';
+            exit.innerText = 'Exit Simulation';
             exit.onclick = () => this.renderWelcome();
+
 
             left.appendChild(exit);
         }

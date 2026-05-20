@@ -44,6 +44,6 @@ export function importDefinition(
 
     });
 
-    app.loadEditor(def.regionTemplate)
+    return def.regionTemplate;
 
 }
