@@ -41,7 +41,7 @@ export class Player implements Editor {
 
         container.style.display = 'flex';
         container.style.flexDirection = 'column';
-        container.style.padding = '8px';
+        // container.style.padding = '8px';
         container.style.background = '#1e1e1e';
         container.style.color = 'white';
         container.style.fontFamily = 'sans-serif';
@@ -61,7 +61,7 @@ export class Player implements Editor {
         controls.appendChild(resetBtn);
 
         const timeLabel = document.createElement('div');
-        timeLabel.style.marginTop = '10px';
+        // timeLabel.style.marginTop = '10px';
         timeLabel.innerText = 'Time: 0.00s';
 
         container.appendChild(controls);
@@ -85,7 +85,7 @@ export class Player implements Editor {
 
         const btn = document.createElement('button');
         btn.innerText = label;
-        btn.style.padding = '6px 10px';
+        // btn.style.padding = '6px 10px';
         btn.style.cursor = 'pointer';
         btn.style.border = 'none';
         btn.style.background = '#333';

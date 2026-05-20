@@ -1,11 +1,13 @@
 const textContent = `
-.stem-engine-root {
+.app-root {
+    width: 100%;
+    height: 100%;
+    box-sizing: 100%;
     display: flex;
     flex-direction: column;
-    height: 100vh;
 }
 `;
 
 export default textContent;
 
-export const rootClass = 'stem-engine-root';
+export const rootClass = 'app-root';

@@ -105,10 +105,12 @@ export class App {
         container.style.flex = '1';
         container.style.minHeight = '0';
         this.container = container;
+        this.container.classList.add('root-container')
 
         this.root.appendChild(this.container);
 
-        this.initApp();
+        // this.initApp();
+
 
         this.bindingManager = new SimBindingManager();
 
@@ -147,6 +149,9 @@ export class App {
 
         this.renderer3D = new Renderer3DSystem(this.context, this.bindingManager);
 
+        // this.loadEditor(templates.default);
+
+
         // Final mental model
         // You now have a pipeline:
         // Template (pure data)
@@ -162,7 +167,7 @@ export class App {
 
         // TODO: find better way to handle
 
-        // this.setMode({type: 'editor', region: buildRegion(templates.default, this.context)});
+        this.setMode({type: 'editor', region: buildRegion(templates.default, this.context)});
 
 
         const btn = document.createElement('button');
@@ -282,38 +287,7 @@ export class App {
         const a = document.createElement('div');
         const b = document.createElement('div');
 
-        // apply size ratios
-        // a.style.flex = `${region.ratio} 1 0`;
-        // b.style.flex = `${1 - region.ratio} 1 0`;
-
-        // const dividerSize = 4; // px
-
-        // if (region.direction === 'horizontal') {
-        //     a.style.flex = `0 0 calc(${region.ratio * 100}% - ${dividerSize / 2}px)`;
-        //     b.style.flex = `0 0 calc(${(1 - region.ratio) * 100}% - ${dividerSize / 2}px)`;
-        // } else {
-        //     a.style.flex = `0 0 calc(${region.ratio * 100}% - ${dividerSize / 2}px)`;
-        //     b.style.flex = `0 0 calc(${(1 - region.ratio) * 100}% - ${dividerSize / 2}px)`;
-        // }
-
         const divider = this.createDivider(region)!;
-
-        wrapper.style.display = 'flex';
-
-        a.style.flex = '1';
-        b.style.flex = '1';
-
-        // divider.style.flex = '0 0 4px';
-
-        a.style.minWidth = '0';
-        b.style.minWidth = '0';
-
-        a.style.flexGrow = `${region.ratio}`;
-        b.style.flexGrow = `${1 - region.ratio}`;
-
-        a.style.margin = '2px'
-        b.style.margin = '2px'
-
 
         if (divider === undefined) {
 
@@ -322,12 +296,14 @@ export class App {
         }
 
         wrapper.appendChild(a);
-        wrapper.appendChild(divider);
+        // wrapper.appendChild(divider);
         wrapper.appendChild(b);
 
         container.appendChild(wrapper);
 
         this.splitMap.set(region.id, { a, b, divider });
+
+        // this.applySplitLayout(region, container);
 
         this.renderRegion(region.a, a);
         this.renderRegion(region.b, b);
@@ -345,7 +321,7 @@ export class App {
         const el = document.createElement('div');
         el.style.width = '100%';
         el.style.height = '100%';
-        el.style.padding = '2px';
+        // el.style.padding = '2px';
         el.style.position = 'relative';
         el.style.border = '1px solid grey';
         el.style.borderRadius = '16px;'
@@ -526,7 +502,7 @@ export class App {
         this.header.style.display = 'flex';
         this.header.style.alignItems = 'center';
         this.header.style.justifyContent = 'space-between';
-        this.header.style.padding = '0 10px';
+        // this.header.style.padding = '0 10px';
         this.header.style.borderBottom = '1px solid #333';
 
         this.root.appendChild(this.header);
@@ -768,6 +744,46 @@ export class App {
     //     this.closeMenu();
     //     // this.closeInspector();
     //     // this.closeTooltips();
+    // }
+
+    // private applySplitLayout(region: Region, container: HTMLElement) {
+
+    //     const split = this.splitMap.get(region.id)!;
+    //     const dividerSize = 4;
+
+    //     console.log({ region, container })
+
+    //     if (region.direction === 'horizontal') {
+
+    //         const totalWidth = container.clientWidth;
+    //         const usableWidth = totalWidth - dividerSize;
+
+    //         const wA = usableWidth * region.ratio;
+    //         const wB = usableWidth * (1 - region.ratio);
+
+    //         split.a.style.width = `${wA}px`;
+    //         split.b.style.width = `${wB}px`;
+
+    //         split.a.style.height = '100%';
+    //         split.b.style.height = '100%';
+
+    //     } else {
+
+    //         const totalHeight = container.clientHeight;
+    //         const usableHeight = totalHeight - dividerSize;
+
+    //         const hA = usableHeight * region.ratio;
+    //         const hB = usableHeight * (1 - region.ratio);
+
+    //         split.a.style.height = `${hA}px`;
+    //         split.b.style.height = `${hB}px`;
+
+    //         split.a.style.width = '100%';
+    //         split.b.style.width = '100%';
+    //     }
+
+    //     split.a.style.flex = '0 0 auto';
+    //     split.b.style.flex = '0 0 auto';
     // }
 
     private startDragging(region: Region, e: MouseEvent) {

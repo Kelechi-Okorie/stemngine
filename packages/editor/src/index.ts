@@ -8,5 +8,8 @@ if (container === null) {
 
 }
 
+container.style.width = '100%';
+container.style.height = '100%';
+
 const app = new App(container);
 app.bootstrap();
