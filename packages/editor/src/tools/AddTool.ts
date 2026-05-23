@@ -2,7 +2,7 @@ import { MathUtils } from '@stemngine/engine';
 
 import { addIcon } from '../assets/icons/addIcon';
 import { Context, Tool } from '../Interfaces';
-import addToolStyle, { addToolClass } from '../assets/css/addToolStyle';
+// import addToolStyle, { addToolClass } from '../assets/css/addToolStyle';
 import { RepresentationStore } from '../core/RepresentationStore';
 
 const OBJECTS = [
@@ -51,7 +51,7 @@ export class AddTool implements Tool {
 
         this.context = context;
 
-        context.styleManager.registerStyle(addToolClass, addToolStyle)
+        // context.styleManager.registerStyle(addToolClass, addToolStyle)
 
     }
 
@@ -71,8 +71,6 @@ export class AddTool implements Tool {
 
         const overlay = document.createElement('div');
         overlay.dataset.name = 'the overlay'
-
-        overlay.classList.add(addToolClass);
 
         const input = document.createElement('input');
         input.name = 'add-object';

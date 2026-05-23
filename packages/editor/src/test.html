@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UI design</title>
+</head>
+
+<body>
+    <h6>for testing</h6>
+
+    <div id="app">
+
+    </div>
+
+
+    <script type="module">
+        import baseCSS from "./assets/css/base.js";
+        import primitivesCSS from "./assets/css/primitives.js";
+        import buttonCSS from "./assets/css/components/button.js";
+        import { StyleManager } from './core/StyleManager.js';
+
+        const host = document.getElementById('app');
+        host.dataset.theme = 'dark';
+        const shadow = host.attachShadow({ mode: 'open' });
+
+        const styleManager = new StyleManager(shadow);
+        // styleManager.registerStyle(rootClass, rootStyle)
+        styleManager.setLayer('base', baseCSS);
+        styleManager.setLayer('primitives', primitivesCSS);
+        styleManager.registerComponent('button', buttonCSS);
+
+
+        const btn = document.createElement('button');
+        btn.classList.add('button');
+        btn.textContent = 'Test Button';
+
+        shadow.appendChild(btn);
+
+        console.log(styleManager)
+
+
+    </script>
+</body>
+
+</html>

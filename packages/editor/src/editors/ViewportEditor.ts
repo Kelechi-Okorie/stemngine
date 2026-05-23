@@ -134,6 +134,8 @@ export class ViewportEditor implements Editor {
 
     public resize(width: number, height: number) {
 
+        console.log('resizing vierpowr')
+
         this.width = width;
         this.height = height;
 

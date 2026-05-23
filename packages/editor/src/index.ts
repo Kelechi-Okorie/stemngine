@@ -1,15 +1,15 @@
 import { App } from "./core/App";
 
-const container = document.getElementById('root');
+const host = document.getElementById('host');
 
-if (container === null) {
+if (host === null) {
 
-    throw new Error('root container does not exist');
+    throw new Error('host host does not exist');
 
 }
 
-container.style.width = '100%';
-container.style.height = '100%';
+host.style.width = '100%';
+host.style.height = '100%';
 
-const app = new App(container);
+const app = new App(host);
 app.bootstrap();

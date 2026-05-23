@@ -3660,6 +3660,12 @@ export class WebGLRenderer {
 
   }
 
+  public syncRendererSize(container: HTMLElement) {
+    const { width, height } = container.getBoundingClientRect();
+
+    this.setSize(width, height, false);
+  }
+
 }
 
 // JSDoc

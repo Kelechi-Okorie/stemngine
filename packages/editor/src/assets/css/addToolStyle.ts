@@ -32,4 +32,4 @@ const textContent = `
 
 export default textContent;
 
-export const addToolClass = 'add-tool';
+export const addToolCSS = 'add-tool';

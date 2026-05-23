@@ -16,7 +16,10 @@ import { templates } from "../editors/templates/registry";
 import { TemplateNode } from "../Interfaces";
 import { importDefinition } from "../io/importDefinition";
 import { RepresentationStoreEventType } from "./RepresentationStore";
-import rootStyle, { rootClass } from '../assets/css/rootStyle';
+import baseCSS from '../assets/css/base';
+import primitivesCSS from '../assets/css/primitives';
+import layoutCSS from '../assets/css/layout';
+import buttonCSS from '../assets/css/components/button';
 // import { InteractionManager } from "./InteractionManager";
 
 // Correct structure
@@ -29,6 +32,13 @@ import rootStyle, { rootClass } from '../assets/css/rootStyle';
 type Type = 'welcome' | 'editor' | 'simulation';
 
 type AppMode = { type: Type, region: Region };
+
+type ScreenMode =
+    | 'compact' // xs
+    | 'mobile'  // sm
+    | 'tablet'  // md
+    | 'desktop' // lg
+    ;
 
 // Your new app lifecycle
 // Now it becomes:
@@ -67,6 +77,10 @@ export class App {
 
     private renderer3D: Renderer3DSystem;
 
+    private a!: HTMLElement;
+    private b!: HTMLElement;
+    private isBOpen = false;    // TODO: for want of a better name
+
     constructor(host: HTMLElement) {
 
         // Renderer3DSystem (scene objects)
@@ -83,27 +97,31 @@ export class App {
 
         });
 
+        host.classList.add('host');
+        host.dataset.theme = 'dark';
         this.host = host;
 
         const shadow = host.attachShadow({ mode: 'open' }); // isolation boundary
 
         const styleManager = new StyleManager(shadow);
-        styleManager.registerStyle(rootClass, rootStyle)
+        // styleManager.registerStyle(rootClass, rootStyle)
+        styleManager.setLayer('base', baseCSS);
+        styleManager.setLayer('primitives', primitivesCSS);
+        styleManager.setLayer('layout', layoutCSS);
+        styleManager.registerComponent('button', buttonCSS);
+
 
         this.root = document.createElement('div');
-        this.root.classList.add(rootClass);
+        this.root.classList.add('root', 'full');
         shadow.appendChild(this.root);
 
-
-        this.createHeader();
-        this.header.style.height = '40px';
-        this.header.style.flexShrink = '0';
+        // this.createHeader();
+        // this.header.style.height = '40px';
+        // this.header.style.flexShrink = '0';
 
         const container = document.createElement('div');
-        container.style.flex = '1';
-        container.style.minHeight = '0';
+        container.classList.add('root-container', 'full', 'column');
         this.container = container;
-        this.container.classList.add('root-container')
 
         this.root.appendChild(this.container);
 
@@ -157,6 +175,23 @@ export class App {
         // render() + layout()
         // That’s clean architecture.
 
+        const btn = document.createElement('button');
+        btn.innerText = 'button';
+        btn.style.position = 'absolute';
+        btn.style.right = '10px'
+        btn.style.top = '10px';
+        btn.style.zIndex = '100';
+        btn.classList.add('button');
+
+        btn.addEventListener('click', () => {
+
+            this.togglePanel();
+        }, false);
+
+        // const body = document.querySelector('body')!;
+        // body.appendChild(btn)
+        this.root.appendChild(btn);
+
     }
 
     public bootstrap() {
@@ -190,27 +225,33 @@ export class App {
 
         this.container.innerHTML = '';
 
-        this.renderHeader();
+        // this.renderHeader();
 
         if (this.mode.type === 'welcome') {
-
             this.renderWelcome();
             return;
-
         }
 
+        const layout = document.createElement('div');
+        layout.classList.add('layout');
+        const a = document.createElement('div');
+        a.classList.add('a');
+        const b = document.createElement('div');
+        b.classList.add('b');
+
+        this.a = a;
+        this.b = b;
+
+        layout.appendChild(a);
+        layout.appendChild(b);
+
+        this.container.appendChild(layout);
+
         this.region = this.mode.region;
-        this.renderRegion(this.region, this.container);
 
-    }
+        this.renderRegion(this.mode.region.a, a)
+        this.renderRegion(this.mode.region.b, b)
 
-    public layout() {
-
-        // TODO: find a better way
-        if (this.mode.type === 'welcome') return;
-
-        const { width, height } = this.getContainerSize();
-        this.layoutRegion(this.region, width, height);
 
     }
 
@@ -230,18 +271,36 @@ export class App {
 
         }
 
-        container.classList.add('container');
+        // container.classList.add('container');
 
         // split
         // TODO: use prebuilt css instead
-        const wrapper = document.createElement('div');
-        wrapper.style.display = 'flex';
-        wrapper.style.width = '100%';
-        wrapper.style.height = '100%';
-        wrapper.style.flexDirection = region.direction === 'horizontal' ? 'row' : 'column';
+        // const wrapper = document.createElement('div');
+        // wrapper.style.display = 'flex';
+        // wrapper.style.width = '100%';
+        // wrapper.style.height = '100%';
+
+        // wrapper.style.flexDirection = region.direction === 'horizontal' ? 'row' : 'column';
+
+        // container.style.flexDirection = region.direction === 'horizontal' ? 'row' : 'column';
+        container.classList.add(region.direction)
 
         const a = document.createElement('div');
         const b = document.createElement('div');
+
+        // const ratio = region.ratio;
+
+        // if (region.direction === 'row') {
+
+        //     a.style.flex = `${ratio} 1 0%`;
+        //     b.style.flex = `${1 - ratio} 1 0%`;
+
+        // } else {
+
+        //     a.style.flex = `${ratio} 1 0%`;
+        //     b.style.flex = `${1 - ratio} 1 0%`;
+
+        // }
 
         const divider = this.createDivider(region)!;
 
@@ -251,15 +310,17 @@ export class App {
 
         }
 
-        wrapper.appendChild(a);
-        // wrapper.appendChild(divider);
-        wrapper.appendChild(b);
+        // wrapper.appendChild(a);
+        // // wrapper.appendChild(divider);
+        // wrapper.appendChild(b);
 
-        container.appendChild(wrapper);
+        // container.appendChild(wrapper);
+
+        container.appendChild(a);
+        // container.appendChild(wrapper);
+        container.appendChild(b);
 
         this.splitMap.set(region.id, { a, b, divider });
-
-        // this.applySplitLayout(region, container);
 
         this.renderRegion(region.a, a);
         this.renderRegion(region.b, b);
@@ -274,25 +335,127 @@ export class App {
 
         }
 
-        const el = document.createElement('div');
-        el.style.width = '100%';
-        el.style.height = '100%';
-        // el.style.padding = '2px';
-        el.style.position = 'relative';
-        el.style.border = '1px solid grey';
-        el.style.borderRadius = '16px;'
+        // const el = document.createElement('div');
+        // el.style.width = '100%';
+        // el.style.height = '100%';
+        // // el.style.padding = '2px';
+        // el.style.position = 'relative';
+        // el.style.border = '1px solid grey';
+        // el.style.borderRadius = '16px;'
 
-        container.appendChild(el);
+        // container.appendChild(el);
 
         // store reference for layout later
-        this.elementMap.set(region.id, el);
+        this.elementMap.set(region.id, container);
 
+        container.classList.add(region.name);
         // mount editor
-        region.editor.mount(el);
+        region.editor.mount(container);
 
     }
 
-    private layoutRegion(region: Region, width: number, height: number) {
+    public layout() {
+        console.log(this.region)
+
+        // TODO: find a better way
+        if (this.mode.type === 'welcome') return;
+
+        const { width, height } = this.getContainerSize();
+
+        // compute A/B sizes based on CSS or ratio
+        const aRect = this.a.getBoundingClientRect();
+        const bRect = this.b.getBoundingClientRect();
+
+        // this.layoutRegion(this.region, width, height);
+
+        this.layoutRegion(this.region.a, aRect.width, aRect.height);
+        this.layoutRegion(this.region.b, bRect.width, bRect.height);
+
+    }
+
+    public layoutRegion(region: Region, width: number, height: number) {
+        // leaf
+        if (region.type === 'leaf') {
+            const wrapper = this.elementMap.get(region.id)!;
+
+            wrapper.style.width = `${width}px`;
+            wrapper.style.height = `${height}px`;
+
+            // 🔥 notify editor
+            region.editor.resize(width, height);
+
+            return;
+        }
+
+        const split = this.splitMap.get(region.id)!;
+
+        if (!split) {
+            console.log(region); return;
+        }
+
+        const wrapper = split.a.parentElement;
+
+        if (wrapper === null) {
+
+            throw new Error('wrapper is null');
+
+        }
+
+        wrapper.style.width = `${width}px`;
+        wrapper.style.height = `${height}px`;
+
+        if (region.direction === 'row') {
+
+            const wA = width * region.ratio;
+            const wB = width - wA;
+
+            this.layoutRegion(region.a, wA, height);
+            this.layoutRegion(region.b, wB, height);
+
+        } else {
+
+            const hA = height * region.ratio;
+            const hB = height - hA;
+
+            this.layoutRegion(region.a, width, hA);
+            this.layoutRegion(region.b, width, hB);
+
+        }
+
+    }
+
+    public _render() {
+
+        this.elementMap.clear();
+        this.splitMap.clear();
+
+        this.container.innerHTML = '';
+
+        this.renderHeader();
+
+        if (this.mode.type === 'welcome') {
+
+            this.renderWelcome();
+            return;
+
+        }
+
+        this.region = this.mode.region;
+        this.renderRegion(this.region, this.container);
+
+    }
+
+    public _layout() {
+
+        // TODO: find a better way
+        if (this.mode.type === 'welcome') return;
+
+        const { width, height } = this.getContainerSize();
+        this.layoutRegion(this.region, width, height);
+
+    }
+
+    private _layoutRegion(region: Region, width: number, height: number) {
 
         // leaf
         if (region.type === 'leaf') {
@@ -320,7 +483,7 @@ export class App {
         wrapper.style.width = `${width}px`;
         wrapper.style.height = `${height}px`;
 
-        if (region.direction === 'horizontal') {
+        if (region.direction === 'row') {
 
             const wA = width * region.ratio;
             const wB = width - wA;
@@ -340,26 +503,34 @@ export class App {
 
     }
 
+    private togglePanel() {
+        this.isBOpen = !this.isBOpen;
+
+        if (this.isBOpen) {
+            this.b.classList.add('open');
+        } else {
+            this.b.classList.remove('open');
+        }
+    }
+
     private renderWelcome() {
 
         const wrapper = document.createElement('div');
-        wrapper.style.display = 'flex';
-        wrapper.style.flexDirection = 'column';
-        wrapper.style.justifyContent = 'center';
-        wrapper.style.alignItems = 'center';
-        wrapper.style.height = '100%';
-        wrapper.style.gap = '12px';
+        wrapper.classList.add('full', 'column', 'center');
 
         const title = document.createElement('h1');
         title.innerText = 'STEMngine';
 
         const newBtn = document.createElement('button');
+        newBtn.classList.add('button');
         newBtn.innerText = 'New Project';
 
         const openBtn = document.createElement('button');
+        openBtn.classList.add('button');
         openBtn.innerText = 'Open Project';
 
         const simBtn = document.createElement('button');
+        simBtn.classList.add('button');
         simBtn.innerText = 'Open Simulation';
 
         newBtn.onclick = () => {
@@ -459,7 +630,8 @@ export class App {
 
     private initApp() {
 
-        this.loadEditor('welcome', templates.default)
+        // this.loadEditor('welcome', templates.default)
+        this.loadEditor('editor', templates.default);
 
     }
 
@@ -702,65 +874,6 @@ export class App {
 
     }
 
-    // private onGlobalPointerDown = (e: PointerEvent) => {
-
-    //     // 1. check overlays first
-    //     if (this.interactions.isInsideOverlay(e)) {
-    //         return;
-    //     }
-
-    //     // 2. close all overlays safely
-    //     this.closeAllOverlays();
-
-    // };
-
-    // private closeAllOverlays() {
-    //     // you implement this based on your system
-    //     this.closeMenu();
-    //     // this.closeInspector();
-    //     // this.closeTooltips();
-    // }
-
-    // private applySplitLayout(region: Region, container: HTMLElement) {
-
-    //     const split = this.splitMap.get(region.id)!;
-    //     const dividerSize = 4;
-
-    //     console.log({ region, container })
-
-    //     if (region.direction === 'horizontal') {
-
-    //         const totalWidth = container.clientWidth;
-    //         const usableWidth = totalWidth - dividerSize;
-
-    //         const wA = usableWidth * region.ratio;
-    //         const wB = usableWidth * (1 - region.ratio);
-
-    //         split.a.style.width = `${wA}px`;
-    //         split.b.style.width = `${wB}px`;
-
-    //         split.a.style.height = '100%';
-    //         split.b.style.height = '100%';
-
-    //     } else {
-
-    //         const totalHeight = container.clientHeight;
-    //         const usableHeight = totalHeight - dividerSize;
-
-    //         const hA = usableHeight * region.ratio;
-    //         const hB = usableHeight * (1 - region.ratio);
-
-    //         split.a.style.height = `${hA}px`;
-    //         split.b.style.height = `${hB}px`;
-
-    //         split.a.style.width = '100%';
-    //         split.b.style.width = '100%';
-    //     }
-
-    //     split.a.style.flex = '0 0 auto';
-    //     split.b.style.flex = '0 0 auto';
-    // }
-
     private startDragging(region: Region, e: MouseEvent) {
 
         this.draggingRegion = region;
@@ -787,7 +900,8 @@ export class App {
 
         const { a, b } = this.splitMap.get(split.id)!;
 
-        const rect = a.parentElement!.getBoundingClientRect();  // wrapper div
+        // const rect = a.parentElement!.getBoundingClientRect();  // wrapper div
+        const rect = a.getBoundingClientRect();  // 
 
         let delta: number;
 
