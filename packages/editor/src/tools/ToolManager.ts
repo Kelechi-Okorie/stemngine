@@ -45,6 +45,7 @@ export class ToolManager {
     }
 
     public onClick(e: MouseEvent, viewportEditor: ViewportEditor): void {
+        console.log('clicked')
 
         this.currentTool?.onClick?.(e, viewportEditor);
 

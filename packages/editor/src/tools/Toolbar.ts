@@ -1,98 +1,42 @@
-import { ToolManager } from "./ToolManager";
-import { SelectTool } from "./SelectTool";
-import { AddTool } from "./AddTool";
-import { CursorTool } from "./CursorTool";
 import { Context, Tool } from "../Interfaces";
-import { BrowserInputManager } from "../inputs/BrowserInputManager";
-import { State } from "../core/State";
-import { getMouseNDC } from "../viewport/renderer/interaction";
+
+export type Config = {
+    context: Context;
+    tools: Tool[];
+    direction: 'row' | 'column';
+    position: 'right' | 'left' | 'top' | 'bottom';
+}
 
 export class Toolbar {
 
-    // private toolManager: ToolManager;
     private context: Context;
+    private tools: Tool[];
+    private direction: 'row' | 'column';
+    private position
 
-    constructor(context: Context/* toolManager: ToolManager */) { 
+    constructor(config: Config) {
 
-        // this.toolManager = toolManager;
-        this.context = context
+        const { context, tools, direction, position } = config;
+
+        this.context = context;
+        this.tools = tools;
+        this.direction = direction;
+        this.position = `toolbar-${position}`;
 
     }
 
-    public create(container: HTMLElement) {
+    public mount(container: HTMLElement) {
+
 
         const div = document.createElement('div');
-        div.style.display = 'flex';
-        div.style.flexDirection = 'column';
-        div.style.position = 'absolute';
-        div.style.top = '20px';
-        div.style.left = '20px';
-        div.style.zIndex = '100';
+        div.classList.add('toolbar', this.direction, this.position);
 
-        const toolManager = this.context.toolManager;
-
-        const selectTool = new SelectTool(this.context);
-        const selectBtn = this.createButton(selectTool, () => {
-
-            toolManager.setTool(selectTool);
-
+        this.tools.forEach(tool => {
+            tool.mount(div);
         });
-
-        // TODO: find a better way to set select tool as default
-        toolManager.setTool(selectTool);
-
-        const addTool = new AddTool(this.context);
-        const addBtn = this.createButton(addTool, () => {
-
-            // this.toolManager.setTool(addTool);
-
-            // console.log('clicked add tool', addTool)
-            addTool.createAddMenu(container);
-        });
-
-        const cursorTool = new CursorTool(this.context);
-        const cursorBtn = this.createButton(cursorTool, (/* e: MouseEvent */) => {
-
-            // const mouse = getMouseND)
-            toolManager.setTool(cursorTool);
-        });
-
-        div.appendChild(selectBtn);
-        div.appendChild(cursorBtn);
-        div.append(addBtn);
 
         container.appendChild(div);
 
     }
 
-    public createButton(tool: Tool, onClick: () => void): HTMLElement {
-
-        const btn = document.createElement('button');
-        btn.style.width = '32px';
-        btn.style.height = '32px';
-        btn.style.background = '#eeeeee';
-        btn.style.border = 'none';
-        btn.style.borderRadius = '4px';
-        btn.style.cursor = 'pointer';
-        btn.style.marginBottom = '2px';
-
-        btn.innerHTML = tool.icon;
-        tool.btn = btn;
-
-        btn.onmousedown = () => {
-
-            btn.style.background = '#cccccc';
-        };
-
-        btn.onmouseup = () => {
-
-            btn.style.background = '#eeeeee';
-
-        }
-
-        btn.onclick = onClick;
-
-        return btn;
-
-    }
 }

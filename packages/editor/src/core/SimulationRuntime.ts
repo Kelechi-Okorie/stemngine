@@ -10,7 +10,6 @@ enum EventTypes {
 type Listener = () => void;
 
 export { EventTypes as ToolManagerEventTypes };
-export type ToolManagerEventListener = Listener;
 
 type UpdateFunction = (dt: number) => void;
 

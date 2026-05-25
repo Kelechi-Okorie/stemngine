@@ -19,6 +19,8 @@ export { Float32BufferAttribute } from './core/BufferAttribute';
 export { BufferGeometry } from './core/BufferGeometry';
 export { Clock } from './core/Clock';
 export { EventDispatcher } from './core/EventDispatcher';
+export type { BaseEvent} from './core/EventDispatcher';
+export type { EventListener } from './core/EventDispatcher';
 export { GLBufferAttribute } from './core/GLBufferAttribute';
 export { GlobalEventDispatcher} from './core/GlobalEventDispatcher';
 export { InstancedBufferAttribute } from './core/InstancedBufferAttribute';

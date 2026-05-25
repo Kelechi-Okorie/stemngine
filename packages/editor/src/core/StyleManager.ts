@@ -40,10 +40,6 @@ export class StyleManager {
 
     private render() {
 
-        // const order: StyleLayer[] = ['base', 'primitives', 'components'];
-
-        // this.styleEl.textContent = order.map(layer => this.layers.get(layer) || '').join('\n');
-
         const layerOrder: StyleLayer[] = ['base', 'primitives', 'layout',  'components'];
 
         const layersCSS = layerOrder.map(layer => this.layers.get(layer) || '').join('\n');
@@ -61,57 +57,5 @@ export class StyleManager {
 
         // if (this.registry)
     }
-
-    //     One important improvement (optional but powerful)
-    // Right now order is implicit.
-    // Later you may want:
-    // registerComponent(id, css, layer)
-    // So components can belong to:
-    // primitives
-    // components
-    // or even custom layers
-    // But DO NOT add this yet unless needed.
-
-
-
-
-
-    // public registerStyle(id: string, css: string) {
-
-    //     // this.registry.set(id, css);
-    //     // this.render();
-
-    //     if (!this.registry.has(id)) {
-
-    //         this.order.push(id);
-
-    //     }
-
-    //     this.registry.set(id, css);
-    //     this.render();
-
-    // }
-
-    // public removeStyle(id: string) {
-
-    //     this.registry.delete(id);
-    //     this.render();
-
-    // }
-
-    // public renderStyles() {
-
-    //     this.render();
-
-    // }
-
-    // private render() {
-
-    //     // this.styleEl.textContent = Array.from(this.registry.values()).join('\n');
-
-    //     this.styleEl.textContent = this.order.map(id => this.registry.get(id)).join('\n');
-
-    // }
-
 
 }

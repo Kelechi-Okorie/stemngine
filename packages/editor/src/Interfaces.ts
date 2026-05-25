@@ -2,7 +2,7 @@ import { SimulationManager } from "./core/SimulationManager";
 import { State } from "./core/State";
 import { ToolManager } from "./tools/ToolManager";
 import { StyleManager } from "./core/StyleManager";
-import { SimulationModel } from "@stemngine/engine";
+import { SimulationModel, BaseEvent, EventListener } from "@stemngine/engine";
 import { RenderIndex } from "./core/RenderIndex";
 import { SimulationRuntime } from "./core/SimulationRuntime";
 import { System } from "@stemngine/engine";
@@ -33,7 +33,7 @@ export type TemplateNode =
     }
     | {
         type: 'split';
-        direction: 'horizontal' | 'vertical';
+        direction: 'row' | 'column';
         ratio: number;
         a: TemplateNode;
         b: TemplateNode;
@@ -45,7 +45,7 @@ export type Region =
     | {
         type: 'split'
         id: string;
-        direction: 'horizontal' | 'vertical';
+        direction: 'row' | 'column';
         ratio: number;  // 0 -> 1
         a: Region;
         b: Region;
@@ -57,7 +57,7 @@ export type Region =
         editor: Editor;
         editorType: keyof typeof editorRegistry;
     }
-;
+    ;
 
 export type Listener<T> = (value: T) => void;
 
@@ -79,6 +79,7 @@ export interface Tool {
     icon: string;
     btn: HTMLElement;
     allows: Record<string, boolean>
+    mount: (container: HTMLElement) => void;
     onMouseDown?: (e: MouseEvent, obj: any) => void;
     onMouseMove?: (e: MouseEvent, obj: any) => void;
     onMouseUp?: (e: MouseEvent, obj: any) => void;
@@ -98,8 +99,10 @@ export interface Context {
     // select(id: string): void;
     // getSelection(): any;
 
-    // on(event: string, handler: Function): void; // TODO: change Function
-    // emit(event: string, payload?: any): void;
+    events: {
+        emit<E extends BaseEvent>(event: E): void;
+        on<K extends keyof any>(type: K, handler: EventListener<any[K]>): void;
+    }
 }
 
 export type VisualRepresentation = {

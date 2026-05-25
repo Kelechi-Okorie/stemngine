@@ -128,6 +128,13 @@ const textContent = `
   --bp-md: 900px;
   --bp-lg: 1200px;
 
+  --layer-0 { z-index: 0; }
+  --layer-1 { z-index: 100; }
+  --layer-2 { z-index: 200; }
+  --layer-3 { z-index: 300; }
+
+  --width: 320px;
+
 }
 
 /* =========================

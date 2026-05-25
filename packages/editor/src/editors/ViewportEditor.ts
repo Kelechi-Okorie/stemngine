@@ -1,15 +1,11 @@
 // TODO: use imports from the build
-import { BufferGeometry, Camera, DirectionalLight, Group, LineBasicMaterial, MeshPhongMaterial, OrthographicCamera, Scene, Vector3, Line, isOrthographicCamera, isPerspectiveCamera, GridHelper, Layers } from "@stemngine/engine";
-import { PerspectiveCamera, Plane, PlaneGeometry } from "@stemngine/engine";
+import { Camera, OrthographicCamera, Vector3, isOrthographicCamera, isPerspectiveCamera, GridHelper, Layers } from "@stemngine/engine";
+import { PerspectiveCamera, Plane } from "@stemngine/engine";
 import { WebGLRenderer } from "@stemngine/engine";
-import { BoxGeometry } from "@stemngine/engine";
-import { MeshBasicMaterial } from "@stemngine/engine";
 import { Mesh } from "@stemngine/engine";
 import { OrbitControls } from "../controllers/OrbitControls";
-import { createCanvasElement } from "@stemngine/engine";
 import { Raycaster } from "@stemngine/engine";
 import { Vector2 } from "@stemngine/engine";
-import { Node3D, TextureLoader } from "@stemngine/engine";
 
 import { State } from "../core/State";
 import { Editor, Context, LAYERS, Tool } from '../Interfaces';
@@ -20,13 +16,17 @@ import { OutlinePass } from "../rendering/postprocessing/OutlinePass";
 import { TestPass } from "../rendering/postprocessing/TestPass";    // TODO: remove
 import { attachGizmo, createAxis } from "../rendering/gizmos";
 import { Toolbar } from "../tools/Toolbar";
-import { ToolManager, ToolManagerEventTypes } from "../tools/ToolManager";
+import { ToolManagerEventTypes } from "../tools/ToolManager";
 import { Cursor3D } from "../viewport/renderer/Cursor3D";
 import { ViewportGizmo } from "../viewport/renderer/ViewportGizmo";
 import { Grid } from "../viewport/renderer/Grid";
 import { RaycasterIntersection } from "../../../engine/src/core/Raycaster";
 import { AxesHelper } from "../../../engine/src/helpers/AxesHelper";
 import { Axes } from "../viewport/renderer/Axes";
+import { AddTool } from "../tools/AddTool";
+import { SelectTool } from "../tools/SelectTool";
+import { CursorTool } from "../tools/CursorTool";
+import { EditorShell } from "../ui/EditorShell";
 
 export class ViewportEditor implements Editor {
     public name: string = '3D viewport';
@@ -38,7 +38,6 @@ export class ViewportEditor implements Editor {
 
     private highlightBox: BoxHelper | null = null;
     private selectedObject!: Mesh;  // TODO: should be a set
-    private toolbar: Toolbar;
 
     public readonly camera: Camera;
     private cursor: Cursor3D;
@@ -76,7 +75,7 @@ export class ViewportEditor implements Editor {
         this.camera.position.z = 15;
         this.camera.lookAt(0, 0, 0);
 
-        this.toolbar = new Toolbar(this.context);
+        // this.toolbar = new Toolbar(this.context);
 
         this.orbitControl = new OrbitControls(this.camera as OrthographicCamera, this.renderer.domElement);
 
@@ -96,14 +95,39 @@ export class ViewportEditor implements Editor {
         const axes = new Axes()
         this.state.scene.add(axes)
 
-
+        container.classList.add('relative', 'test');
         container.appendChild(this.renderer.domElement);
 
+        new EditorShell(this.context, container);
 
         // TODO: may have to be inside the select tool
         // TODO: take care of the as OrthographicCamera
 
-        this.toolbar.create(container);
+        // create once
+        const tools = {
+            select: new SelectTool(this.context),
+            cursor: new CursorTool(this.context),
+            add: new AddTool(this.context)
+        };
+
+        // pass references to multiple toolbars
+
+        // right toolbar
+        new Toolbar({
+            context: this.context,
+            tools: [tools.add, tools.select/* , tools.cursor */],
+            position: 'right',
+            direction: 'column'
+        }).mount(container);
+
+        // const bottomToolbar = new Toolbar({
+        //     context: this.context,
+        //     tools: [cursorTool, selectTool, addTool],
+        //     position: 'bottom',
+        //     direction: 'row'
+        // });
+
+        this.context.toolManager.setTool(tools.select);
 
         const domElement = this.renderer.domElement;
         const toolManager = this.context.toolManager;
@@ -126,15 +150,13 @@ export class ViewportEditor implements Editor {
 
         });
 
-        // this.cursor.attach(this.state.scene);
+        this.cursor.attach(this.state.scene);
 
         this.context.toolManager.on(ToolManagerEventTypes.TOOL_SET, this.updateInteractiveMode.bind(this));
 
     }
 
     public resize(width: number, height: number) {
-
-        console.log('resizing vierpowr')
 
         this.width = width;
         this.height = height;
@@ -196,7 +218,6 @@ export class ViewportEditor implements Editor {
 
             // this.highlightBox = new BoxHelper(object, 0xffff00) // yellow
             // this.highlightBox.layers.set(LAYERS.HELPERS);
-            // console.log({h: this.highlightBox})
 
             // this.state.scene.add(this.highlightBox);
 

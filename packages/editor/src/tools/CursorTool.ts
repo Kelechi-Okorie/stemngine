@@ -17,20 +17,49 @@ export class CursorTool implements Tool {
 
         this.context = context;
 
+        const btn = document.createElement('button');
+        btn.style.width = '32px';
+        btn.style.height = '32px';
+        btn.style.background = '#eeeeee';
+        btn.style.border = 'none';
+        btn.style.borderRadius = '4px';
+        btn.style.cursor = 'pointer';
+
+        btn.innerHTML = this.icon;
+        this.btn = btn;
+
+        // btn.onmousedown = () => this.onMouseDown;
+
+        // btn.onmouseup = () => {
+
+        //     btn.style.background = '#eeeeee';
+
+        // }
+
+        btn.onclick = (e: MouseEvent) => { this.context.toolManager.setTool(this); };
+
+
     }
 
-    public onClick(e: MouseEvent, viewportEditor: ViewportEditor): void {
+    public mount(container: HTMLElement) {
 
+        container.appendChild(this.btn);
+        this.context.toolManager.setTool(this)
     }
 
-    public onMouseDown(e: MouseEvent, viewportEditor: ViewportEditor): void {
+    public onClick = (e: MouseEvent, viewportEditor: ViewportEditor): void => {
+
+        this.context.toolManager.setTool(this);
+    }
+
+    public onMouseDown = (e: MouseEvent, viewportEditor: ViewportEditor): void => {
 
         const point = viewportEditor.getIntersectionPoint(e);
 
         if (!point) return;
 
         this.context.state.cursor.position.copy(point);
-        
+
     }
 
     public update(event: MouseEvent): void {

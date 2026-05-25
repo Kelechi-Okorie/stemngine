@@ -1,178 +1,69 @@
-import { MathUtils } from '@stemngine/engine';
-
 import { addIcon } from '../assets/icons/addIcon';
 import { Context, Tool } from '../Interfaces';
-// import addToolStyle, { addToolClass } from '../assets/css/addToolStyle';
-import { RepresentationStore } from '../core/RepresentationStore';
 
-const OBJECTS = [
-    // physics - state carriers
-    { name: "Particle", type: "particle" },
-    { name: "Rigid Body", type: "rigid_body" },
-
-    // physics - constraints / relations
-    { name: "Distance", type: "distance" },
-    { name: "Fixed Point", type: "fixed_point" },
-    { name: "Joint (hinge, slider)", type: "joint" },
-
-    // physics - forces
-    { name: "Gravity", type: "gravity" },
-    { name: "Spring", type: "spring" },
-    { name: "External", type: "external" },
-
-    // math - objects
-    { name: "Point", type: "point" },
-    { name: "Scalar", type: "scalar" },
-    { name: "Vector", type: "vector" },
-
-    // math - mappings
-    { name: "Function f(x)", type: "function" },
-    { name: "Parametric curve", type: "parametric_curve" },
-
-    // math relations
-    { name: "Equation", type: "equation" },
-    { name: "Constraint", type: "con" }
-];
+export const  enum AddToolEvent {
+    ADDTOOL_OPEN_MODAL = 'add_tool:open_modal'
+};
 
 export class AddTool implements Tool {
 
     public name = 'add';
     public icon = addIcon;
     private context: Context;
-    private overlay: HTMLElement | null = null;
-    private container: HTMLElement | null = null;   // TODO: container should be the thing that holds the canvas
     public btn!: HTMLElement;
 
     public allows: Record<string, boolean> = {};
 
-    private outsideClickHandler?: (e: MouseEvent) => void;
 
     constructor(context: Context) {
 
         this.context = context;
 
-        // context.styleManager.registerStyle(addToolClass, addToolStyle)
+        const btn = document.createElement('button');
+        btn.style.width = '32px';
+        btn.style.height = '32px';
+        btn.style.background = '#eeeeee';
+        btn.style.border = 'none';
+        btn.style.borderRadius = '4px';
+        btn.style.cursor = 'pointer';
+
+        btn.innerHTML = this.icon;
+        this.btn = btn;
+
+        // btn.onmousedown = () => {
+
+        //     btn.style.background = '#cccccc';
+        // };
+
+        // btn.onmouseup = () => {
+
+        //     btn.style.background = '#eeeeee';
+
+        // }
+
+        btn.onclick = (e: MouseEvent) => { this.onClick(e)};
 
     }
 
-    public onClick(e: MouseEvent) {
+    public mount(container: HTMLElement)  {
 
-        // this.createAddMenu(container);
+        container.appendChild(this.btn);
+        this.context.toolManager.setTool(this)
+    }
+
+    public onClick = (e: MouseEvent) => {
+
+        // this.context.toolManager.setTool(this);
+
+        this.context.events.emit({
+            type: AddToolEvent.ADDTOOL_OPEN_MODAL,
+            target: this
+        });
 
     }
 
     public onMouseDown(e: MouseEvent) {
 
-        console.log(e);
-
-    }
-
-    public createAddMenu(container: HTMLElement) {
-
-        const overlay = document.createElement('div');
-        overlay.dataset.name = 'the overlay'
-
-        const input = document.createElement('input');
-        input.name = 'add-object';
-        input.placeholder = 'Search objects...';
-
-        input.addEventListener('input', () => {
-
-            const query = input.value.toLowerCase();
-
-            const filtered = OBJECTS.filter(o => o.name.toLocaleLowerCase().includes(query));
-
-            this.renderList(listElement, filtered);
-        })
-
-        const listElement = document.createElement('div');
-
-        this.renderList(listElement, OBJECTS);
-
-        overlay.appendChild(input);
-        overlay.appendChild(listElement);
-
-        this.overlay = overlay;
-        this.container = container;
-
-        container.appendChild(overlay);
-
-        const onOutsideClick = (e: MouseEvent) => {
-
-            const path = e.composedPath();
-
-            if (!path.includes(overlay)) {
-                this.closeMenu();
-                document.removeEventListener('mousedown', onOutsideClick);
-            }
-        };
-
-        this.outsideClickHandler = onOutsideClick;
-
-        input.focus();
-
-        return { overlay, input, listElement };
-    }
-
-    public renderList(listEl: HTMLElement, items: { name: string, type: string }[]) {
-
-        listEl.innerHTML = '';
-
-        items.forEach(item => {
-
-            const row = document.createElement('div');
-            row.innerText = item.name;
-            row.classList.add('menu-row');
-
-
-
-            row.onclick = () => {
-
-                this.spawnObject(item);
-
-                // prevent double-click spam
-                // close after spawn succeeds
-                requestAnimationFrame(() => {
-
-                    this.closeMenu();
-
-                });
-            }
-
-            listEl.appendChild(row);
-        });
-
-    }
-
-    public spawnObject(config: Record<string, any>) {
-
-        const position = this.context.state.cursor.position.clone();
-        config = { ...config, position }
-
-        const entity = this.context.simulationManager.addEntity(config);
-
-        RepresentationStore.add({
-            id: MathUtils.generateUUID(),
-            entityId: entity.uuid,
-            entity,
-            kind: 'point', // default view for this tool
-            color: 0x00ff00,
-            size: 1
-        });
-
-    }
-
-    public closeMenu() {
-
-        if (this.overlay?.parentNode) {
-            this.overlay.parentNode.removeChild(this.overlay);
-        }
-
-        if (this.outsideClickHandler) {
-
-            document.removeEventListener('mousedown', this.outsideClickHandler);
-            this.outsideClickHandler = undefined;
-        }
 
     }
 

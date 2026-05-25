@@ -6,7 +6,7 @@ export interface BaseEvent {
 }
 
 
-type EventListener<E extends BaseEvent> = (event: E) => void;
+export type EventListener<E extends BaseEvent> = (event: E) => void;
 
 // TODO: EventDispatcher needs to be rewritten. it is unnecessarily complex.
 // look at BrowserInputManager

@@ -20,6 +20,8 @@ import baseCSS from '../assets/css/base';
 import primitivesCSS from '../assets/css/primitives';
 import layoutCSS from '../assets/css/layout';
 import buttonCSS from '../assets/css/components/button';
+import toolbarCSS from '../assets/css/components/toolbar';
+import liCSS from '../assets/css/components/li';
 // import { InteractionManager } from "./InteractionManager";
 
 // Correct structure
@@ -104,11 +106,12 @@ export class App {
         const shadow = host.attachShadow({ mode: 'open' }); // isolation boundary
 
         const styleManager = new StyleManager(shadow);
-        // styleManager.registerStyle(rootClass, rootStyle)
         styleManager.setLayer('base', baseCSS);
         styleManager.setLayer('primitives', primitivesCSS);
         styleManager.setLayer('layout', layoutCSS);
         styleManager.registerComponent('button', buttonCSS);
+        styleManager.registerComponent('toolbar', toolbarCSS);
+        styleManager.registerComponent('li', liCSS)
 
 
         this.root = document.createElement('div');
@@ -156,8 +159,10 @@ export class App {
             // select: (id: string) => console.log('test'),
             // getSelection: () => console.log('get selection'),
 
-            // emit: GlobalEventDispatcher.instance.dispatchEvent.bind(GlobalEventDispatcher.instance),
-            // on: GlobalEventDispatcher.instance.addEventListener.bind(GlobalEventDispatcher.instance),
+            events: {
+                emit: GlobalEventDispatcher.instance.dispatchEvent.bind(GlobalEventDispatcher.instance),
+                on: GlobalEventDispatcher.instance.addEventListener.bind(GlobalEventDispatcher.instance),
+            }
         }
 
         this.renderer3D = new Renderer3DSystem(this.context, this.bindingManager);
@@ -178,14 +183,14 @@ export class App {
         const btn = document.createElement('button');
         btn.innerText = 'button';
         btn.style.position = 'absolute';
-        btn.style.right = '10px'
+        btn.style.left = '10px'
         btn.style.top = '10px';
         btn.style.zIndex = '100';
         btn.classList.add('button');
 
         btn.addEventListener('click', () => {
 
-            this.togglePanel();
+            // this.togglePanel();
         }, false);
 
         // const body = document.querySelector('body')!;
@@ -220,6 +225,7 @@ export class App {
 
     public render() {
 
+
         this.elementMap.clear();
         this.splitMap.clear();
 
@@ -227,31 +233,39 @@ export class App {
 
         // this.renderHeader();
 
+        // this.renderRegion(this.region, this.container);
+
         if (this.mode.type === 'welcome') {
+
             this.renderWelcome();
             return;
+
         }
 
-        const layout = document.createElement('div');
-        layout.classList.add('layout');
-        const a = document.createElement('div');
-        a.classList.add('a');
-        const b = document.createElement('div');
-        b.classList.add('b');
+        if (this.mode.type === 'editor') {
 
-        this.a = a;
-        this.b = b;
+            this.region = this.mode.region;
+            this.renderRegion(this.region, this.container);
+            return;
 
-        layout.appendChild(a);
-        layout.appendChild(b);
+        }
 
-        this.container.appendChild(layout);
+        if (this.mode.type === 'simulation') {
 
-        this.region = this.mode.region;
+            // TODO: later
+            return;
 
-        this.renderRegion(this.mode.region.a, a)
-        this.renderRegion(this.mode.region.b, b)
+        }
 
+    }
+
+    public layout() {
+
+        const { width, height } = this.getContainerSize();
+
+        if (this.mode.type !== 'editor') return;
+
+        this.layoutRegion(this.region, width, height);
 
     }
 
@@ -271,38 +285,22 @@ export class App {
 
         }
 
-        // container.classList.add('container');
-
         // split
         // TODO: use prebuilt css instead
-        // const wrapper = document.createElement('div');
-        // wrapper.style.display = 'flex';
-        // wrapper.style.width = '100%';
-        // wrapper.style.height = '100%';
-
-        // wrapper.style.flexDirection = region.direction === 'horizontal' ? 'row' : 'column';
-
-        // container.style.flexDirection = region.direction === 'horizontal' ? 'row' : 'column';
-        container.classList.add(region.direction)
+        const wrapper = document.createElement('div');
+        wrapper.style.display = 'flex';
+        wrapper.style.width = '100%';
+        wrapper.style.height = '100%';
+        wrapper.style.flexDirection = region.direction;
 
         const a = document.createElement('div');
         const b = document.createElement('div');
 
-        // const ratio = region.ratio;
+        // apply size ratios
+        a.style.flex = `${region.ratio} 1 0`;
+        b.style.flex = `${1 - region.ratio} 1 0`;
 
-        // if (region.direction === 'row') {
-
-        //     a.style.flex = `${ratio} 1 0%`;
-        //     b.style.flex = `${1 - ratio} 1 0%`;
-
-        // } else {
-
-        //     a.style.flex = `${ratio} 1 0%`;
-        //     b.style.flex = `${1 - ratio} 1 0%`;
-
-        // }
-
-        const divider = this.createDivider(region)!;
+        const divider = this.createDivider(region);
 
         if (divider === undefined) {
 
@@ -310,15 +308,11 @@ export class App {
 
         }
 
-        // wrapper.appendChild(a);
-        // // wrapper.appendChild(divider);
-        // wrapper.appendChild(b);
+        wrapper.appendChild(a);
+        wrapper.appendChild(divider);
+        wrapper.appendChild(b);
 
-        // container.appendChild(wrapper);
-
-        container.appendChild(a);
-        // container.appendChild(wrapper);
-        container.appendChild(b);
+        container.appendChild(wrapper);
 
         this.splitMap.set(region.id, { a, b, divider });
 
@@ -335,127 +329,23 @@ export class App {
 
         }
 
-        // const el = document.createElement('div');
-        // el.style.width = '100%';
-        // el.style.height = '100%';
-        // // el.style.padding = '2px';
-        // el.style.position = 'relative';
-        // el.style.border = '1px solid grey';
-        // el.style.borderRadius = '16px;'
+        const el = document.createElement('div');
+        el.style.width = '100%';
+        el.style.height = '100%';
+        el.style.padding = '2px';
+        el.style.position = 'relative';
 
-        // container.appendChild(el);
+        container.appendChild(el);
 
         // store reference for layout later
-        this.elementMap.set(region.id, container);
+        this.elementMap.set(region.id, el);
 
-        container.classList.add(region.name);
         // mount editor
-        region.editor.mount(container);
+        region.editor.mount(el);
 
     }
 
-    public layout() {
-        console.log(this.region)
-
-        // TODO: find a better way
-        if (this.mode.type === 'welcome') return;
-
-        const { width, height } = this.getContainerSize();
-
-        // compute A/B sizes based on CSS or ratio
-        const aRect = this.a.getBoundingClientRect();
-        const bRect = this.b.getBoundingClientRect();
-
-        // this.layoutRegion(this.region, width, height);
-
-        this.layoutRegion(this.region.a, aRect.width, aRect.height);
-        this.layoutRegion(this.region.b, bRect.width, bRect.height);
-
-    }
-
-    public layoutRegion(region: Region, width: number, height: number) {
-        // leaf
-        if (region.type === 'leaf') {
-            const wrapper = this.elementMap.get(region.id)!;
-
-            wrapper.style.width = `${width}px`;
-            wrapper.style.height = `${height}px`;
-
-            // 🔥 notify editor
-            region.editor.resize(width, height);
-
-            return;
-        }
-
-        const split = this.splitMap.get(region.id)!;
-
-        if (!split) {
-            console.log(region); return;
-        }
-
-        const wrapper = split.a.parentElement;
-
-        if (wrapper === null) {
-
-            throw new Error('wrapper is null');
-
-        }
-
-        wrapper.style.width = `${width}px`;
-        wrapper.style.height = `${height}px`;
-
-        if (region.direction === 'row') {
-
-            const wA = width * region.ratio;
-            const wB = width - wA;
-
-            this.layoutRegion(region.a, wA, height);
-            this.layoutRegion(region.b, wB, height);
-
-        } else {
-
-            const hA = height * region.ratio;
-            const hB = height - hA;
-
-            this.layoutRegion(region.a, width, hA);
-            this.layoutRegion(region.b, width, hB);
-
-        }
-
-    }
-
-    public _render() {
-
-        this.elementMap.clear();
-        this.splitMap.clear();
-
-        this.container.innerHTML = '';
-
-        this.renderHeader();
-
-        if (this.mode.type === 'welcome') {
-
-            this.renderWelcome();
-            return;
-
-        }
-
-        this.region = this.mode.region;
-        this.renderRegion(this.region, this.container);
-
-    }
-
-    public _layout() {
-
-        // TODO: find a better way
-        if (this.mode.type === 'welcome') return;
-
-        const { width, height } = this.getContainerSize();
-        this.layoutRegion(this.region, width, height);
-
-    }
-
-    private _layoutRegion(region: Region, width: number, height: number) {
+    private layoutRegion(region: Region, width: number, height: number) {
 
         // leaf
         if (region.type === 'leaf') {
@@ -503,14 +393,17 @@ export class App {
 
     }
 
-    private togglePanel() {
-        this.isBOpen = !this.isBOpen;
+    //  That becomes your:
+    // “New Project”
+    // “Switch Layout”
+    // “Reset Layout”
+    private loadTemplate(template: TemplateNode) {
+        // this.container.innerHTML = ''; // clear DOM
 
-        if (this.isBOpen) {
-            this.b.classList.add('open');
-        } else {
-            this.b.classList.remove('open');
-        }
+        this.region = buildRegion(template, this.context);
+
+        this.render();
+        this.layout();
     }
 
     private renderWelcome() {
@@ -849,7 +742,7 @@ export class App {
         divider.style.background = 'red';
         divider.style.flexShrink = '0';
 
-        if (region.direction === 'horizontal') {
+        if (region.direction === 'row') {
 
             divider.style.width = '4px';
             divider.style.height = '100%';
@@ -905,7 +798,7 @@ export class App {
 
         let delta: number;
 
-        if (split.direction === 'horizontal') {
+        if (split.direction === 'row') {
 
             delta = e.movementX / rect.width;
 
