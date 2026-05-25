@@ -105,7 +105,7 @@ export class ViewportEditor implements Editor {
 
         // create once
         const tools = {
-            select: new SelectTool(this.context),
+            // select: new SelectTool(this.context),
             cursor: new CursorTool(this.context),
             add: new AddTool(this.context)
         };
@@ -114,20 +114,16 @@ export class ViewportEditor implements Editor {
 
         // right toolbar
         new Toolbar({
-            context: this.context,
-            tools: [tools.add, tools.select/* , tools.cursor */],
+            tools: [tools.add, tools.cursor],
             position: 'right',
             direction: 'column'
         }).mount(container);
 
         // const bottomToolbar = new Toolbar({
-        //     context: this.context,
         //     tools: [cursorTool, selectTool, addTool],
         //     position: 'bottom',
         //     direction: 'row'
         // });
-
-        this.context.toolManager.setTool(tools.select);
 
         const domElement = this.renderer.domElement;
         const toolManager = this.context.toolManager;
@@ -151,8 +147,6 @@ export class ViewportEditor implements Editor {
         });
 
         this.cursor.attach(this.state.scene);
-
-        this.context.toolManager.on(ToolManagerEventTypes.TOOL_SET, this.updateInteractiveMode.bind(this));
 
     }
 
@@ -196,7 +190,6 @@ export class ViewportEditor implements Editor {
 
     public unmount(): void {
 
-        this.context.toolManager.remove(ToolManagerEventTypes.TOOL_SET, this.updateInteractiveMode);
         this.context.simulationRuntime.unSchedule(this.update);
 
     }
@@ -228,7 +221,6 @@ export class ViewportEditor implements Editor {
 
     private onMouseMove(event: MouseEvent, canvas: HTMLCanvasElement) {
 
-        // const canvas = this.state.renderer.domElement;
         const rect = canvas.getBoundingClientRect();
 
         const mouse = new Vector2();
@@ -316,12 +308,6 @@ export class ViewportEditor implements Editor {
 
         return hits;
 
-    }
-
-    public updateInteractiveMode(tool: Tool) {
-
-        // this.orbitControl.enabled = tool.name === "select";
-        this.orbitControl.enabled = tool.allows['orbitControls'];
     }
 
 }

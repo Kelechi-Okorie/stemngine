@@ -91,10 +91,10 @@ const textContent = `
 
   /* typography */
   --font-family: Inter, sans-serif;
-  --text: 11px;
-  --text-sm: 12px;
-  --text-md: 13px;
-  --text-lg: 14px;
+  --font-size: 11px;
+  --font-size-sm: 12px;
+  --font-size-md: 13px;
+  --font-size-lg: 14px;
 
   /* spacing */
   --space: 4px;

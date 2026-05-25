@@ -22,11 +22,11 @@ export class ToolManager {
 
     public setTool(tool: Tool) {
 
-        if (this.currentTool) {
-            this.currentTool.btn.style.backgroundColor = '#eeeeee';
-        }
+        // if (this.currentTool) {
+        //     this.currentTool.btn.style.backgroundColor = '#eeeeee';
+        // }
 
-        tool.btn.style.backgroundColor = 'green';
+        // tool.btn.style.backgroundColor = 'green';
         this.currentTool = tool;
 
         this.emit(EventTypes.TOOL_SET, tool);
@@ -88,11 +88,11 @@ export class ToolManager {
 
     public reset(): void {
 
-        if (this.currentTool) {
+        // if (this.currentTool) {
 
-            this.currentTool.btn.style.backgroundColor = '#eeeeee'; // TODO:
+        //     this.currentTool.btn.style.backgroundColor = '#eeeeee'; // TODO:
 
-        }
+        // }
 
         this.currentTool = null;
 

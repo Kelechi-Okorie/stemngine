@@ -18,9 +18,6 @@ export class BrowserInputManager {
   public readonly domElement: HTMLElement | SVGElement;
   public listeners = new Map<InputEventType, Listener[]>();
 
-  private lastX = 0;
-  private lastY = 0;
-
   /**
    * The html element used for event listening
    * @param domElement

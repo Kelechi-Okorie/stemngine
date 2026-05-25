@@ -1,27 +1,39 @@
 const textContent = `
-.button {
-  background: var(--panel-2);
+.tool-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--bg);
+  width: 32px;
+  height: 32px;
+  border: none;
   color: var(--text);
-  padding: var(--space-sm) var(--space-md);
+  padding: 4px;
   border-radius: var(--radius);
   cursor: pointer;
-  border: 1px solid transparent;
   transition: background 0.15s ease;
 }
 
-.button:active {
+.tool-button:active {
     background: color-mix(in srgb, var(--panel), var(--active-overlay));
 }
 
-.button:focus {
+.tool-button:focus {
     outline: none;
     /* box-shadow: var(--focus-ring); */
     border-color: var(--accent);
     background: color-mix(in srgb, var(--panel), var(--hover-overlay));
 }
 
-.button:hover {
+.tool-button:hover {
     background: color-mix(in srgb, var(--panel), var(--hover-overlay));
+}
+
+.tool-button svg {
+  stroke: currentColor;
+  fill: none;
+  width: 20px;
+  height: 20px;
 }
 `;
 

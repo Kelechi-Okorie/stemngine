@@ -22,6 +22,7 @@ import layoutCSS from '../assets/css/layout';
 import buttonCSS from '../assets/css/components/button';
 import toolbarCSS from '../assets/css/components/toolbar';
 import liCSS from '../assets/css/components/li';
+import toolButtonCSS from '../assets/css/components/toolButton'
 // import { InteractionManager } from "./InteractionManager";
 
 // Correct structure
@@ -111,8 +112,8 @@ export class App {
         styleManager.setLayer('layout', layoutCSS);
         styleManager.registerComponent('button', buttonCSS);
         styleManager.registerComponent('toolbar', toolbarCSS);
-        styleManager.registerComponent('li', liCSS)
-
+        styleManager.registerComponent('li', liCSS);
+        styleManager.registerComponent('tool-button', toolButtonCSS);
 
         this.root = document.createElement('div');
         this.root.classList.add('root', 'full');

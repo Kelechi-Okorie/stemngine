@@ -6,7 +6,7 @@ const textContent = `
 }
 
 .toolbar-right {
-  top: 20px;
+  top: 100px;
   right: 0;
 }
 

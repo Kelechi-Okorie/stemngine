@@ -18,12 +18,7 @@ export class CursorTool implements Tool {
         this.context = context;
 
         const btn = document.createElement('button');
-        btn.style.width = '32px';
-        btn.style.height = '32px';
-        btn.style.background = '#eeeeee';
-        btn.style.border = 'none';
-        btn.style.borderRadius = '4px';
-        btn.style.cursor = 'pointer';
+        btn.classList.add('tool-button');
 
         btn.innerHTML = this.icon;
         this.btn = btn;
