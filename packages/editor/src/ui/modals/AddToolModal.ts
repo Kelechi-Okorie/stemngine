@@ -12,23 +12,23 @@ const OBJECTS = [
     { name: "Fixed Point", type: "fixed_point" },
     { name: "Joint (hinge, slider)", type: "joint" },
 
-    // physics - forces
-    { name: "Gravity", type: "gravity" },
-    { name: "Spring", type: "spring" },
-    { name: "External", type: "external" },
+    // // physics - forces
+    // { name: "Gravity", type: "gravity" },
+    // { name: "Spring", type: "spring" },
+    // { name: "External", type: "external" },
 
-    // math - objects
-    { name: "Point", type: "point" },
-    { name: "Scalar", type: "scalar" },
-    { name: "Vector", type: "vector" },
+    // // math - objects
+    // { name: "Point", type: "point" },
+    // { name: "Scalar", type: "scalar" },
+    // { name: "Vector", type: "vector" },
 
-    // math - mappings
-    { name: "Function f(x)", type: "function" },
-    { name: "Parametric curve", type: "parametric_curve" },
+    // // math - mappings
+    // { name: "Function f(x)", type: "function" },
+    // { name: "Parametric curve", type: "parametric_curve" },
 
-    // math relations
-    { name: "Equation", type: "equation" },
-    { name: "Constraint", type: "con" }
+    // // math relations
+    // { name: "Equation", type: "equation" },
+    // { name: "Constraint", type: "con" }
 ];
 
 
@@ -78,15 +78,9 @@ export class AddToolModal {
 
         items.forEach(item => {
 
-            // const row = document.createElement('div');
-            // row.innerText = item.name;
-            // row.classList.add('button');
-
             const div = document.createElement('div');
             div.innerText = item.name;
             div.classList.add('li', 'fill');
-
-
 
             div.onclick = () => {
 

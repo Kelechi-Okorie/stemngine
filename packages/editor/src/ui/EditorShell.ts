@@ -2,6 +2,10 @@ import { Context } from "../Interfaces";
 import { ModalSystem } from "./ModalSystem";
 import { AddToolModal } from "./modals/AddToolModal";
 import { AddToolEvent } from "../tools/AddTool";
+import { OutlinerModal } from "./modals/OutlinerModal";
+import { OutlinerEvent } from "../tools/OutlinerTool";
+import { ObjectInspectorModal } from "./modals/ObjectInspectorModal";
+import { ObjectInspectorEvent } from "../tools/ObjectInspectorTool";
 
 export class EditorShell {
 
@@ -21,6 +25,26 @@ export class EditorShell {
 
 
       const modal = new AddToolModal(this.context);
+      const el = modal.render();
+
+      this.modalSystem.open(el);
+
+    });
+
+    this.context.events.on(OutlinerEvent.OUTLINER_OPEN_MODAL, () => {
+
+
+      const modal = new OutlinerModal(this.context);
+      const el = modal.render();
+
+      this.modalSystem.open(el);
+
+    });
+
+    this.context.events.on(ObjectInspectorEvent.OBJECT_INSPECTOR_OPEN_MODAL, () => {
+
+
+      const modal = new ObjectInspectorModal(this.context);
       const el = modal.render();
 
       this.modalSystem.open(el);

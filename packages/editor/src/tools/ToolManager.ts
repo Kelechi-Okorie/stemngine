@@ -33,23 +33,22 @@ export class ToolManager {
 
     }
 
-    public onMouseDown(e: MouseEvent, viewportEditor: ViewportEditor) {
+    // public onMouseDown(e: MouseEvent, viewportEditor: ViewportEditor) {
 
-        this.currentTool?.onMouseDown?.(e, viewportEditor);
+    //     this.currentTool?.onMouseDown?.(e, viewportEditor);
 
-    }
+    // }
 
-    public onMouseMove(e: MouseEvent, viewportEditor: ViewportEditor) {
+    // public onMouseMove(e: MouseEvent, viewportEditor: ViewportEditor) {
 
-        this.currentTool?.onMouseMove?.(e, viewportEditor)
-    }
+    //     this.currentTool?.onMouseMove?.(e, viewportEditor)
+    // }
 
-    public onClick(e: MouseEvent, viewportEditor: ViewportEditor): void {
-        console.log('clicked')
+    // public onClick(e: MouseEvent, viewportEditor: ViewportEditor): void {
 
-        this.currentTool?.onClick?.(e, viewportEditor);
+    //     this.currentTool?.onClick?.(e, viewportEditor);
 
-    }
+    // }
 
     public on(type: EventTypes, fn: Listener): void {
 

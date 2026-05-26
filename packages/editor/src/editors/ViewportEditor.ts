@@ -27,6 +27,10 @@ import { AddTool } from "../tools/AddTool";
 import { SelectTool } from "../tools/SelectTool";
 import { CursorTool } from "../tools/CursorTool";
 import { EditorShell } from "../ui/EditorShell";
+import { InspectorTool } from "../tools/InspectorTool";
+import { OutlinerTool } from "../tools/OutlinerTool";
+import { ObjectInspectorTool } from "../tools/ObjectInspectorTool";
+import { RepresentationStore } from "../core/RepresentationStore";
 
 export class ViewportEditor implements Editor {
     public name: string = '3D viewport';
@@ -82,6 +86,9 @@ export class ViewportEditor implements Editor {
         // TODO: may need to set near and far
         this.raycaster.layers.set(LAYERS.DEFAULT);
 
+        // TODO: find better way
+        this.renderer.domElement.addEventListener('mousedown', this.onMouseDown);
+
         this.context.simulationRuntime.schedule('render', this.update);
 
     }
@@ -103,18 +110,28 @@ export class ViewportEditor implements Editor {
         // TODO: may have to be inside the select tool
         // TODO: take care of the as OrthographicCamera
 
+        const context = this.context;
+
         // create once
         const tools = {
-            // select: new SelectTool(this.context),
-            cursor: new CursorTool(this.context),
-            add: new AddTool(this.context)
+            // select: new SelectTool(context),
+            cursor: new CursorTool(context),
+            add: new AddTool(context),
+            outliner: new OutlinerTool(context),
+            objectInspector: new ObjectInspectorTool(context)
+            // inspector: new InspectorTool(context)
         };
 
         // pass references to multiple toolbars
 
         // right toolbar
         new Toolbar({
-            tools: [tools.add, tools.cursor],
+            tools: [
+                tools.add,
+                tools.cursor,
+                // tools.outliner,
+                tools.objectInspector
+            ],
             position: 'right',
             direction: 'column'
         }).mount(container);
@@ -125,26 +142,26 @@ export class ViewportEditor implements Editor {
         //     direction: 'row'
         // });
 
-        const domElement = this.renderer.domElement;
-        const toolManager = this.context.toolManager;
+        // const domElement = this.renderer.domElement;
+        // const toolManager = this.context.toolManager;
 
-        domElement.addEventListener('mousedown', (e) => {
+        // domElement.addEventListener('mousedown', (e) => {
 
-            toolManager.onMouseDown(e, this);
+        //     toolManager.onMouseDown(e, this);
 
-        });
+        // });
 
-        domElement.addEventListener('mousemove', (e) => {
+        // domElement.addEventListener('mousemove', (e) => {
 
-            toolManager.onMouseMove(e, this);
+        //     toolManager.onMouseMove(e, this);
 
-        });
+        // });
 
-        domElement.addEventListener('click', (e) => {
+        // domElement.addEventListener('click', (e) => {
 
-            toolManager.onClick(e, this);
+        //     toolManager.onClick(e, this);
 
-        });
+        // });
 
         this.cursor.attach(this.state.scene);
 
@@ -246,6 +263,31 @@ export class ViewportEditor implements Editor {
 
         }
 
+    }
+
+    public onMouseDown = (e: MouseEvent) => {
+
+        const intersect = this.getIntersection(e);
+
+        if (intersect) {
+
+            const renderIndex = this.context.renderIndex;
+            const mesh = intersect.object;
+
+            const repId = renderIndex.getRepId(mesh);
+
+            if (repId === undefined) return;
+
+            const rep = RepresentationStore.getById(repId);
+
+            if (rep === undefined) return;
+
+            this.state.selectionManager.set(rep.entity);
+
+        } else {
+
+            this.state.selectionManager.set(null);  // click on empty space
+        }
     }
 
     public getIntersectionPoint(e: MouseEvent): Vector3 | null {
