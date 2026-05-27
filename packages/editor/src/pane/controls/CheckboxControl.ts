@@ -9,14 +9,17 @@ export class CheckboxControl extends Control<boolean> {
 
         super(binding);
 
-        this.input = document.createElement('input');
-        this.input.type = 'checkbox';
+        const input = document.createElement('input');
+        input.classList.add('checkbox');
+        input.type = 'checkbox';
 
-        this.input.addEventListener('change', () => {
+        input.addEventListener('change', () => {
 
-            this.setValue(this.input.checked);
+            this.setValue(input.checked);
 
         });
+        
+        this.input = input;
 
         this.element.appendChild(this.input);
 

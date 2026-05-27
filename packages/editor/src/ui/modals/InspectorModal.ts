@@ -9,6 +9,8 @@ import { NumberControl } from "../../pane/controls/NumberControl";
 import { ControlNode } from "../../pane/nodes/ControlNode";
 import { TextControl } from "../../pane/controls/TextControl";
 import { SliderControl } from "../../pane/controls/SliderControl";
+import { CheckboxControl } from "../../pane/controls/CheckboxControl";
+import { DropDownControl } from "../../pane/controls/DropDownControl";
 
 interface Node {
     id: number;
@@ -49,7 +51,13 @@ export class InspectorModal {
             factor: 1,
             title: 'hello',
             color: 'color',
-            range: 20
+            range: 20,
+            going: true,
+            color2: {
+                value: 'red',
+                type: 'select',
+                options: ['red', 'green', 'blue']
+            },
         };
 
         const binding = new ParameterBinding<number>(obj, 'factor');
@@ -61,8 +69,16 @@ export class InspectorModal {
         folder.add(new ControlNode(control2, 'title'));
 
         const binding3 = new ParameterBinding<number>(obj, 'range');
-        const control3 = new SliderControl(binding3, {min: -50, max: 50, step: 2});
+        const control3 = new SliderControl(binding3, { min: -50, max: 50, step: 2 });
         folder.add(new ControlNode(control3, 'range'));
+
+        const binding4 = new ParameterBinding<boolean>(obj, 'going');
+        const control4 = new CheckboxControl(binding4);
+        folder.add(new ControlNode(control4, 'going'));
+
+        const binding5 = new ParameterBinding<string>(obj, 'color2');
+        const control5 = new DropDownControl<string>(binding5, obj.color2.options);
+        folder.add(new ControlNode(control5, 'color2'));
 
         const subFolder = new Folder('sub folder');
         folder.add(subFolder);

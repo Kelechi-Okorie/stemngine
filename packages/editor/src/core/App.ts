@@ -26,6 +26,8 @@ import toolButtonCSS from '../assets/css/components/toolButton';
 import panelCSS from '../assets/css/components/panel';
 import folderCSS from '../assets/css/components/folder';
 import inputCSS from '../assets/css/components/input';
+import checkboxCSS from '../assets/css/components/checkbox';
+import selectCSS from '../assets/css/components/select';
 import labelCSS from '../assets/css/components/label';
 import windowCSS from '../assets/css/components/window';
 // import { InteractionManager } from "./InteractionManager";
@@ -122,6 +124,8 @@ export class App {
         styleManager.registerComponent('panel', panelCSS);
         styleManager.registerComponent('folder', folderCSS);
         styleManager.registerComponent('input', inputCSS);
+        styleManager.registerComponent('checkbox', checkboxCSS);
+        styleManager.registerComponent('select', selectCSS);
         styleManager.registerComponent('label', labelCSS);
         styleManager.registerComponent('window', windowCSS);
 
