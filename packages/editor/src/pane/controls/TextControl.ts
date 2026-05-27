@@ -1,28 +1,23 @@
 import { Control } from "./Control";
 import { IBinding } from "../../Interfaces";
 
-export class NumberControl extends Control<number> {
+export class TextControl extends Control<string> {
 
     private input: HTMLInputElement;
 
-    constructor(binding: IBinding<number>) {
+    constructor(binding: IBinding<string>) {
 
         super(binding);
 
         const input = document.createElement('input');
         input.classList.add('input');
-        input.type = 'number';
+        input.type = 'text';
 
         input.addEventListener('input', () => {
 
-            const value = this.input.valueAsNumber;
+            const value = this.input.value;
 
-            // important: guard against NaN
-            if (!Number.isNaN(value)) {
-
-                this.setValue(value);
-
-            }
+            this.setValue(value);
 
         });
 
@@ -33,12 +28,12 @@ export class NumberControl extends Control<number> {
         this.updateView(this.binding.get());
     }
 
-    protected updateView(value: number): void {
+    protected updateView(value: string): void {
         
         // avoid overwritting user typing unnecessarily
-        if (this.input.valueAsNumber !== value) {
+        if (this.input.value !== value) {
 
-            this.input.value = String(value);
+            this.input.value = value;
 
         }
 

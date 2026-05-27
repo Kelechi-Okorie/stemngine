@@ -11,14 +11,14 @@ export class Folder extends ContainerNode {
 
         super();
 
-        this.header = document.createElement('div');
-        this.header.textContent = title;
-        this.header.style.cursor = 'pointer';
-        this.header.style.fontWeight = 'bold';
-        this.header.style.marginBottom = '8px';
+        const header = document.createElement('div');
+        header.classList.add('folder-header');
+        header.textContent = title;
+        this.header = header;
 
-        this.content = document.createElement('div');
-        this.content.style.paddingLeft = '10px';
+        const content = document.createElement('div');
+        content.classList.add('folder-content', 'column');
+        this.content = content;
 
         this.header.addEventListener('click', () => {
             
@@ -27,6 +27,7 @@ export class Folder extends ContainerNode {
 
         });
 
+        this.element.classList.add('folder', 'column');
         this.element.appendChild(this.header);
         this.element.appendChild(this.content);
     }

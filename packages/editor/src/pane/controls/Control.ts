@@ -19,6 +19,7 @@ export abstract class Control<T> {
     protected setValue(v: T) {
 
         this.binding.set(v);
+        this.updateView(v);
 
     }
 

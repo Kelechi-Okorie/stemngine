@@ -22,7 +22,12 @@ import layoutCSS from '../assets/css/layout';
 import buttonCSS from '../assets/css/components/button';
 import toolbarCSS from '../assets/css/components/toolbar';
 import liCSS from '../assets/css/components/li';
-import toolButtonCSS from '../assets/css/components/toolButton'
+import toolButtonCSS from '../assets/css/components/toolButton';
+import panelCSS from '../assets/css/components/panel';
+import folderCSS from '../assets/css/components/folder';
+import inputCSS from '../assets/css/components/input';
+import labelCSS from '../assets/css/components/label';
+import windowCSS from '../assets/css/components/window';
 // import { InteractionManager } from "./InteractionManager";
 
 // Correct structure
@@ -114,6 +119,11 @@ export class App {
         styleManager.registerComponent('toolbar', toolbarCSS);
         styleManager.registerComponent('li', liCSS);
         styleManager.registerComponent('tool-button', toolButtonCSS);
+        styleManager.registerComponent('panel', panelCSS);
+        styleManager.registerComponent('folder', folderCSS);
+        styleManager.registerComponent('input', inputCSS);
+        styleManager.registerComponent('label', labelCSS);
+        styleManager.registerComponent('window', windowCSS);
 
         this.root = document.createElement('div');
         this.root.classList.add('root', 'full');

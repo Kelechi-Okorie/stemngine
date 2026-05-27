@@ -25,7 +25,8 @@ const textContent = `
 .row {
   display: flex;
   flex-direction: row;
-  gap: var(--space-md);
+  gap: var(--space);
+  padding: var(--space);
 }
 
 .column {
@@ -33,6 +34,7 @@ const textContent = `
   flex-direction: column;
   gap: var(--space);
 }
+
 
 /*
   internal layout (flex-based)
@@ -42,6 +44,14 @@ const textContent = `
 */
 .fill {
   flex: 1;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+.flex-2 {
+  flex: 2;
 }
 
 .center {
@@ -60,7 +70,7 @@ const textContent = `
   height: 100%;
 }
 
-width {
+.width {
   width: var(--width);
 }
 
@@ -83,24 +93,9 @@ width {
 }
 
 /* layering (z system) */
-.z-modal { z-index: 200; }
-
-.z-overlay { z-index: 100; }
-
-/* Overlay Primitive (Very Important for Modals) */
-.overlay {
-  position: absolute;
-  inset: 0;
-  /* background: rgba(0,0,0,0.5); */
-}
-
-/* Surface Primitive */
-.surface {
-  background: var(--panel);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-lg);
-  padding: var(--space-md);
-}
+.z-0 { z-index: var(--layer-1);}
+.z-1 { z-index: var(--layer-2);}
+.z-3 { z-index: var(--layer-3);}
 `;
 
 export default textContent;

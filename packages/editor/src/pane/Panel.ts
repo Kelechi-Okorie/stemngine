@@ -9,7 +9,7 @@ export class Panel extends ContainerNode {
 
         super();
 
-        this.element.classList.add('panel');
+        this.element.classList.add('panel', 'column');
 
     }
 

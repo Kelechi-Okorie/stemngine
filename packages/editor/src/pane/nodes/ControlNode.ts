@@ -7,16 +7,21 @@ export class ControlNode<T> extends Node {
 
         super();
 
+        this.element.classList.add('row');
+
         if (label) {
 
             const labelEl = document.createElement('span');
             labelEl.textContent = label;
-            labelEl.style.marginRight = '8px';
             this.element.appendChild(labelEl);
-        }
 
-        this.element.style.display = 'flex';
-        this.element.style.marginBottom = '5px';
+            labelEl.classList.add('flex-1');
+            control.element.classList.add('flex-2');
+
+        } else {
+
+            control.element.classList.add('flex-1');
+        }
 
         this.element.appendChild(control.element);
 

@@ -1,37 +1,38 @@
-
+import { WindowFrame } from "./WindowFrame";
 
 export class ModalSystem {
 
     private container: HTMLElement;
 
+    private windows = new Map<string, WindowFrame>();
+
     constructor(container: HTMLElement) {
+
         this.container = container;
+
     }
 
-    open(modal: HTMLElement) {
+    open(key: string, content: HTMLElement, title = "Window") {
 
-        const overlay = document.createElement('div');
+        if (this.windows.has(key)) {
 
-        overlay.classList.add('overlay', 'z-overlay');
+            const windowFrame = this.windows.get(key)!;
+            windowFrame.element.style.zIndex = String(Date.now());  // simple stacking
+            return;
+        }
 
-        overlay.onclick = () => {
-            this.close(overlay);
-        };
+        const windowFrame = new WindowFrame(title);
+        windowFrame.setContent(content);
 
-        const surface = document.createElement('div');
-        surface.classList.add('absolute', 'center-xy', 'z-modal', 'surface', 'column', 'width');
+        windowFrame.onCloseClick(() => {
 
-        overlay.appendChild(surface);
-        surface.appendChild(modal);
+            this.container.removeChild(windowFrame.element);
+            this.windows.delete(key);
 
-        this.container.appendChild(overlay);
-    }
+        });
 
-    private close(overlay: HTMLElement) {
-
-        if (!overlay) return;
-
-        this.container.removeChild(overlay);
+        this.windows.set(key, windowFrame)
+        this.container.appendChild(windowFrame.element);
     }
 
 }

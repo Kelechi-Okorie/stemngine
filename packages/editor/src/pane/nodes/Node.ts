@@ -7,6 +7,7 @@ export abstract class Node {
     constructor(tag = 'div') {
 
         this.element = document.createElement(tag);
+        this.element.classList.add('node');
 
     }
 

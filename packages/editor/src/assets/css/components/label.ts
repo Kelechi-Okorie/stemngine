@@ -1,7 +1,7 @@
 const textContent = `
 .label {
   font-size: 12px;
-  color: var(--muted);
+  color: var(--text);
   letter-spacing: 0.2px;
 }
 `;

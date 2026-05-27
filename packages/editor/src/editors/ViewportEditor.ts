@@ -118,8 +118,8 @@ export class ViewportEditor implements Editor {
             cursor: new CursorTool(context),
             add: new AddTool(context),
             outliner: new OutlinerTool(context),
-            objectInspector: new ObjectInspectorTool(context)
-            // inspector: new InspectorTool(context)
+            // objectInspector: new ObjectInspectorTool(context),
+            inspector: new InspectorTool(context)
         };
 
         // pass references to multiple toolbars
@@ -130,7 +130,7 @@ export class ViewportEditor implements Editor {
                 tools.add,
                 tools.cursor,
                 // tools.outliner,
-                tools.objectInspector
+                tools.inspector
             ],
             position: 'right',
             direction: 'column'

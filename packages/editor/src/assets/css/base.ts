@@ -21,10 +21,10 @@ const textContent = `
 :host([data-theme="dark"]) {
 
   /* Surfaces */
-  --bg: #0b0f14;
-  --panel: #121821;
-  --panel-2: #0f141c;
-  --panel-3: #0c1117;
+  --bg: #28292E;
+  --panel-1: #0C1117;
+  --panel-2: #38383D;
+  --panel-3: #ADAFB8;
 
   /* Content */
   --text: #e6edf3;
@@ -128,10 +128,10 @@ const textContent = `
   --bp-md: 900px;
   --bp-lg: 1200px;
 
-  --layer-0 { z-index: 0; }
-  --layer-1 { z-index: 100; }
-  --layer-2 { z-index: 200; }
-  --layer-3 { z-index: 300; }
+  --layer-0: 0;
+  --layer-1: 100;
+  --layer-2: 200;
+  --layer-3: 300;
 
   --width: 320px;
 
