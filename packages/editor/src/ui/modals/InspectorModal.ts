@@ -1,7 +1,7 @@
 import { Context, LAYERS } from "../../Interfaces";
-import { Entity, Layers } from "@stemngine/engine";
+import { Entity, Layers, Color, Vector2, Vector3 } from "@stemngine/engine";
 import { Folder } from "../../pane/nodes/Folder";
-import { renderSchema } from "../../pane/controls/factories";
+import { renderSchema, renderVector3 } from "../../pane/controls/factories";
 import { Panel } from "../../pane/Panel";
 import { renderNumber } from "../../pane/controls/factories";
 import { ParameterBinding } from "../../pane/bindings/ParameterBinding";
@@ -11,6 +11,9 @@ import { TextControl } from "../../pane/controls/TextControl";
 import { SliderControl } from "../../pane/controls/SliderControl";
 import { CheckboxControl } from "../../pane/controls/CheckboxControl";
 import { DropDownControl } from "../../pane/controls/DropDownControl";
+import { ColorControl } from "../../pane/controls/ColorControl";
+import { Control } from "../../pane/controls/Control";
+import { ContainerNode } from "../../pane/nodes/ContainerNode";
 
 interface Node {
     id: number;
@@ -58,6 +61,9 @@ export class InspectorModal {
                 type: 'select',
                 options: ['red', 'green', 'blue']
             },
+            color3: new Color(0xff0000),
+            vector2: new Vector2(),
+            vector3: new Vector3(1, 2, 3)
         };
 
         const binding = new ParameterBinding<number>(obj, 'factor');
@@ -79,6 +85,39 @@ export class InspectorModal {
         const binding5 = new ParameterBinding<string>(obj, 'color2');
         const control5 = new DropDownControl<string>(binding5, obj.color2.options);
         folder.add(new ControlNode(control5, 'color2'));
+
+        const binding6 = new ParameterBinding<Color>(obj, 'color3');
+        const control6 = new ColorControl(binding6);
+        folder.add(new ControlNode(control6, 'color3'));
+
+        const bindingX = new ParameterBinding<number>(obj['vector3'], 'x');
+        const controlX = new NumberControl(bindingX);
+        const bindingY = new ParameterBinding<number>(obj['vector3'], 'y');
+        const controlY = new NumberControl(bindingY);
+        const bindingZ = new ParameterBinding<number>(obj['vector3'], 'z');
+        const controlZ = new NumberControl(bindingZ);
+        
+        // div.appendChild(new ControlNode(controlX).element);
+        const container1 = new ContainerNode();
+        const container2 = new ContainerNode();
+        container1.element.classList.add('center-y');
+        container2.element.classList.add('row');
+
+        container2.add(new ControlNode(controlX));
+        container2.add(new ControlNode(controlY));
+        container2.add(new ControlNode(controlZ));
+
+        container1.element.innerText = 'vector3';
+
+        container1.element.classList.add('flex-1');
+        container2.element.classList.add('flex-2');
+
+        const container = new ContainerNode();
+        container.element.classList.add('row');
+        container.add(container1);
+        container.add(container2);
+
+        folder.add(container);
 
         const subFolder = new Folder('sub folder');
         folder.add(subFolder);

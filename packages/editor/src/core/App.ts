@@ -28,6 +28,7 @@ import folderCSS from '../assets/css/components/folder';
 import inputCSS from '../assets/css/components/input';
 import checkboxCSS from '../assets/css/components/checkbox';
 import selectCSS from '../assets/css/components/select';
+import colorCSS from '../assets/css/components/color';
 import labelCSS from '../assets/css/components/label';
 import windowCSS from '../assets/css/components/window';
 // import { InteractionManager } from "./InteractionManager";
@@ -126,6 +127,7 @@ export class App {
         styleManager.registerComponent('input', inputCSS);
         styleManager.registerComponent('checkbox', checkboxCSS);
         styleManager.registerComponent('select', selectCSS);
+        styleManager.registerComponent('color', colorCSS);
         styleManager.registerComponent('label', labelCSS);
         styleManager.registerComponent('window', windowCSS);
 

@@ -10,11 +10,11 @@ export class ContainerNode extends Node {
 
     }
 
-    // public add(node: Node) {
+    public add(node: Node) {
 
-    //     // TODO: remember to also remove children
-    //     this.children.push(node);
-    //     this.element.appendChild(node.element);
+        // TODO: remember to also remove children
+        this.children.push(node);
+        this.element.appendChild(node.element);
 
-    // }
+    }
 }

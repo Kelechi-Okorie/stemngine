@@ -96,6 +96,8 @@ function hue2rgb(p: number, q: number, t: number): number {
  * ```
  */
 export class Color {
+  /** Color = A mutable RGB container that ALWAYS stores values in working color space */
+
   /**
    * This flag can be used for type testing.
    *

@@ -39,7 +39,6 @@ export class ObjectInspector implements Inspector {
 
         entity = entity || this.parent.context.state.selectionManager.get();
 
-        const simulationManager = this.parent.context.simulationManager;
         const content = this.parent.content;
 
         content.innerHTML = '';

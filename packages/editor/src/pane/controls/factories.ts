@@ -129,5 +129,6 @@ export {
     renderField,
     renderNumber,
     renderBoolean,
-    renderObject
+    renderObject,
+    renderVector3
 }

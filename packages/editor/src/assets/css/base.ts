@@ -133,7 +133,7 @@ const textContent = `
   --layer-2: 200;
   --layer-3: 300;
 
-  --width: 320px;
+  --width: 300px;
 
 }
 

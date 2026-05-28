@@ -60,6 +60,12 @@ const textContent = `
   justify-content: center;
 }
 
+.center-y {
+  display: flex;
+  align-items: center; /* vertical centering */
+
+}
+
 .text {
   color: var(--text);
   font-family: var(--font-family);
