@@ -3,7 +3,7 @@ const textContent = `
   display: flex;
   justify-content: center;
   align-items: center;
-  background: var(--bg);
+  background: var(--color-bg-base);
   width: 32px;
   height: 32px;
   border: none;
@@ -15,14 +15,14 @@ const textContent = `
 }
 
 .tool-button:active {
-    background: color-mix(in srgb, var(--panel), var(--active-overlay));
+  background: color-mix(in srgb, var(--panel), var(--active-overlay));
 }
 
 .tool-button:focus {
-    outline: none;
-    /* box-shadow: var(--focus-ring); */
-    border-color: var(--accent);
-    background: color-mix(in srgb, var(--panel), var(--hover-overlay));
+  outline: none;
+  /* box-shadow: var(--focus-ring); */
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--panel), var(--hover-overlay));
 }
 
 .tool-button:hover {

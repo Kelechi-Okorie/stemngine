@@ -14,6 +14,7 @@ import { DropDownControl } from "../../pane/controls/DropDownControl";
 import { ColorControl } from "../../pane/controls/ColorControl";
 import { Control } from "../../pane/controls/Control";
 import { ContainerNode } from "../../pane/nodes/ContainerNode";
+import { ButtonControl } from "../../pane/controls/ButtonControl";
 
 interface Node {
     id: number;
@@ -101,7 +102,7 @@ export class InspectorModal {
         const container1 = new ContainerNode();
         const container2 = new ContainerNode();
         container1.element.classList.add('center-y');
-        container2.element.classList.add('row');
+        container2.element.classList.add('row', 'center');
 
         container2.add(new ControlNode(controlX));
         container2.add(new ControlNode(controlY));
@@ -120,8 +121,15 @@ export class InspectorModal {
         folder.add(container);
 
         const subFolder = new Folder('sub folder');
+        const btnContainer = new ContainerNode();
+        btnContainer.element.classList.add('row');
+        const action = {trigger: () => console.log('button')}
+        const button = new ButtonControl(action, 'Button');
+        const button2 = new ButtonControl(action, 'Button2');
+        btnContainer.add(button);
+        btnContainer.add(button2);
+        subFolder.add(btnContainer);
         folder.add(subFolder);
-
 
         return panel.element;
 

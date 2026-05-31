@@ -1,19 +1,24 @@
 const textContent = `
 .window {
-    background: var(--panel-2);
+    background: var(--color-bg-base);
+    border-radius: var(--radius-sm);
+
     width: var(--width);
     color: var(--text);
     z-index: var(--layer-2);
+    
     /* min-width: 200px; */
     /* min-height: 100p */;
 }
 
 .window-header {
+    background: var(--neutral-2-10);   
     touch-action: none;
+    margin-bottom: var(--space-sm);
+    cursor: pointer;
 }
 
 .window-content {
-    background: var(--panel-3);
     overflow: hidden;
     max-height: 800px;
     opacity: 1;

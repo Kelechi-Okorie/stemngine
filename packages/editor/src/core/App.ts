@@ -5,7 +5,7 @@ import { Scene, SimBindingManager, Vector3 } from "@stemngine/engine";
 import { SimulationManager } from "./SimulationManager";
 import { GlobalEventDispatcher } from "@stemngine/engine";
 import { ToolManager } from "../tools/ToolManager";
-import { StyleManager } from "./StyleManager";
+import { registerStyles } from "./StyleManager";
 import { RenderIndex } from "./RenderIndex";
 import { Renderer3DSystem } from "../renderers/Renderer3DSystem";
 import { SimulationRuntime } from "./SimulationRuntime";
@@ -16,21 +16,6 @@ import { templates } from "../editors/templates/registry";
 import { TemplateNode } from "../Interfaces";
 import { importDefinition } from "../io/importDefinition";
 import { RepresentationStoreEventType } from "./RepresentationStore";
-import baseCSS from '../assets/css/base';
-import primitivesCSS from '../assets/css/primitives';
-import layoutCSS from '../assets/css/layout';
-import buttonCSS from '../assets/css/components/button';
-import toolbarCSS from '../assets/css/components/toolbar';
-import liCSS from '../assets/css/components/li';
-import toolButtonCSS from '../assets/css/components/toolButton';
-import panelCSS from '../assets/css/components/panel';
-import folderCSS from '../assets/css/components/folder';
-import inputCSS from '../assets/css/components/input';
-import checkboxCSS from '../assets/css/components/checkbox';
-import selectCSS from '../assets/css/components/select';
-import colorCSS from '../assets/css/components/color';
-import labelCSS from '../assets/css/components/label';
-import windowCSS from '../assets/css/components/window';
 // import { InteractionManager } from "./InteractionManager";
 
 // Correct structure
@@ -113,23 +98,7 @@ export class App {
         this.host = host;
 
         const shadow = host.attachShadow({ mode: 'open' }); // isolation boundary
-
-        const styleManager = new StyleManager(shadow);
-        styleManager.setLayer('base', baseCSS);
-        styleManager.setLayer('primitives', primitivesCSS);
-        styleManager.setLayer('layout', layoutCSS);
-        styleManager.registerComponent('button', buttonCSS);
-        styleManager.registerComponent('toolbar', toolbarCSS);
-        styleManager.registerComponent('li', liCSS);
-        styleManager.registerComponent('tool-button', toolButtonCSS);
-        styleManager.registerComponent('panel', panelCSS);
-        styleManager.registerComponent('folder', folderCSS);
-        styleManager.registerComponent('input', inputCSS);
-        styleManager.registerComponent('checkbox', checkboxCSS);
-        styleManager.registerComponent('select', selectCSS);
-        styleManager.registerComponent('color', colorCSS);
-        styleManager.registerComponent('label', labelCSS);
-        styleManager.registerComponent('window', windowCSS);
+        registerStyles(shadow);
 
         this.root = document.createElement('div');
         this.root.classList.add('root', 'full');
@@ -168,7 +137,7 @@ export class App {
             simulationRuntime: this.simulationRuntime,
             state: this.state,
             toolManager: new ToolManager(),
-            styleManager,
+            // styleManager,
             renderIndex,
             // interactions: this.interactions,
 

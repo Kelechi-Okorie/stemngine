@@ -12,7 +12,7 @@ export class Folder extends ContainerNode {
         super();
 
         const header = document.createElement('div');
-        header.classList.add('folder-header');
+        header.classList.add('folder-header', 'padded');
         header.textContent = title;
         this.header = header;
 
@@ -23,7 +23,7 @@ export class Folder extends ContainerNode {
         this.header.addEventListener('click', () => {
             
             this.expanded = !this.expanded;
-            this.content.style.display = this.expanded ? 'block' : 'none';
+            this.element.classList.toggle('collapsed', !this.expanded);
 
         });
 
@@ -36,6 +36,7 @@ export class Folder extends ContainerNode {
     public add(node: Node) {
 
         // TODO: remember to also remove children
+        node.element.classList.add('mb-sm');
         this.children.push(node);
         this.content.appendChild(node.element);
 

@@ -3,7 +3,7 @@ const textContent = `
   appearance: none;
   width: 16px;
   height: 16px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--color-neutral-1);
   background: var(--panel-2);
   border-radius: var(--radius);
   display: inline-grid;
@@ -18,8 +18,8 @@ const textContent = `
 }
 
 .checkbox:checked {
-  background: var(--accent);
-  border-color: var(--accent);
+  background: var(--color-neutral-1);
+  border-color: var(--color-neutral-1);
 }
 
 .checkbox:checked::after {

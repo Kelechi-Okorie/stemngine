@@ -10,7 +10,7 @@ export class NumberControl extends Control<number> {
         super(binding);
 
         const input = document.createElement('input');
-        input.classList.add('input');
+        input.classList.add('input', 'padded');
         input.type = 'number';
 
         input.addEventListener('input', () => {

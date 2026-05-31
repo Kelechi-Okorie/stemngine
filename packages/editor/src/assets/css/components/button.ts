@@ -1,27 +1,29 @@
 const textContent = `
+
 .button {
-  background: var(--panel-2);
-  color: var(--text);
-  padding: var(--space-sm) var(--space-md);
+  background: var(--color-neutral-1);
+  color: var(--color-bg-base);
+  padding: var(--space) var(--space);
   border-radius: var(--radius);
   cursor: pointer;
   border: 1px solid transparent;
   transition: background 0.15s ease;
+  flex: 1;
+  transition: filter 0.05s ease;
 }
 
 .button:active {
-    background: color-mix(in srgb, var(--panel), var(--active-overlay));
+    background: var(--color-neutral-3);
+    filter: brightness(1.05);
 }
 
 .button:focus {
     outline: none;
-    /* box-shadow: var(--focus-ring); */
-    border-color: var(--accent);
-    background: color-mix(in srgb, var(--panel), var(--hover-overlay));
+    box-shadow: var(--focus-ring);
 }
 
 .button:hover {
-    background: color-mix(in srgb, var(--panel), var(--hover-overlay));
+    background: var(--color-neutral-2);
 }
 `;
 

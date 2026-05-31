@@ -91,7 +91,6 @@ export interface Context {
     simulationRuntime: SimulationRuntime,
     state: State,
     toolManager: ToolManager;
-    styleManager: StyleManager;
     renderIndex: RenderIndex,
     // interactions: InteractionManager,
 

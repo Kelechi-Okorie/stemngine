@@ -14,25 +14,43 @@
 // borders
 // interaction
 
+/**
+ * Need 3 layers:
+ * 1. base palette (raw colors)
+ * 2. derived colors (with opacity / blending)
+ * 3. semantic tokens (what they mean)
+ */
+
 const textContent = `
 /* =========================
   THEME: DARK
 ========================= */
 :host([data-theme="dark"]) {
 
+  /* base palette (raw) */
+  --color-bg-base: #28292E;
+  --color-neutral-1: #ADAFB8;
+  --color-neutral-2: #BBBCC4;
+  --color-neutral-3: #D6D7DB;
+
+  /* Derived (alpha/opacity variants) color + opacity states */
+  --neutral-2-10: rgba(187, 188, 196, 0.10);  /* #BBBCC4 10% */
+  --neutral-2-15: rgba(187, 188, 196, 0.15);  /* #BBBCC4 15% */
+  --neutral-2-20: rgba(187, 188, 196, 0.20);  /* #BBBCC4 20% */
+  --neutral-2-25: rgba(187, 188, 196, 0.25);  /* #BBBCC4 25% */
+  --neutral-2-70: rgba(187, 188, 196, 0.70);  /* #BBBCC4 70% */
+
   /* Surfaces */
-  --bg: #28292E;
-  --panel-1: #0C1117;
-  --panel-2: #38383D;
-  --panel-3: #ADAFB8;
 
   /* Content */
   --text: #e6edf3;
   --muted: #9aa4af;
 
   /* Actions */
-  --accent: #3b82f6;
-  --accent-2: #22c55e;
+  --accent: #22d3ee;
+  --accent-strong: #06b6d4;
+  --accent-soft: rgba(34, 211, 238, 0.2);
+
   
   /* Borders */
   --border: rgba(255,255,255,0.06);
@@ -40,11 +58,17 @@ const textContent = `
   /* Interaction overlay */
   --hover-overlay:rgba(255,255,255,0.05);
   --active-overlay: rgba(0,0,0,0.25);
-  --focus-ring: 1px solid rgba(59,130,246,0.9);
+  --focus-ring: 1px solid var(--accent);
+  --focus-glow: 0 0 0 2px var(--accent-soft);
   --focus-border: 1px solid var(--accent);
 
   /* state */
-  --selection-bg: rgba(59,130,246,0.2);
+  --selection-bg: var(--accent-soft);
+  --state-active: var(--accent);
+  --state-hover: var(--overlay-hover);
+  --state-focus-bg: var(--overlay-accent-soft);
+  --state-pressed-bg: var(--overlay-active);
+  --state-highlight: var(--accent-strong);
   --disabled-opacity: 0.45;
   --disabled-overlay: rgba(255,255,255,0.15);
 
@@ -97,10 +121,10 @@ const textContent = `
   --font-size-lg: 14px;
 
   /* spacing */
-  --space: 4px;
-  --space-sm: 8px;
-  --space-md: 12px;
-  --space-lg: 16px;
+  --space: 2px;
+  --space-sm: 4px;
+  --space-md: 8px;
+  --space-lg: 12px;
 
   /* radius */
   --radius: 2px;
@@ -133,7 +157,7 @@ const textContent = `
   --layer-2: 200;
   --layer-3: 300;
 
-  --width: 300px;
+  --width: 260px;
 
 }
 

@@ -49,7 +49,7 @@ export class WindowFrame {
 
         const titleEl = document.createElement('div');
         titleEl.innerText = title;
-        titleEl.classList.add('flex-1');
+        titleEl.classList.add('flex-1', 'center', 'padded');
 
         const btnClose = document.createElement('button');
         btnClose.innerText = 'x';
@@ -57,7 +57,7 @@ export class WindowFrame {
         const btnMin = document.createElement('button');
         btnMin.innerText = '-';
 
-        // handle for resizing the window
+        // TODO: handle for resizing the window
         // const handle = document.createElement('div');
         // handle.classList.add('window-resize-handle');
 
@@ -69,7 +69,6 @@ export class WindowFrame {
         }
 
         btnMin.addEventListener('click', (e) => {
-            console.log('clicked')
 
             this.expanded = !this.expanded;
             this.element.classList.toggle('collapsed', !this.expanded);

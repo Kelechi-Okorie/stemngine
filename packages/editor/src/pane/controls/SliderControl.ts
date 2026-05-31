@@ -15,7 +15,7 @@ export class SliderControl extends Control<number> {
 
         // TODO: find a better way to create html elements
         const input = document.createElement('input');
-        input.classList.add('input');
+        input.classList.add('slider');
         input.type = 'range';
         input.min = String(min);
         input.max = String(max);

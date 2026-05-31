@@ -1,0 +1,41 @@
+/* base */
+background: #28292E;
+
+/* blade */
+border-radius: 2
+/* button */
+background: #ADAFB8;
+background-active: #D6D7DB;
+border-radius: 6;
+background-hover: #BBBCC4;
+foreground: #28292E;
+
+/* container */
+background: #BBBCC4 10%;
+background-active: #BBBCC4 25%;
+background-focus: #BBBCC4 20%;
+background-focus 2: #C8CAD0;
+background-hover: #BBBCC4;
+foreground: #BBBCC4;
+height: 24;
+horizontal-padding: 4;
+indent: 4;
+unit-size: 4;
+vertical-padding: 4;
+
+/* groove */
+foreground: #BBBCC4 10%;
+
+/* input */
+foreground: #BBBCC4 10%;
+background-active: #BBBCC4 25%;
+background-focus: #BBBCC4 20%;
+background-hover: #BBBCC4 15%;
+foreground: #BBBCC4;
+
+/* label */
+foreground: #BBBCC4 70%;
+
+/* monitor */
+background: #000000 20%;
+foreground: #BBBCC4 70%;

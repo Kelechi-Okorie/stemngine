@@ -19,17 +19,21 @@ const textContent = `
 }
 
 .select:hover {
-  border-color: var(--text);
+  border-color: var(--accent-soft);
 }
 
 .select:focus {
-  border-color: var(--accent);
+  border-color: var(--color-neutral-1);
 }
 
 .select option {
-  background: var(--panel-2);
+  background: var(--color-bg-base);
   color: var(--text);
   cursor: pointer;
+}
+
+.select option:hover {
+  background: var(--accent);
 }
 `;
 

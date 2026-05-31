@@ -15,7 +15,7 @@ export class ControlNode<T> extends Node {
             labelEl.textContent = label;
             this.element.appendChild(labelEl);
 
-            labelEl.classList.add('flex-1');
+            labelEl.classList.add('flex-1', 'input-label');
             control.element.classList.add('flex-2');
 
         } else {

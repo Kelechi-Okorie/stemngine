@@ -26,15 +26,14 @@ const textContent = `
   display: flex;
   flex-direction: row;
   gap: var(--space);
-  padding: var(--space);
 }
 
 .column {
   display: flex;
   flex-direction: column;
-  gap: var(--space);
 }
 
+.padded { padding: var(--space);}
 
 /*
   internal layout (flex-based)
@@ -76,6 +75,7 @@ const textContent = `
   height: 100%;
 }
 
+/* TODO: to be removed */
 .width {
   width: var(--width);
 }
@@ -93,15 +93,19 @@ const textContent = `
 
 /* Centering in Coordinate Space */
 .center-xy {
+  position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
 
 /* layering (z system) */
-.z-0 { z-index: var(--layer-1);}
-.z-1 { z-index: var(--layer-2);}
+.z-0 { z-index: var(--layer-0);}
+.z-1 { z-index: var(--layer-1);}
+.z-2 { z-index: var(--layer-2);}
 .z-3 { z-index: var(--layer-3);}
+
+.mb-sm {padding-bottom: var(--space-sm);}
 `;
 
 export default textContent;

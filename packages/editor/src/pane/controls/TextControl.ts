@@ -10,7 +10,7 @@ export class TextControl extends Control<string> {
         super(binding);
 
         const input = document.createElement('input');
-        input.classList.add('input');
+        input.classList.add('input', 'padded');
         input.type = 'text';
 
         input.addEventListener('input', () => {
