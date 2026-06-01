@@ -96,9 +96,6 @@ export class NumberControl extends Control<number> {
 
     protected updateView(value: number): void {
 
-        console.log(value, 'updating');
-
-
         // avoid overwritting user typing unnecessarily
         if (this.input.valueAsNumber !== value) {
 

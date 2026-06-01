@@ -25,18 +25,30 @@ export class OutlinerModal {
 
     }
 
-    public render() {
+    public render(): HTMLElement {
 
         const listEl = document.createElement('div');
         listEl.classList.add('list');
 
         const entities = this.context.simulationManager.getAllEntities();
 
-        entities.forEach(entity => {
-            this.renderEntity(listEl, entity)
-        });
+        if (entities.length === 0) {
 
-        return listEl;
+            // TODO: give this a better design
+            const div = document.createElement('div');
+            div.classList.add('row', 'padded');
+            div.textContent = 'No object(s) added yet';
+            return div;
+
+        } else {
+
+            entities.forEach(entity => {
+                this.renderEntity(listEl, entity)
+            });
+
+            return listEl;
+
+        }
 
     }
 
@@ -46,8 +58,6 @@ export class OutlinerModal {
         div.classList.add('list-item');
         div.innerText = entity.name;
         div.onclick = () => {
-
-            console.log('entity clicked')
 
             this.context.state.selectionManager.set(entity);
 

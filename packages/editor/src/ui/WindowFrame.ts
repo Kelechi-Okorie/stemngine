@@ -16,6 +16,7 @@ export class WindowFrame {
 
     private expanded = true;
 
+    private onFocus?: () => void;
     private onClose?: () => void;
     private cleanup?: () => void;
 
@@ -91,6 +92,12 @@ export class WindowFrame {
 
     }
 
+    public onFocusClick(fn: () => void) {
+
+        this.onFocus = fn;
+
+    }
+
     private enableDrag() {
 
         let isDragging = false;
@@ -113,6 +120,8 @@ export class WindowFrame {
 
         this.header.addEventListener('pointerdown', (e) => {
 
+            this.onFocus?.();
+
             // ignore buttons
             if ((e.target as HTMLElement).tagName === 'BUTTON') return;
 
@@ -129,21 +138,15 @@ export class WindowFrame {
             this.element.style.left = `${rect.left}px`;
             this.element.style.top = `${rect.top}px`;
 
-            this.element.style.position = 'absolute';
+            // this.element.style.position = 'absolute';
 
-            // capture pointer (important for mobile)
-            (e.target as HTMLElement).setPointerCapture(e.pointerId);
+            // capture pointer
+            this.header.setPointerCapture(e.pointerId);
+
+            this.header.addEventListener('pointermove', onPointerMove);
+            this.header.addEventListener('pointerup', onPointerUp);
 
         });
-
-        window.addEventListener('pointermove', onPointerMove);
-        window.addEventListener('pointerup', onPointerUp);
-
-        this.cleanup = () => {
-
-            window.removeEventListener('pointermove', onPointerMove);
-            window.removeEventListener('pionterup', onPointerUp);
-        }
 
     }
 

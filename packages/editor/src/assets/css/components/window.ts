@@ -5,7 +5,7 @@ const textContent = `
 
     width: var(--width);
     color: var(--text);
-    z-index: var(--layer-2);
+    position: absolute;
 
     touch-action: none;
     
