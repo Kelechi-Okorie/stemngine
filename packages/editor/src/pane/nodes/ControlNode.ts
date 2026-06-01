@@ -7,7 +7,7 @@ export class ControlNode<T> extends Node {
 
         super();
 
-        this.element.classList.add('row');
+        this.element.classList.add('row', 'padded');
 
         if (label) {
 

@@ -1,6 +1,6 @@
 import { Inspector } from "../../Interfaces";
 import { Properties } from "../Properties";
-import { worldIcon } from "../../assets/icons/world";
+import { worldIcon } from "../../assets/icons/worldIcon";
 import { SolverDefinition, SolverRegistry, SolverManager } from "@stemngine/engine";
 import { renderSchema } from "../../pane/controls/factories";
 import { Folder } from "../../pane/nodes/Folder";

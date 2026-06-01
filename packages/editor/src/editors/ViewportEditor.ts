@@ -30,6 +30,7 @@ import { EditorShell } from "../ui/EditorShell";
 import { InspectorTool } from "../tools/InspectorTool";
 import { OutlinerTool } from "../tools/OutlinerTool";
 import { ObjectInspectorTool } from "../tools/ObjectInspectorTool";
+import { WorldInspectorTool } from "../tools/WorldInspectorTool";
 import { RepresentationStore } from "../core/RepresentationStore";
 
 export class ViewportEditor implements Editor {
@@ -119,13 +120,14 @@ export class ViewportEditor implements Editor {
             add: new AddTool(context),
             outliner: new OutlinerTool(context),
             objectInspector: new ObjectInspectorTool(context),
+            worldInspector: new WorldInspectorTool(context),
             inspector: new InspectorTool(context)
         };
 
         // pass references to multiple toolbars
 
         // right toolbar
-        new Toolbar({
+        const rightToolbar = new Toolbar({
             tools: [
                 tools.add,
                 tools.cursor,
@@ -137,11 +139,14 @@ export class ViewportEditor implements Editor {
             direction: 'column'
         }).mount(container);
 
-        // const bottomToolbar = new Toolbar({
-        //     tools: [cursorTool, selectTool, addTool],
-        //     position: 'bottom',
-        //     direction: 'row'
-        // });
+        const bottomToolbar = new Toolbar({
+            tools: [
+                tools.worldInspector,
+                tools.inspector,
+            ],
+            position: 'bottom',
+            direction: 'row'
+        }).mount(container);
 
         // const domElement = this.renderer.domElement;
         // const toolManager = this.context.toolManager;

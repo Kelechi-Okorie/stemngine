@@ -1,4 +1,4 @@
-import { Context, Tool } from "../Interfaces";
+import { Tool } from "../Interfaces";
 
 export type Config = {
     tools: Tool[];
@@ -23,7 +23,6 @@ export class Toolbar {
     }
 
     public mount(container: HTMLElement) {
-
 
         const div = document.createElement('div');
         div.classList.add('toolbar', this.direction, this.position);

@@ -16,16 +16,9 @@ import { Control } from "../../pane/controls/Control";
 import { ContainerNode } from "../../pane/nodes/ContainerNode";
 import { ButtonControl } from "../../pane/controls/ButtonControl";
 
-interface Node {
-    id: number;
-    name: string;
-    type: string;
-    visible: boolean;
-    children: Node[];
-    layers: Layers;
-}
-
 export class InspectorModal {
+
+    public static name = 'Inspector';
 
     private context: Context;
     private layers: Layers; // TODO: may be removed

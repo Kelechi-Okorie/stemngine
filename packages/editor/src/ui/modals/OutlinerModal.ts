@@ -3,16 +3,9 @@ import { Entity, Layers } from "@stemngine/engine";
 import { Context, LAYERS } from "../../Interfaces";
 import { SelectionEventType } from "../../core/SelectionManager";
 
-interface Node {
-    id: number;
-    name: string;
-    type: string;
-    visible: boolean;
-    children: Node[];
-    layers: Layers;
-}
-
 export class OutlinerModal {
+
+    public static name = 'Outliner';
 
     private context: Context;
     private layers: Layers; // TODO: may be removed

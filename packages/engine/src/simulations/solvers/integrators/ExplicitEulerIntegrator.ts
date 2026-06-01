@@ -1,6 +1,6 @@
 import { World } from "../../World";
 import { Vector3 } from "../../../math/Vector3";
-import { Solver, SolverScope } from "../../Interfaces";
+import { Solver, SolverScope, FieldSchema } from "../../Interfaces";
 import { System } from "../../core/System";
 
 const _v = /*@__PURE__*/ new Vector3();
@@ -82,6 +82,14 @@ export class ExplicitEulerIntegrator implements Solver {
     //     number("fixedDt", { default: 1 / 60 }),
     //     number("maxAccumulatedTime", { default: 0.25 })
     // ];
+
+    public schema: FieldSchema[] = [
+        {
+            type: "boolean",
+            key: "enabled",
+            label: "Enabled"
+        },
+    ];
 
     constructor() { }
 

@@ -66,8 +66,7 @@ const textContent = `
 }
 
 .text {
-  color: var(--text);
-  font-family: var(--font-family);
+  color: var(--text-neutral-2-70);
 }
 
 .full {
@@ -105,7 +104,11 @@ const textContent = `
 .z-2 { z-index: var(--layer-2);}
 .z-3 { z-index: var(--layer-3);}
 
-.mb-sm {padding-bottom: var(--space-sm);}
+/* margins */
+.mb-sm { margin-bottom: var(--space-sm); }
+
+/* paddings */
+.pb-sm { padding-bottom: var(--space-sm); }
 
 /* background colors */
 .bg-accent-soft { background: var(--accent-soft); }

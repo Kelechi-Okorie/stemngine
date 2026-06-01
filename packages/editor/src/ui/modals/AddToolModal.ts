@@ -35,6 +35,8 @@ const OBJECTS = [
 
 export class AddToolModal {
 
+    public static name = 'Add Entity';
+
     private context: Context;
 
     constructor(context: Context) {

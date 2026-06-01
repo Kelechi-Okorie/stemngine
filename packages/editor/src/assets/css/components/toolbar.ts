@@ -3,6 +3,8 @@ const textContent = `
 .toolbar {
   position: absolute;
   z-index: var(--layer-1);
+  background: var(--color-bg-base);
+  border-radius: var(--radius)
 }
 
 .toolbar-right {

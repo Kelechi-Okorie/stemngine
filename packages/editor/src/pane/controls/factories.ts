@@ -90,7 +90,7 @@ function renderVector3(field: any, target: any, container: ContainerNode) {
 
     const container1 = new ContainerNode();
     const container2 = new ContainerNode();
-    container1.element.classList.add('center-y', 'flex-1');
+    container1.element.classList.add('center-y', 'flex-1', 'text');
     container2.element.classList.add('row', 'center', 'flex-2');
 
     for (const axis of axes) {
@@ -113,7 +113,7 @@ function renderVector3(field: any, target: any, container: ContainerNode) {
     container1.element.innerText = field.label;
 
     const fieldContainer = new ContainerNode();
-    fieldContainer.element.classList.add('row');
+    fieldContainer.element.classList.add('row', 'padded');
     fieldContainer.add(container1);
     fieldContainer.add(container2);
 

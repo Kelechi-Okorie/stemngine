@@ -44,6 +44,7 @@ const textContent = `
 
   /* Content */
   --text: #e6edf3;
+  --text-neutral-2-70: var(--neutral-2-70);
   --muted: #9aa4af;
 
   /* Actions */

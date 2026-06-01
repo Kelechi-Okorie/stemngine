@@ -3,16 +3,9 @@ import { Layers } from "@stemngine/engine";
 import { renderSchema } from "../../pane/controls/factories";
 import { Panel } from "../../pane/Panel";
 
-interface Node {
-    id: number;
-    name: string;
-    type: string;
-    visible: boolean;
-    children: Node[];
-    layers: Layers;
-}
-
 export class ObjectInspectorModal {
+
+    public static name = 'Object Inspector';
 
     private context: Context;
     private layers: Layers; // TODO: may be removed

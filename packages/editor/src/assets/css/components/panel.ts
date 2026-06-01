@@ -7,7 +7,7 @@ const textContent = `
 
 .panel-content {
     background: var(--color-bg-base);
-    padding: var(--space-sm) var(--space-sm) var(--space) var(--space-md);
+    padding: var(--space-sm) var(--space-sm) var(--space) 0;
     max-height: 600px;
     opacity: 1;
     transition: max-height 0.2s ease, opacity 0.2s ease;
