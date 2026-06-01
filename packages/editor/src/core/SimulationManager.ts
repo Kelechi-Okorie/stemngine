@@ -44,7 +44,7 @@ export class SimulationManager {
     }
 
     public addEntity(config: Record<string, string>) {
-        const { name, type } = config;
+        const { type } = config;
 
         const world = this.world;
 
@@ -66,12 +66,6 @@ export class SimulationManager {
                 entity = ps.add(particle);
 
                 this.entitySystemTypeMap.set(entity.uuid, SystemType.ParticleSystem);
-
-                GlobalEventDispatcher.instance.dispatchEvent({
-                    type: EntityEventType.ENTITY_CREATED,
-                    entity,
-                    source: 'user'
-                });
 
                 break;
 

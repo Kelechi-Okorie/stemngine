@@ -1,7 +1,7 @@
 import { Context, LAYERS } from "../../Interfaces";
-import { Entity, Layers } from "@stemngine/engine";
-import { Folder } from "../../pane/nodes/Folder";
+import { Layers } from "@stemngine/engine";
 import { renderSchema } from "../../pane/controls/factories";
+import { Panel } from "../../pane/Panel";
 
 interface Node {
     id: number;
@@ -25,18 +25,25 @@ export class ObjectInspectorModal {
 
     }
 
-    public render() {
-
-        const div = document.createElement('div');
+    public render(): HTMLElement {
 
         const entity = this.context.state.selectionManager.get();
 
-        const folder = new Folder(entity.name);
-        renderSchema(entity.schema, entity, folder);
+        if (entity === null) {
 
-        div.appendChild(folder.element);
+            // TODO: give this a better design
+            const div = document.createElement('div');
+            div.classList.add('row', 'padded');
+            div.textContent = 'No entity selected';
+            return div;
 
-        return div;
+        } else {
+            
+            const panel = new Panel();
+            renderSchema(entity.schema, entity, panel);
+            return panel.element;
+
+        }
 
     }
 

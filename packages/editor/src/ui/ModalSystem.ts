@@ -35,4 +35,18 @@ export class ModalSystem {
         this.container.appendChild(windowFrame.element);
     }
 
+    public close(key: string) {
+
+        if (!this.windows.has(key)) return;
+
+        const windowFrame = this.windows.get(key)!;
+
+        this.container.removeChild(windowFrame.element);
+        this.windows.delete(key);
+    }
+
+    public get(key: string): WindowFrame | undefined {
+        return this.windows.get(key);
+    }
+
 }

@@ -1,6 +1,7 @@
 import { Context } from "../../Interfaces";
 import { RepresentationStore } from "../../core/RepresentationStore";
 import { MathUtils } from "@stemngine/engine";
+import { EntityEventType } from "../../core/SimulationManager";
 
 const OBJECTS = [
     // physics - state carriers
@@ -46,6 +47,7 @@ export class AddToolModal {
 
         const div = document.createElement('div');
         const input = document.createElement('input');
+        input.classList.add('input', 'padded');
         input.name = 'add-object';
         input.placeholder = 'Search objects...';
 
@@ -59,7 +61,7 @@ export class AddToolModal {
         })
 
         const listElement = document.createElement('div');
-        listElement.classList.add('column');
+        listElement.classList.add('column', 'list');
 
         this.renderList(listElement, OBJECTS);
 
@@ -80,22 +82,16 @@ export class AddToolModal {
 
             const div = document.createElement('div');
             div.innerText = item.name;
-            div.classList.add('li', 'fill');
+            div.classList.add('list-item', 'fill');
 
             div.onclick = () => {
 
                 this.spawnObject(item);
 
-                // prevent double-click spam
-                // close after spawn succeeds
-                requestAnimationFrame(() => {
-
-                    // this.closeMenu();
-
-                });
             }
 
             listEl.appendChild(div);
+            
         });
 
     }
@@ -114,6 +110,20 @@ export class AddToolModal {
             kind: 'point', // default view for this tool
             color: 0x00ff00,
             size: 1
+        });
+
+        this.context.state.selectionManager.set(entity);
+
+        // defer UI reactions
+        requestAnimationFrame(() => {
+
+            this.context.events.emit({
+                type: EntityEventType.ENTITY_CREATED,
+                target: this,
+                entity,
+                source: 'user'
+            });
+
         });
 
     }

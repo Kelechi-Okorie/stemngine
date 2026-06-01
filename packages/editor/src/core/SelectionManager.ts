@@ -1,4 +1,9 @@
 
+export enum SelectionEventType {
+    SELECTION_CHANGED = 'selection:changed'
+};
+
+
 export class SelectionManager {
 
     private _selected: any = null;

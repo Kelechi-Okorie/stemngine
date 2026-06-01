@@ -1,5 +1,7 @@
-import { Context, LAYERS } from "../../Interfaces";
 import { Entity, Layers } from "@stemngine/engine";
+
+import { Context, LAYERS } from "../../Interfaces";
+import { SelectionEventType } from "../../core/SelectionManager";
 
 interface Node {
     id: number;
@@ -25,35 +27,42 @@ export class OutlinerModal {
 
     public render() {
 
-        const div = document.createElement('div');
+        const listEl = document.createElement('div');
+        listEl.classList.add('list');
 
         const entities = this.context.simulationManager.getAllEntities();
 
         entities.forEach(entity => {
-            this.renderEntity(div, entity)
+            this.renderEntity(listEl, entity)
         });
 
-        return div;
+        return listEl;
 
     }
 
     public renderEntity(listEl: HTMLElement, entity: Entity) {
 
         const div = document.createElement('div');
+        div.classList.add('list-item');
         div.innerText = entity.name;
-        div.classList.add('li', 'fill');
-
         div.onclick = () => {
 
-            // this.spawnObject(item);
+            console.log('entity clicked')
 
-            // prevent double-click spam
-            // close after spawn succeeds
+            this.context.state.selectionManager.set(entity);
+
+            // defer UI reactions
             requestAnimationFrame(() => {
 
-                // this.closeMenu();
+                this.context.events.emit({
+                    type: SelectionEventType.SELECTION_CHANGED,
+                    target: this,
+                    entity,
+                    source: 'user'
+                });
 
             });
+
         }
 
         listEl.appendChild(div);

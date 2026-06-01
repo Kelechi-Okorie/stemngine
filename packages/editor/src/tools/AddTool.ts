@@ -2,7 +2,7 @@ import { addIcon } from '../assets/icons/addIcon';
 import { Context, Tool } from '../Interfaces';
 
 export const  enum AddToolEvent {
-    ADDTOOL_OPEN_MODAL = 'add_tool:open_modal'
+    OPEN_MODAL = 'add_tool:open_modal'
 };
 
 export class AddTool implements Tool {
@@ -51,7 +51,7 @@ export class AddTool implements Tool {
         // this.context.toolManager.setTool(this);
 
         this.context.events.emit({
-            type: AddToolEvent.ADDTOOL_OPEN_MODAL,
+            type: AddToolEvent.OPEN_MODAL,
             target: this
         });
 

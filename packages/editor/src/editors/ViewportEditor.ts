@@ -118,7 +118,7 @@ export class ViewportEditor implements Editor {
             cursor: new CursorTool(context),
             add: new AddTool(context),
             outliner: new OutlinerTool(context),
-            // objectInspector: new ObjectInspectorTool(context),
+            objectInspector: new ObjectInspectorTool(context),
             inspector: new InspectorTool(context)
         };
 
@@ -129,7 +129,8 @@ export class ViewportEditor implements Editor {
             tools: [
                 tools.add,
                 tools.cursor,
-                // tools.outliner,
+                tools.outliner,
+                tools.objectInspector,
                 tools.inspector
             ],
             position: 'right',

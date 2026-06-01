@@ -47,12 +47,6 @@ export class Outliner implements Editor {
 
         this.container = container;
 
-        GlobalEventDispatcher.instance.addEventListener(
-            EntityEventType.ENTITY_CREATED,
-            this.onEntityCreated
-        );
-
-        this.renderEntities();
     }
 
     public resize(width: number, height: number) {
@@ -151,18 +145,10 @@ export class Outliner implements Editor {
 
     public unmount() {
 
-        GlobalEventDispatcher.instance.removeEventListener(
-            EntityEventType.ENTITY_CREATED,
-            this.onEntityCreated
-        );
-
-    }
-
-    private onEntityCreated = (e: EntityEvent): void => {
-
-        const { type, entity, source } = e;
-
-        this.renderEntity(entity);
+        // GlobalEventDispatcher.instance.removeEventListener(
+        //     EntityEventType.ENTITY_CREATED,
+        //     this.onEntityCreated
+        // );
 
     }
 

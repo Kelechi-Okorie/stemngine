@@ -54,11 +54,18 @@ export type SolverScope =
 // | Enum
 // | AssetReference
 export type FieldSchema =
+    | StringField
     | NumberField
     | BooleanField
     | Vector3Field
     | ObjectField
     ;
+
+export interface StringField {
+    type: "string";
+    key: string;
+    label: string;
+}
 
 export interface NumberField {
     type: "number";

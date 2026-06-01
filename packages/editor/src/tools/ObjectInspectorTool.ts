@@ -1,14 +1,14 @@
-import { circleOffIcon } from '../assets/icons/circleOff';
+import { cubeIcon } from '../assets/icons/cube';
 import { Context, Tool } from '../Interfaces';
 
 export const  enum ObjectInspectorEvent {
-    OBJECT_INSPECTOR_OPEN_MODAL = 'object_inspector_tool:open_modal'
+    OPEN_MODAL = 'object_inspector_tool:open_modal'
 };
 
 export class ObjectInspectorTool implements Tool {
 
     public name = 'object inspector';
-    public icon = circleOffIcon;
+    public icon = cubeIcon;
     private context: Context;
     public btn!: HTMLElement;
 
@@ -47,10 +47,8 @@ export class ObjectInspectorTool implements Tool {
 
     public onClick = (e: MouseEvent) => {
 
-        // this.context.toolManager.setTool(this);
-
         this.context.events.emit({
-            type: ObjectInspectorEvent.OBJECT_INSPECTOR_OPEN_MODAL,
+            type: ObjectInspectorEvent.OPEN_MODAL,
             target: this
         });
 

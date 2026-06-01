@@ -109,6 +109,11 @@ export class Particle implements SimulationModel {
 
     public schema: FieldSchema[] = [
         {
+            type: "string",
+            key: "name",
+            label: "Name"
+        },
+        {
             type: "vector3",
             key: "position",
             label: "Position",
@@ -168,9 +173,9 @@ export class Particle implements SimulationModel {
 
     constructor(options: ParticleOptions = {}) {
 
-        const { name, objectId, position, velocity, acceleration, mass, damping } = options;
+        const { objectId, position, velocity, acceleration, mass, damping } = options;
 
-        this.name = name || `Particle_${this.id}`;
+        this.name = `Particle_${this.id}`;
         this.objectId = objectId || null;
         this.position = position || new Vector3();
         this.velocity = velocity || new Vector3();
@@ -245,7 +250,7 @@ export class Particle implements SimulationModel {
      */
     public import(config: ParticleExport): void {
 
-        const {name, objectId, mass, position, velocity, acceleration, damping} = config;
+        const { name, objectId, mass, position, velocity, acceleration, damping } = config;
 
         this.name = name;
         this.objectId = objectId;

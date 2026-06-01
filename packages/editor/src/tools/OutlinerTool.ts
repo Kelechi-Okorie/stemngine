@@ -1,19 +1,18 @@
-import { circleOffIcon } from '../assets/icons/circleOff';
+import { listIcon } from '../assets/icons/listIcon';
 import { Context, Tool } from '../Interfaces';
 
 export const  enum OutlinerEvent {
-    OUTLINER_OPEN_MODAL = 'outliner_tool:open_modal'
+    OPEN_MODAL = 'outliner_tool:open_modal'
 };
 
 export class OutlinerTool implements Tool {
 
     public name = 'outliner';
-    public icon = circleOffIcon;
+    public icon = listIcon;
     private context: Context;
     public btn!: HTMLElement;
 
     public allows: Record<string, boolean> = {};
-
 
     constructor(context: Context) {
 
@@ -48,10 +47,8 @@ export class OutlinerTool implements Tool {
 
     public onClick = (e: MouseEvent) => {
 
-        // this.context.toolManager.setTool(this);
-
         this.context.events.emit({
-            type: OutlinerEvent.OUTLINER_OPEN_MODAL,
+            type: OutlinerEvent.OPEN_MODAL,
             target: this
         });
 

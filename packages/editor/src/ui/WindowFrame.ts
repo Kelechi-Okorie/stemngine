@@ -38,6 +38,7 @@ export class WindowFrame {
 
     public setContent(el: HTMLElement) {
 
+        this.content.innerHTML = '';
         this.content.appendChild(el);
 
     }
