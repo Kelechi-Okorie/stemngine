@@ -106,6 +106,9 @@ const textContent = `
 .z-3 { z-index: var(--layer-3);}
 
 .mb-sm {padding-bottom: var(--space-sm);}
+
+/* background colors */
+.bg-accent-soft { background: var(--accent-soft); }
 `;
 
 export default textContent;

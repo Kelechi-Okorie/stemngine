@@ -52,7 +52,8 @@ export class ParameterBinding<T> implements IBinding<T> {
 
     public set(v: T): void {
 
-        this.obj[this.key] = v; // will trigger Proxy
+        this.obj[this.key] = v;
+        this.notify();
 
     }
 
@@ -69,34 +70,5 @@ export class ParameterBinding<T> implements IBinding<T> {
         this.listeners.forEach(fn => fn(v));
 
     }
-
-
-    // TODO: may be removed
-    // private param: Parameter<T>;
-
-    // constructor(param: Parameter<T>) {
-
-    //     this.param = param;
-
-    // }
-
-    // public get(): T {
-
-    //     return this.param.value;
-
-    // }
-
-    // public set(v: T) {
-
-    //     this.param.value = v;
-
-    // }
-
-    // public subscribe(fn: Listener<T>): void {
-        
-    //     // TODO: remember to unsubscribe
-    //     this.param.subscribe(fn);
-
-    // }
 
 }

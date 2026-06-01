@@ -6,6 +6,8 @@ const textContent = `
     width: var(--width);
     color: var(--text);
     z-index: var(--layer-2);
+
+    touch-action: none;
     
     /* min-width: 200px; */
     /* min-height: 100p */;

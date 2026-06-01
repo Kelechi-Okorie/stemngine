@@ -50,7 +50,7 @@ export class WindowFrame {
 
         const titleEl = document.createElement('div');
         titleEl.innerText = title;
-        titleEl.classList.add('flex-1', 'center', 'padded');
+        titleEl.classList.add('flex-1', 'center', 'padded', 'bg-accent-soft');
 
         const btnClose = document.createElement('button');
         btnClose.innerText = 'x';

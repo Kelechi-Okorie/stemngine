@@ -7,6 +7,8 @@ const textContent = `
   outline: none;
   box-sizing: border-box;
   color: var(--neutral-2);
+  cursor: ns-resize;
+  /* touch-action: none; */
 }
 
 .input-label {
