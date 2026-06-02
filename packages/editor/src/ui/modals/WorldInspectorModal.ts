@@ -1,4 +1,4 @@
-import { Layers, SolverRegistry, SolverManager } from "@stemngine/engine";
+import { Layers, SolverManager } from "@stemngine/engine";
 
 import { Context, LAYERS } from "../../Interfaces";
 import { Folder } from "../../pane/nodes/Folder";
@@ -45,6 +45,8 @@ export class WorldInspectorModal {
 
         const panel = new Panel();
 
+        // TODO: add empty text/design for when no solvers exist yet
+
         for (const solver of solvers) {
 
             const folder = new Folder(solver.name);
@@ -64,7 +66,7 @@ export class WorldInspectorModal {
         btnContainer.element.classList.add('row');
         const action = {
             trigger: () => {
-                requestAnimationFrame(() => {
+                requestAnimationFrame(() => {   // TODO: should this be here or in the button
 
                     this.context.events.emit({
                         type: AddSolversEvent.OPEN_MODAL,
