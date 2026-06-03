@@ -1,8 +1,7 @@
-import { GlobalEventDispatcher, MeshBasicMaterial, Scene, SimBindingManager, SphereGeometry, Mesh, BoxGeometry } from "@stemngine/engine";
+import { GlobalEventDispatcher, MeshBasicMaterial, Scene, SimBindingManager, SphereGeometry, Mesh, BoxGeometry, MeshStandardMaterial, disposeMaterial } from "@stemngine/engine";
 import { RepresentationEvent, RepresentationStoreEventType } from "../core/RepresentationStore";
 import { Context, VisualRepresentation } from "../Interfaces";
 import { RenderIndex } from "../core/RenderIndex";
-import { disposeMaterial } from "../../../engine/src/materials/Material";
 
 export class Renderer3DSystem {
 
@@ -82,7 +81,17 @@ export class Renderer3DSystem {
             case 'point':
                 mesh = new Mesh(
                     new SphereGeometry(rep.size ?? 0),
-                    new MeshBasicMaterial({ color: rep.color ?? 0xffff00 })
+                    // new MeshBasicMaterial({ color: rep.color ?? 0xffff00 })
+                    // new MeshStandardMaterial({
+                    //     color: rep.color ?? 0xffff00,
+                    //     roughness: 0.5,
+                    //     metalness: 0.1
+                    // })
+                    new MeshStandardMaterial({
+                        color: rep.color ?? 0xff0000,
+                        roughness: 0.8,   // ↑ increase this
+                        metalness: 0.0    // keep this at 0 for now
+                    })
                 );
 
                 break;
@@ -95,7 +104,7 @@ export class Renderer3DSystem {
 
         }
 
-        mesh.position.copy(entity.position);
+        mesh.position.copy((entity as unknown as Mesh).position);   // TODO: find a better way
 
         return mesh;
 

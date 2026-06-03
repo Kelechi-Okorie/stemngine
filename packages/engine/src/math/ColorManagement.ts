@@ -61,6 +61,8 @@ const REC709_PRIMARIES = [0.640, 0.330, 0.300, 0.600, 0.150, 0.060];
 const REC709_LUMINANCE_COEFFICIENTS = [0.2126, 0.7152, 0.0722];
 const D65 = [0.3127, 0.3290];
 
+// const _c = new Color();
+
 
 /* ------------------------------------------------------------------------- */
 /* Color Management Class */
@@ -183,7 +185,8 @@ export class ColorManagement {
 
     }
 
-    if (this.spaces[sourceColorSpace].primaries !== this.spaces[targetColorSpace].primaries) {
+    // if (this.spaces[sourceColorSpace].primaries !== this.spaces[targetColorSpace].primaries) {
+    if (sourceColorSpace !== targetColorSpace) {
 
       color.applyMatrix3(this.spaces[sourceColorSpace].toXYZ);
       color.applyMatrix3(this.spaces[targetColorSpace].fromXYZ);
@@ -200,6 +203,33 @@ export class ColorManagement {
 
     return color;
   }
+
+  // public convert(color: Color, source: ColorSpace, target: ColorSpace): Color {
+
+  //   if (!this.enabled || source === target) return color;
+
+  //   _c.copy(color);
+
+  //   const s = this.spaces[source];
+  //   const t = this.spaces[target];
+
+  //   if (s.transfer === SRGBTransfer) {
+  //     _c.r = SRGBToLinear(_c.r);
+  //     _c.g = SRGBToLinear(_c.g);
+  //     _c.b = SRGBToLinear(_c.b);
+  //   }
+
+  //   _c.applyMatrix3(s.toXYZ);
+  //   _c.applyMatrix3(t.fromXYZ);
+
+  //   if (t.transfer === SRGBTransfer) {
+  //     _c.r = LinearToSRGB(_c.r);
+  //     _c.g = LinearToSRGB(_c.g);
+  //     _c.b = LinearToSRGB(_c.b);
+  //   }
+
+  //   return color.copy(_c);
+  // }
 
   /**
    * Converts a color from the working color space to the target color space.
@@ -219,7 +249,9 @@ export class ColorManagement {
    * @returns
    */
   public colorSpaceToWorking(color: Color, sourceColorSpace: ColorSpace): Color {
+
     return this.convert(color, sourceColorSpace, this.workingColorSpace);
+
   }
 
   /**
@@ -228,7 +260,9 @@ export class ColorManagement {
    * @returns
    */
   public getPrimaries(colorSpace: ColorSpace): number[] {
+
     return this.spaces[colorSpace].primaries;
+
   }
 
   /**
@@ -237,9 +271,11 @@ export class ColorManagement {
    * @returns
    */
   public getTransfer(colorSpace: ColorSpace): TransferType {
+
     if (colorSpace === NoColorSpace) return LinearTransfer;
 
     return this.spaces[colorSpace].transfer;
+
   }
 
   /**
@@ -249,7 +285,9 @@ export class ColorManagement {
    * @returns The tone mapping mode
    */
   public getToneMappingMode(colorSpace: ColorSpace): ToneMappingMode {
+
     return this.spaces[colorSpace].outputColorSpaceConfig?.toneMappingMode ?? 'standard';
+
   }
 
   /**
@@ -259,7 +297,9 @@ export class ColorManagement {
    * @returns The target Color populated with luminance coefficients
    */
   public getLuminanceCoefficients(target: Vector3, colorSpace: ColorSpace = this.workingColorSpace): Vector3 {
+
     return target.fromArray(this.spaces[colorSpace]!.luminanceCoefficients);
+
   }
 
   /**
@@ -267,7 +307,9 @@ export class ColorManagement {
    * @param colorSpaces
    */
   public define(colorSpaces: ColorManagementSpaces): void {
+
     Object.assign(this.spaces, colorSpaces);
+
   }
 
   /**
@@ -278,9 +320,11 @@ export class ColorManagement {
    * @returns
    */
   public _getMatrix(targetMatrix: Matrix3, sourceColorSpace: ColorSpace, targetColorSpace: ColorSpace): Matrix3 {
+
     return targetMatrix
       .copy(this.spaces[sourceColorSpace].toXYZ)
       .multiply(this.spaces[targetColorSpace].fromXYZ);
+
   }
 
   /**
@@ -300,6 +344,7 @@ export class ColorManagement {
 
     if (cs === "display-p3") return "display-p3";
     return "srgb"; // default fallback
+    
   }
 
   /**

@@ -1736,6 +1736,8 @@ export class WebGLRenderer {
 
     }
 
+    // TODO:  remove and uncomment next line when you introduce xr
+    this._renderBackground = true;
     // _renderBackground = xr.enabled === false || xr.isPresenting === false || xr.hasDepthSensing() === false;
     // if (_renderBackground) {
 

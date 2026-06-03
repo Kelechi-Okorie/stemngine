@@ -1,5 +1,5 @@
 // TODO: use imports from the build
-import { Camera, OrthographicCamera, Vector3, isOrthographicCamera, isPerspectiveCamera, GridHelper, Layers } from "@stemngine/engine";
+import { Camera, OrthographicCamera, Vector3, isOrthographicCamera, isPerspectiveCamera, GridHelper, Layers, AmbientLight, DirectionalLight, HemisphereLight, CONSTANTS, Color, Vector4 } from "@stemngine/engine";
 import { PerspectiveCamera, Plane } from "@stemngine/engine";
 import { WebGLRenderer } from "@stemngine/engine";
 import { Mesh } from "@stemngine/engine";
@@ -57,10 +57,21 @@ export class ViewportEditor implements Editor {
 
     constructor(context: Context) {
 
-        this.renderer = new WebGLRenderer({ antialias: true });
+        this.renderer = new WebGLRenderer({ antialias: true, alpha: true });
+        this.renderer.setClearColor(0xffffff, 1);
         this.context = context;
 
         this.state = context.state;
+
+        const directionalLight = new DirectionalLight(0xffffff, 1); // color, intensity
+        directionalLight.position.set(5, 10, 7);
+        this.state.scene.add(directionalLight);
+
+        // const ambientLight = new AmbientLight(0xffffff, 0.3); // color, intensity
+        // this.state.scene.add(ambientLight);
+
+        const hemi = new HemisphereLight(0x87ceeb, 0x444444, 0.4);
+        this.state.scene.add(hemi);
 
         this.cursor = new Cursor3D(this.context);
         this.viewportGizmo = new ViewportGizmo();
@@ -206,7 +217,7 @@ export class ViewportEditor implements Editor {
             width: this.width,
             height: this.height
         }
-        this.viewportGizmo.update(context);
+
         this.viewportGizmo.render(context);
 
     }

@@ -19,7 +19,7 @@ import { WebGLRenderList } from './WebGLRenderLists.js';
 import { isCubeTexture } from '../../textures/CubeTexture.js';
 import { Texture } from '../../textures/Texture.js';
 
-const _rgb = { r: 0, b: 0, g: 0 };
+const _rgb = new Color(0x000000);
 const _e1 = /*@__PURE__*/ new Euler();
 const _m1 = /*@__PURE__*/ new Matrix4();
 
@@ -42,7 +42,7 @@ export class WebGLBackground {
   public alpha: boolean;
   public premultipliedAlpha: boolean;
 
-  public cm = ColorManagement.instance;
+  public cm = ColorManagement.instance; // TODO: do not store ColorManagement. use it as is
 
   constructor(
     renderer: WebGLRenderer,
@@ -126,7 +126,7 @@ export class WebGLBackground {
   public setClear(color: Color, alpha: number) {
 
     // color.getRGB(_rgb, getUnlitUniformColorSpace(this.renderer));
-    color.getRGB(/* _rgb */ new Color(_rgb.r, _rgb.g, _rgb.b), getUnlitUniformColorSpace(this.renderer));
+    color.getRGB(_rgb, getUnlitUniformColorSpace(this.renderer));
 
     this.state.buffers.color.setClear(_rgb.r, _rgb.g, _rgb.b, alpha, this.premultipliedAlpha);
 
@@ -357,6 +357,5 @@ export class WebGLBackground {
     }
 
   }
-
 
 }

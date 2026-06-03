@@ -117,7 +117,7 @@ export class App {
         this.bindingManager = new SimBindingManager();
 
         const stateConfig = {
-            scene: new Scene(),
+            scene: new Scene(), // TODO: scene should be created and owned by the viewport renderer
             selectionManager: new SelectionManager(),
             isDragging: false,
             cursor: { position: new Vector3(), visible: true }
@@ -509,8 +509,8 @@ export class App {
 
     private initApp() {
 
-        // this.loadEditor('welcome', templates.default)
-        this.loadEditor('editor', templates.default);
+        this.loadEditor('welcome', templates.default)
+        // this.loadEditor('editor', templates.default);
 
     }
 

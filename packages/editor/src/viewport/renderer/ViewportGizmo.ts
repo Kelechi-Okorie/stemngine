@@ -1,4 +1,4 @@
-import { BufferGeometry, Camera, DoubleSide, Group, Line, LineBasicMaterial, MeshBasicMaterial, Scene, Vector3, WebGLRenderer, Mesh, CanvasTexture, SpriteMaterial, Sprite, OrthographicCamera, Material } from "@stemngine/engine";
+import { BufferGeometry, Camera, DoubleSide, Group, Line, LineBasicMaterial, MeshBasicMaterial, Scene, Vector3, WebGLRenderer, Mesh, CanvasTexture, SpriteMaterial, Sprite, OrthographicCamera, Material, Color } from "@stemngine/engine";
 
 type context = {
     mainCamera: Camera,
@@ -181,7 +181,7 @@ export class ViewportGizmo {
 
     public update(context: context): void {
 
-        const { mainCamera, renderer } = context;
+        const { mainCamera } = context;
 
         // rotate whole gizmo - match orientation
         this.gizmo.quaternion.copy(mainCamera.quaternion).invert();
@@ -190,20 +190,25 @@ export class ViewportGizmo {
 
     public render(context: context) {
 
+        this.update(context);
+
         const { renderer, width, height } = context;
 
         const size = this.size;
 
         renderer.clearDepth();
 
-        renderer.setViewport(
-            width - size - this.margin,
-            height - size - this.margin,
-            size,
-            size
-        );
+        const x = width - size - this.margin;
+        const y = height - size - this.margin;
+
+        renderer.setViewport(x, y, size, size);
+        renderer.setScissor(x, y, size, size);
+        renderer.setScissorTest(true);
 
         renderer.render(this.scene, this.camera);
+
+        renderer.setScissorTest(false);
+
     }
 
     public dispose() {

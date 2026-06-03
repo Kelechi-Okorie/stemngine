@@ -1,6 +1,6 @@
 import { clamp, euclideanModulo, lerp } from './MathUtils.js';
 import { ColorManagement, SRGBToLinear, LinearToSRGB } from './ColorManagement';
-import { SRGBColorSpace, WritableArrayLike } from '../constants.js';
+import { ColorSpace, SRGBColorSpace, WritableArrayLike } from '../constants.js';
 import { Vector3 } from './Vector3.js';
 import { Matrix3 } from './Matrix3.js';
 import { BufferAttribute } from '../core/BufferAttribute.js';
@@ -117,9 +117,6 @@ export class Color {
  */
   public NAMES: ColorName[] = Object.keys(_colorKeywords) as ColorName[];
 
-  // Get the color management singleton instance
-  private colorManagement = ColorManagement.instance;
-
   public r: number = 1;
   public g: number = 1;
   public b: number = 1;
@@ -137,11 +134,12 @@ export class Color {
    * @param {number} [b] - The blue component.
    */
   constructor(
-    r: number | string | Color = 1,
-    g: number = 1,
-    b: number = 1
+    r: number | string | Color,
+    g?: number,
+    b?: number
   ) {
-    return this.set(r, g, b);
+
+    this.set(r, g, b);
   }
 
   /**
@@ -208,7 +206,7 @@ export class Color {
    * @param {string} [colorSpace=SRGBColorSpace] - The color space.
    * @return {Color} A reference to this color.
    */
-  public setHex(hex: number, colorSpace: string = SRGBColorSpace): this {
+  public setHex(hex: number, colorSpace: ColorSpace = SRGBColorSpace): this {
 
     hex = Math.floor(hex);
 
@@ -216,7 +214,7 @@ export class Color {
     this.g = (hex >> 8 & 255) / 255;
     this.b = (hex & 255) / 255;
 
-    this.colorManagement.colorSpaceToWorking(this, colorSpace);
+    ColorManagement.instance.colorSpaceToWorking(this, colorSpace);
 
     return this;
 
@@ -231,13 +229,13 @@ export class Color {
    * @param {string} [colorSpace=ColorManagement.workingColorSpace] - The color space.
    * @return {Color} A reference to this color.
    */
-  public setRGB(r: number, g: number, b: number, colorSpace: string = this.colorManagement.workingColorSpace): Color {
+  public setRGB(r: number, g: number, b: number, colorSpace: string = ColorManagement.instance.workingColorSpace): Color {
 
     this.r = r;
     this.g = g;
     this.b = b;
 
-    this.colorManagement.colorSpaceToWorking(this, colorSpace);
+    ColorManagement.instance.colorSpaceToWorking(this, colorSpace);
 
     return this;
 
@@ -252,7 +250,12 @@ export class Color {
    * @param {string} [colorSpace=ColorManagement.workingColorSpace] - The color space.
    * @return {Color} A reference to this color.
    */
-  public setHSL(h: number, s: number, l: number, colorSpace: string = this.colorManagement.workingColorSpace): Color {
+  public setHSL(
+    h: number,
+    s: number,
+    l: number,
+    colorSpace: string = ColorManagement.instance.workingColorSpace
+  ): Color {
 
     // h,s,l ranges are in 0.0 - 1.0
     h = euclideanModulo(h, 1);
@@ -274,7 +277,7 @@ export class Color {
 
     }
 
-    this.colorManagement.colorSpaceToWorking(this, colorSpace);
+    ColorManagement.instance.colorSpaceToWorking(this, colorSpace);
 
     return this;
 
@@ -545,7 +548,7 @@ export class Color {
    */
   public getHex(colorSpace: string = SRGBColorSpace): number {
 
-    this.colorManagement.workingToColorSpace(_color.copy(this), colorSpace);
+    ColorManagement.instance.workingToColorSpace(_color.copy(this), colorSpace);
 
     return Math.round(clamp(_color.r * 255, 0, 255)) * 65536 + Math.round(clamp(_color.g * 255, 0, 255)) * 256 + Math.round(clamp(_color.b * 255, 0, 255));
 
@@ -571,11 +574,11 @@ export class Color {
    * @param {string} [colorSpace=ColorManagement.workingColorSpace] - The color space.
    * @return {{h:number,s:number,l:number}} The HSL representation of this color.
    */
-  public getHSL(target: { h: number, s: number, l: number }, colorSpace: string = this.colorManagement.workingColorSpace): { h: number; s: number; l: number; } {
+  public getHSL(target: { h: number, s: number, l: number }, colorSpace: string = ColorManagement.instance.workingColorSpace): { h: number; s: number; l: number; } {
 
     // h,s,l ranges are in 0.0 - 1.0
 
-    this.colorManagement.workingToColorSpace(_color.copy(this), colorSpace);
+    ColorManagement.instance.workingToColorSpace(_color.copy(this), colorSpace);
 
     const r = _color.r, g = _color.g, b = _color.b;
 
@@ -623,9 +626,9 @@ export class Color {
    * @param {string} [colorSpace=ColorManagement.workingColorSpace] - The color space.
    * @return {Color} The RGB representation of this color.
    */
-  public getRGB(target: Color, colorSpace: string = this.colorManagement.workingColorSpace): Color {
+  public getRGB(target: Color, colorSpace: string = ColorManagement.instance.workingColorSpace): Color {
 
-    this.colorManagement.workingToColorSpace(_color.copy(this), colorSpace);
+    ColorManagement.instance.workingToColorSpace(_color.copy(this), colorSpace);
 
     target.r = _color.r;
     target.g = _color.g;
@@ -643,7 +646,7 @@ export class Color {
    */
   public getStyle(colorSpace: string = SRGBColorSpace): string {
 
-    this.colorManagement.workingToColorSpace(_color.copy(this), colorSpace);
+    ColorManagement.instance.workingToColorSpace(_color.copy(this), colorSpace);
 
     const r = _color.r, g = _color.g, b = _color.b;
 
@@ -958,10 +961,9 @@ export class Color {
     return [this.r, this.g, this.b][Symbol.iterator]();
   }
 
-
 }
 
-const _color = /*@__PURE__*/ new Color();
+const _color = /*@__PURE__*/ new Color(0xffffff);
 
 export function isColor(obj: any): obj is Color {
   return obj && obj.isColor === true;

@@ -2,6 +2,7 @@ import { REVISION } from "./constants";
 
 // constants.ts
 export { HalfFloatType, NoBlending, AdditiveBlending, DoubleSide, RGBADepthPacking, TOUCH, MOUSE } from './constants';
+export * as CONSTANTS from './constants';
 
 // animation
 export { AnimationClip } from './animation/AnimationClip';
@@ -68,7 +69,7 @@ export { TextureLoader } from './loaders/TextureLoader';
 // materials
 export { LineBasicMaterial } from './materials/LineBasicMaterial';
 export { LineDashedMaterial } from './materials/LineDashedMaterial';
-export { Material } from './materials/Material';
+export { Material, disposeMaterial } from './materials/Material';
 export { MeshBasicMaterial } from './materials/MeshBasicMaterial';
 export { MeshDepthMaterial } from './materials/MeshDepthMaterial';
 export { MeshDistanceMaterial } from './materials/MeshDistanceMaterial';
