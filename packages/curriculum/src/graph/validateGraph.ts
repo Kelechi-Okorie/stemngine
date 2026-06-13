@@ -1,6 +1,6 @@
-import { Topic, TopicID } from "../Interfaces";
+import { ConceptNode, ConceptID } from "../Interfaces";
 
-type Graph = Map<TopicID, Topic>;
+type Graph = Map<ConceptID, ConceptNode>;
 
 export function validateGraph(graph: Graph) {
 
@@ -47,10 +47,10 @@ export function validateGraph(graph: Graph) {
     }
 
     // 4. detect cycles in dependency graph
-    const visiting = new Set<TopicID>();
-    const visited = new Set<TopicID>();
+    const visiting = new Set<ConceptID>();
+    const visited = new Set<ConceptID>();
 
-    function dfs(id: TopicID, stack: TopicID[]) {
+    function dfs(id: ConceptID, stack: ConceptID[]) {
 
         if (visiting.has(id)) {
 

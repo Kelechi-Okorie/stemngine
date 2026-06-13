@@ -1,18 +1,13 @@
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 
 
-import { Artifact, Registry, Lesson } from "./Interfaces.js";
+import { Artifact, Registry, Lesson } from "../Interfaces.js";
 
 // type Registry = Map<string, Artifact>;
 
-// const DATA_DIR = path.join(process.cwd(), 'src/data');
-const DATA_DIR = path.join(__dirname, "./data");
+const DATA_DIR = path.join(process.cwd(), 'src/data');
 
 // import { buildCurriculum } from "./curriculum";
 
@@ -129,7 +124,7 @@ function parseArtifact(data: any, filePath: string): Artifact {
     return data as Artifact;
 }
 
-export function buildRegistry(dataDir: string = DATA_DIR) {
+export function buildRegistry(dataDir: string) {
 
     const registry = new Map<string, Artifact>();
 
@@ -217,33 +212,33 @@ function validate(registry: Registry) {
 }
 
 
-// function main() {
-//     console.log("🔧 Building curriculum...");
+function main() {
+    console.log("🔧 Building curriculum...");
 
-//     const registry = buildRegistry(DATA_DIR);
-//     console.log(registry);
+    const registry = buildRegistry(DATA_DIR);
+    console.log(registry);
 
-//     // const indices = buildIndices(registry);
-//     // console.log(indices);
+    const indices = buildIndices(registry);
+    console.log(indices);
 
-//     validate(registry);
+    validate(registry);
 
-//     console.log(`Loaded ${registry.size} artifacts`);
+    // console.log(`Loaded ${registry.size} artifacts`);
 
-//     const indices = buildIndices(registry);
+    // const indices = buildIndices(registry);
 
-//     console.log(`Concepts: ${indices.concepts.size}`);
-//     console.log(`Lessons: ${indices.lessons.size}`);
-//     console.log(`Builds: ${indices.builds.size}`);
+    // console.log(`Concepts: ${indices.concepts.size}`);
+    // console.log(`Lessons: ${indices.lessons.size}`);
+    // console.log(`Builds: ${indices.builds.size}`);
 
-//     validate(registry);
+    // validate(registry);
 
-//     console.log("✅ Validation passed");
+    // console.log("✅ Validation passed");
 
-//     return { registry, indices };
-// }
+    // return { registry, indices };
+}
 
-// main();
+main();
 
 // /data
 //    ↓

@@ -1,5 +1,6 @@
 {
-    "id": "physics.mechanics.projectile_motion",
+    "type": "concept",
+    "id": "physics.mechanics.projectile_motion.concept",
     "name": "Projectile Motion",
     "parent": "physics.mechanics.kinematics",
     "children": [],
@@ -86,7 +87,12 @@
             "u",
             "theta"
         ],
-        "controls": ["c", "o", "n", "t"],
+        "controls": [
+            "c",
+            "o",
+            "n",
+            "t"
+        ],
         "visualization": "2d"
     }
 }

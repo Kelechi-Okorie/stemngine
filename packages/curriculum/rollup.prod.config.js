@@ -1,0 +1,62 @@
+// rollup.prod.config.js
+import typescript from 'rollup-plugin-typescript2';
+import dts from 'rollup-plugin-dts';
+import { terser } from '@rollup/plugin-terser';
+import obfuscatorPlugin from 'rollup-plugin-obfuscator';
+import path from 'path';
+// import { fileURLToPath } from 'url';
+
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
+
+// const distFolder = path.resolve(__dirname, '../../dist/curriculum');
+
+const distFolder = 'dist';
+
+export default [
+  // UMD (minified + obfuscated)
+  // TODO: have to prove that UMD should be supported
+  // {
+  //   input: 'src/curriculum.ts',
+  //   output: {
+  //     file: path.join(distFolder, 'curriculum.umd.min.js'),
+  //     format: 'umd',
+  //     name: 'STEMEngine',
+  //     sourcemap: false,
+  //   },
+  //   plugins: [
+  //     typescript(),
+  //     terser(),
+  //     obfuscatorPlugin({
+  //       compact: true,
+  //       controlFlowFlattening: true,
+  //       deadCodeInjection: true,
+  //       stringArray: true,
+  //       stringArrayEncoding: ['base64'],
+  //       rotateStringArray: true,
+  //     }),
+  //   ],
+  // },
+
+  // ESM (clean, modern build)
+  // TODO: may have to add a minifier and obfuscator
+  {
+    input: 'src/curriculum.ts',
+    output: {
+      file: path.join(distFolder, 'curriculum.esm.js'),
+      format: 'esm',
+      sourcemap: true,
+    },
+    plugins: [typescript()],
+  },
+
+  // Types (single .d.ts bundle)
+  {
+    input: 'src/types/index.d.ts',
+    output: {
+      file: path.join(distFolder, 'curriculum.d.ts'),
+      format: 'es',
+    },
+    plugins: [dts()],
+  },
+];

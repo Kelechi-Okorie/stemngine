@@ -1,10 +1,10 @@
 import fs from 'fs';
 import path from 'path';
-import {Topic, TopicID} from '../Interfaces';
+import {ConceptNode, ConceptID} from '../Interfaces';
 
 const DATA_DIR = path.join(process.cwd(), 'src/data');
 
-function readJSON(filePath:string): Topic | Topic[] {
+function readJSON(filePath:string): ConceptNode | ConceptNode[] {
 
     const raw = fs.readFileSync(filePath, 'utf-8');
     return JSON.parse(raw);
@@ -37,9 +37,9 @@ function walk(dir: string): string[] {
 
 }
 
-export function loadCurriculum(): Map<TopicID, Topic> {
+export function loadCurriculum(): Map<ConceptID, ConceptNode> {
 
-    const graph = new Map<TopicID, Topic>();
+    const graph = new Map<ConceptID, ConceptNode>();
 
     const files = walk(DATA_DIR);
 
@@ -47,17 +47,17 @@ export function loadCurriculum(): Map<TopicID, Topic> {
 
         const data = readJSON(file);
 
-        const topics: Topic[] = Array.isArray(data) ? data : [data];
+        const concepts: ConceptNode[] = Array.isArray(data) ? data : [data];
 
-        for (const topic of topics) {
+        for (const concept of concepts) {
 
-            if (graph.has(topic.id)) {
+            if (graph.has(concept.id)) {
 
-                throw new Error(`Duplicate topic ID detected: ${topic.id}`);
+                throw new Error(`Duplicate topic ID detected: ${concept.id}`);
 
             }
 
-            graph.set(topic.id, topic);
+            graph.set(concept.id, concept);
 
         }
 
@@ -65,4 +65,5 @@ export function loadCurriculum(): Map<TopicID, Topic> {
 
 
     return graph;
+
 }

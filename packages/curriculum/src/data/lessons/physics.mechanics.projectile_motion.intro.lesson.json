@@ -1,0 +1,30 @@
+{
+    "version": "1.0.0",
+    "id": "lesson.projectile.intro",
+    "type": "lesson",
+    "steps": [
+        {
+            "conceptId": "physics.mechanics.projectile_motion",
+            "instructions": "Set angle to 45°",
+            "goals": [
+                {
+                    "type": "reachValue",
+                    "target": "variables.theta",
+                    "condition": "eq",
+                    "value": 0.785
+                }
+            ]
+        },
+        {
+            "instructions": "Increase velocity until range > 20m",
+            "goals": [
+                {
+                    "type": "reachValue",
+                    "target": "metrics.range",
+                    "condition": "gt",
+                    "value": 20
+                }
+            ]
+        }
+    ]
+}

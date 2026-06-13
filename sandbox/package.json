@@ -12,7 +12,8 @@
     "start": "vite"
   },
   "dependencies": {
-    "@stemngine/engine": "workspace:*"
+    "@stemngine/engine": "workspace:*",
+    "@stemngine/curriculum": "workspace:*"
   },
   "devDependencies": {
     "tweakpane": "^4.0.5",

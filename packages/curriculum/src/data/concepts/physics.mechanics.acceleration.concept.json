@@ -1,5 +1,6 @@
 {
-  "id": "physics.mechanics.acceleration",
+  "type": "concept",
+  "id": "physics.mechanics.acceleration.concept",
   "name": "Acceleration",
   "parent": "physics.mechanics.kinematics",
   "children": [],

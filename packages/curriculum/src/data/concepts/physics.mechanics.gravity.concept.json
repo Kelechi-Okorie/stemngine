@@ -1,0 +1,24 @@
+{
+  "type": "concept",
+  "id": "physics.mechanics.gravity.concept",
+  "name": "Acceleration",
+  "parent": "physics.mechanics.kinematics",
+  "children": [],
+  "dependsOn": ["physics.mechanics.velocity"],
+  "subject": "physics",
+  "domain": "mechanics",
+
+  "variables": [
+    { "id": "g", "name": "Acceleration", "symbol": "g", "unit": "m/s^2" },
+    { "id": "v", "name": "Velocity", "symbol": "v", "unit": "m/s" },
+    { "id": "t", "name": "Time", "symbol": "t", "unit": "s" }
+  ],
+
+  "equations": [
+    {
+      "id": "newton_gravity",
+      "latex": "g = \\frac{v - u}{t}",
+      "variables": ["g", "u", "v", "t"]
+    }
+  ]
+}

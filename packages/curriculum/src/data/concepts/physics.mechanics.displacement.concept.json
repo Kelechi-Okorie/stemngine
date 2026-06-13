@@ -1,5 +1,6 @@
 {
-  "id": "physics.mechanics.displacement",
+  "type": "concept",
+  "id": "physics.mechanics.displacement.concept",
   "name": "Displacement",
   "parent": "physics.mechanics.kinematics",
   "children": [],
