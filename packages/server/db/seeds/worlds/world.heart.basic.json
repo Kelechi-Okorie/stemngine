@@ -1,0 +1,24 @@
+{
+    "id": "world:heart:basic",
+    "type": "world",
+    "systems": [
+        {
+            "type": "fluid",
+            "id": "blood",
+            "state": {
+                "pressureField": true,
+                "velocityField": true
+            }
+        },
+        {
+            "type": "muscle",
+            "id": "heart_wall",
+            "elasticity": 0.8
+        },
+        {
+            "type": "electrical",
+            "id": "conduction",
+            "waveSpeed": 1.2
+        }
+    ]
+}

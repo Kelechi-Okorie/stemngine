@@ -112,7 +112,8 @@ function readJSON(filePath: string): any {
 
     } catch (err) {
 
-        throw new Error(`Failed to parse JSON: ${filePath}`);
+        // TODO: find a better way
+        // throw new Error(`Failed to parse JSON: ${filePath}`);
 
     }
 
@@ -122,9 +123,18 @@ function parseArtifact(data: any, filePath: string): Artifact {
 
     if (!data.type || !data.id) {
 
-        throw new Error(`Invalid artifact in ${filePath}`);
+        // TODO: find a better way
+        // an invalid artifact should not crash the entire server
+        // throw new Error(`Invalid artifact in ${filePath}`);
 
     }
+
+    // try {
+    //     return parse(file);
+    // } catch (err) {
+    //     console.error("Skipping invalid artifact:", file, err);
+    //     return null; // IMPORTANT
+    // }
 
     return data as Artifact;
 }
@@ -138,6 +148,10 @@ export function buildRegistry(dataDir: string = DATA_DIR) {
     for (const file of files) {
 
         const raw = readJSON(file);
+
+        // TODO: find a better way
+        if (!raw) continue;
+
         const artifact = parseArtifact(raw, file);
 
         if (registry.has(artifact.id)) {
@@ -154,11 +168,13 @@ export function buildRegistry(dataDir: string = DATA_DIR) {
 
 }
 
-function buildIndices(registry: Registry) {
+export function buildIndices(registry: Registry) {
 
     const concepts = new Map();
+    const explores = new Map();
     const lessons = new Map();
     const builds = new Map();
+    const conceptIndex = new Map();
 
     for (const artifact of registry.values()) {
 
@@ -176,13 +192,62 @@ function buildIndices(registry: Registry) {
                 builds.set(artifact.id, artifact);
                 break;
 
+            case "explore":
+                explores.set(artifact.id, artifact);
+                break;
+
             default:
-                throw new Error(`Artifact unknown: ${artifact.id}`);
+                // TODO: find a better way
+                // throw new Error(`Artifact unknown: ${artifact.id}`);
+                continue;
+        }
+
+
+        // This also unlocks something deeper
+        // Now you can query:
+        // getExplores(conceptId)
+        // getLessons(conceptId)
+        // getBuilds(conceptId)
+        // AND EVEN:
+        // getNextLessons(userState)
+
+        if (!("conceptId" in artifact)) continue;
+
+        const id = artifact.conceptId;
+
+        if (!conceptIndex.has(id)) {
+
+            conceptIndex.set(id, {
+                explores: [],
+                lessons: [],
+                builds: []
+            });
+
+        }
+
+        const bucket = conceptIndex.get(id);
+
+        if (artifact.type === "explore") {
+
+            bucket.explores.push(artifact.id);
+
+        }
+
+        if (artifact.type === "lesson") {
+
+            bucket.lesson.push(artifact.id);
+
+        }
+
+        if (artifact.type === "build") {
+
+            bucket.builds.push(artifact.id);
+
         }
 
     }
 
-    return { concepts, lessons, builds, /* scenes */ };
+    return { concepts, lessons, builds, explores, conceptIndex /* scenes */ };
 
 }
 

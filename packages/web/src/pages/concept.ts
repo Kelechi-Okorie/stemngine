@@ -1,30 +1,67 @@
 import { loadBundle } from "../services/api";
 
-export async function renderRunner(id: string) {
+export async function renderConcept(id: string) {
 
     const root = document.getElementById("root")!;
     root.innerHTML = "Loading...";
 
     const data = await loadBundle(id);
+    const { concept, bundle } = data.data;
+    const { explores } = bundle;
 
-    console.log("BUNDLE:", data); // TODO: to be removes
+    console.log("data:", data); // TODO: to be removes
 
     root.innerHTML = "";
 
     const container = document.createElement('div');
 
     const title = document.createElement('h2');
-    title.textContent = `Running: ${id}`;
+    title.textContent = concept.name;
 
-    const pre = document.createElement('pre');
-    pre.textContent = JSON.stringify(data, null, 2);
+    const section = createExploreSection(explores)
 
     container.appendChild(title);
-    container.appendChild(pre);
+    container.appendChild(section);
 
     root.appendChild(container);
 
 }
+
+/**
+ * Build section
+ * 
+ * @returns 
+ */
+function createExploreSection(explores: any[]) {
+
+    const section = document.createElement('div');
+
+    const title = document.createElement('h3');
+    title.textContent = "Build projects";
+
+    for (const explore of explores) {
+
+        const link = document.createElement('a');
+        link.textContent = explore.name;
+        link.href = `#/run/${explore.id}`;
+
+        section.appendChild(link);
+        console.log(explore);
+
+    }
+
+    // const link = document.createElement('a');
+    // link.textContent = "Resume Projectile Motion";
+
+    // // important: use hash
+    // link.href = "#/run/physics.mechanics.gravity.concept";
+
+    // section.appendChild(title);
+    // section.appendChild(link);
+
+    return section;
+}
+
 
 // TODO: to be removed
 // renderer

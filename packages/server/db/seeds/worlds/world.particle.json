@@ -1,0 +1,89 @@
+{
+  "id": "world:particle",
+  "type": "world",
+  "meta": {
+    "name": "particle",
+    "version": "1.0.0"
+  },
+  "systems": [
+    {
+      "name": "Particle System",
+      "id": "particle_system",
+      "entities": [
+        {
+          "name": "Particle",
+          "objectId": null,
+          "mass": 1,
+          "position": [
+            0.8091309018229262,
+            8.592610563018646,
+            0
+          ],
+          "velocity": [
+            0,
+            0,
+            0
+          ],
+          "acceleration": [
+            0,
+            0,
+            0
+          ],
+          "damping": 1
+        }
+      ]
+    }
+  ],
+  "solvers": [
+    {
+      "name": "Gravity",
+      "type": "gravity",
+      "enabled": true,
+      "gravity": [
+        0,
+        -9.81,
+        0
+      ]
+    },
+    {
+      "name": "ExplicitEulerIntegrator",
+      "type": "integrator",
+      "enabled": true
+    }
+  ],
+  "regionTemplate": {
+    "type": "split",
+    "direction": "horizontal",
+    "ratio": 0.7,
+    "a": {
+      "type": "split",
+      "direction": "vertical",
+      "ratio": 0.7,
+      "a": {
+        "type": "leaf",
+        "name": "viewport",
+        "editorType": "viewport"
+      },
+      "b": {
+        "type": "leaf",
+        "name": "player",
+        "editorType": "player"
+      }
+    },
+    "b": {
+      "type": "split",
+      "direction": "vertical",
+      "ratio": 0.3,
+      "a": {
+        "type": "leaf",
+        "name": "outliner",
+        "editorType": "outliner"
+      },
+      "b": {
+        "type": "leaf",
+        "name": "properties",
+        "editorType": "properties"
+      }
+    }
+  }
+}

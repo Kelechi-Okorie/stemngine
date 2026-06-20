@@ -1,0 +1,10 @@
+{
+    "type": "concept",
+    "id": "concept:kinematics",
+    "name": "Kinematics",
+    "relationhips": [
+        
+    ],
+
+    "tags": ["physics", "velocity", "displacement"]
+}

@@ -1,0 +1,21 @@
+{
+    "type": "explore",
+    "id": "explore:velocity:direction",
+    "name": "Velocity direction",
+
+    "conceptId": "concept:velocity",
+    "runtimeId": "runtime:velocity",
+
+    "controls": [
+        {
+            "type": "vector",
+            "target": "p1.velocity",
+            "lockMagnitude": true
+        }
+    ],
+
+    "observations": {
+        "include": ["o_position", "o_velocity"],
+        "exclude": ["o_height_graph"]
+    }
+}

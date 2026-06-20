@@ -15,27 +15,17 @@ registerRoutes();
 router.start();
 router.navigate("/");
 
-// navigation anywhere in the app
-// router.navigate("/run/physics.mechanics.velocity");
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// simple routing (no framework)
-// window.addEventListener('hashchange', renderRoute);
-
-// console.log('the main app')
-
-// renderHome(root);
+// CONCEPT
+//    ↓
+// SCENE (simulation)
+//    ↓
+// ENGINE STATE
+//    ↓
+// OBSERVATIONS
+//    ↓
+// ASSETS (GLTF, meshes)
+//    ↓
+// BINDINGS (state → asset)
+//    ↓
+// RENDERER

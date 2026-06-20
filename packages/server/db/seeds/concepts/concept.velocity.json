@@ -1,11 +1,10 @@
 {
   "type": "concept",
-  "id": "physics.mechanics.velocity.concept",
+  "id": "concept:velocity",
   "name": "Velocity",
-  "parent": "physics.mechanics.kinematics",
-  "children": [],
-  "dependsOn": [
-    "physics.mechanics.displacement"
+  "relationships": [
+    {"type": "prerequisite", "to": "concept:position"},
+    {"type": "prerequisite", "to": "concept:displacement"}
   ],
   "variables": [
     {
@@ -37,5 +36,6 @@
         "t"
       ]
     }
-  ]
+  ],
+  "tags": ["physics", "kinematics"]
 }

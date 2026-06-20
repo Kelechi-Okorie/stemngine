@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "start": "node dist/index.ts",
@@ -14,11 +15,12 @@
   "packageManager": "pnpm@10.17.1",
   "dependencies": {
     "@fastify/cors": "^11.2.0",
-    "@stemngine/curriculum": "workspace:*",
-    "fastify": "^5.8.5"
+    "fastify": "^5.8.5",
+    "pg": "^8.21.0"
   },
   "devDependencies": {
     "@types/node": "^25.9.1",
+    "@types/pg": "^8.20.0",
     "tsx": "^4.22.4",
     "typescript": "^6.0.3"
   }

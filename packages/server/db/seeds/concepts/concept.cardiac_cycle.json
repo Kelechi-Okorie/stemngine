@@ -1,0 +1,27 @@
+{
+    "type": "concept",
+    "id": "concept:cardiac_cycle",
+    "name": "Cardiac cycle",
+    "relationships": [],
+    "variables": [
+        {
+            "id": "pressure"
+        },
+        {
+            "id": "volume"
+        },
+        {
+            "id": "electrical_signal"
+        },
+        {
+            "id": "oxygen_level"
+        }
+    ],
+    "equations": [
+        {
+            "id": "flow",
+            "latex": "Q = \\Delta P / R"
+        }
+    ],
+    "tags": ["biology"]
+}

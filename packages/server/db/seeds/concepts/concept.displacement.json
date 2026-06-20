@@ -1,0 +1,22 @@
+{
+  "type": "concept",
+  "id": "concept:displacement",
+  "name": "Displacement",
+  "relationship": [],
+  "variables": [
+    {
+      "id": "s",
+      "name": "Displacement",
+      "symbol": "s",
+      "unit": "m"
+    }
+  ],
+  "equations": [],
+  
+  "aliases": [
+    "Position",
+    "Position vector",
+    "Change in position",
+    "Distance from origin (contextual)"
+  ]
+}

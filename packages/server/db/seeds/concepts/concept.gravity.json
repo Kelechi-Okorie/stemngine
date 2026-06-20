@@ -1,12 +1,10 @@
 {
   "type": "concept",
-  "id": "physics.mechanics.gravity.concept",
-  "name": "Acceleration",
-  "parent": "physics.mechanics.kinematics",
-  "children": [],
-  "dependsOn": ["physics.mechanics.velocity"],
-  "subject": "physics",
-  "domain": "mechanics",
+  "id": "concept:gravity",
+  "name": "Gravity",
+  "relationships": [
+    {"type": "prerequisite", "to": "concept.velocity"}
+  ],
 
   "variables": [
     { "id": "g", "name": "Acceleration", "symbol": "g", "unit": "m/s^2" },
@@ -20,5 +18,6 @@
       "latex": "g = \\frac{v - u}{t}",
       "variables": ["g", "u", "v", "t"]
     }
-  ]
+  ],
+  "tags": ["physics", "kinematics"]
 }

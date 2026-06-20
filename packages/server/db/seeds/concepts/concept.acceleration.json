@@ -1,12 +1,13 @@
 {
   "type": "concept",
-  "id": "physics.mechanics.acceleration.concept",
+  "id": "concept:acceleration",
   "name": "Acceleration",
-  "parent": "physics.mechanics.kinematics",
-  "children": [],
-  "dependsOn": ["physics.mechanics.velocity"],
-  "subject": "physics",
-  "domain": "mechanics",
+
+  "relationships": [
+    {"type": "prerequisite", "to": "velocity"},
+    {"type": "belongsTo", "to": "mechanics"},
+    {"type": "belongsTo", "to": "physics"}
+  ],
 
   "variables": [
     { "id": "a", "name": "Acceleration", "symbol": "a", "unit": "m/s^2" },
@@ -20,5 +21,7 @@
       "latex": "a = \\frac{v - u}{t}",
       "variables": ["a", "u", "v", "t"]
     }
-  ]
+  ],
+
+  "tags": ["physics", "mechanics"]
 }

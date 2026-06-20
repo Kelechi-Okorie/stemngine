@@ -1,0 +1,49 @@
+{
+    "type": "concept_runtime",
+    "id": "runtime:cardiac_cycle",
+    "name": "Cardiac cycle",
+    "worldId": "world:heart:basic",
+    "observations": [
+        {
+            "id": "o_anatomy",
+            "source": "heart_wall.geometry",
+            "projection": "raw",
+            "visualization": {
+                "type": "mesh",
+                "mode": "3d",
+                "assetId": "asset.heart.glft",
+                "binding": {
+                    "transform": "heart_wall.transform",
+                    "deformation": "heart_wall.geometry"
+                }
+            }
+        },
+        {
+            "id": "o_ecg",
+            "source": "conduction.signal",
+            "projection": "signal",
+            "visualization": {
+                "type": "plot"
+            }
+        },
+        {
+            "id": "o_blood_flow",
+            "source": "blood.velocity_field",
+            "projection": "field",
+            "visualization": {
+                "type": "vectorField",
+                "binding": {
+                    "field": "blood.velocity_field"
+                }
+            }
+        },
+        {
+            "id": "o_pressure",
+            "source": "blood.pressure_field",
+            "projection": "field",
+            "visualization": {
+                "type": "heatmap"
+            }
+        }
+    ]
+}

@@ -1,0 +1,37 @@
+{
+    "type": "concept_runtime",
+    "id": "runtime:position",
+    "name": "Position",
+    "conceptId": "concept:displacement",
+    "simulationId": "simulationId",
+    "bindings": [
+        {
+            "variableId": "x",
+            "targetPath": "entities.particles[0].position['x']"
+        },
+        {
+            "variableId": "y",
+            "targetPath": "entities.particles[0].position['y']"
+        },
+        {
+            "variableId": "z",
+            "targetPath": "entities.particles[0].position['z']"
+        }
+    ],
+    "visualization": {
+        "mode": "2d",
+        "targets": [
+            {
+                "variableId": "x"
+            },
+            {
+                "variableId": "y"
+            }
+        ],
+        "representations": [
+            {
+                "type": "point"
+            }
+        ]
+    }
+}

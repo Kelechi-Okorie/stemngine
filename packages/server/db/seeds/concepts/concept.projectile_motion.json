@@ -1,15 +1,12 @@
 {
     "type": "concept",
-    "id": "physics.mechanics.projectile_motion.concept",
+    "id": "concept:projectile_motion",
     "name": "Projectile Motion",
-    "parent": "physics.mechanics.kinematics",
-    "children": [],
-    "dependsOn": [
-        "physics.mechanics.velocity",
-        "physics.mechanics.acceleration"
+    "relationships": [
+        {"type": "prerequisite", "to": "concept:kinematics"},
+        {"type": "prerequisite", "to": "concept:velocity"},
+        {"type": "prerequisite", "to": "concept:acceleration"}
     ],
-    "subject": "physics",
-    "domain": "mechanics",
     "variables": [
         {
             "id": "u",
@@ -71,28 +68,5 @@
             ]
         }
     ],
-    "simulation": {
-        "type": "interactive",
-        "model": "name of the process or equation",
-        "inputs": [
-            "u",
-            "theta",
-            "g"
-        ],
-        "outputs": [
-            "x",
-            "y"
-        ],
-        "manipulatable": [
-            "u",
-            "theta"
-        ],
-        "controls": [
-            "c",
-            "o",
-            "n",
-            "t"
-        ],
-        "visualization": "2d"
-    }
+    "tags": ["physics", "kinematics"]
 }

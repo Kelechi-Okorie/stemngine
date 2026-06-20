@@ -18,5 +18,5 @@
   "include": [
     "src",
     "src/types/**/*.d.ts"
-  ]
+, "../server/src/Interfaces.ts"  ]
 }

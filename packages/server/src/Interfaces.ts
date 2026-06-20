@@ -19,6 +19,8 @@ export type BaseArtifact = {
   type: "concept" | "lesson" | "build" | "scene";
   version?: string;
 
+  relationships?: Relationship[]
+
   aliases?: string[];
   displayName?: string;
 };
@@ -26,7 +28,7 @@ export type BaseArtifact = {
 /**
  * layer 1: Knowledge graph
  */
-export type ConceptNode = BaseArtifact & {
+export type Concept = BaseArtifact & {
   name: string;
 
   relationships: Relationship[],
@@ -52,24 +54,78 @@ export type ConceptNode = BaseArtifact & {
   kind: "theoretical" | "computational" | "composite";
 };
 
-type Relationship =
-  | {
-    type: "prerequisite";
-    to: string; // ConceptID
-  }
-  | {
-    type: "belongsTo";
-    to: string; // TaxonomyID
-  }
-  | {
-    type: "related";
-    to: string; // ConceptID
-  }
-  | {
-    type: "partOf";
-    to: string; // ConceptID
-  }
-;
+
+type ConceptRelationshipType =
+  | "prerequisite"
+  | "belongs_to"
+  | "related"
+  | "part_of"
+  | "derived_from"
+  | "depends_on"
+  ;
+
+type ExploreRelationshipType =
+  | "demonstrates"
+  | "visualizes"
+  | "extends"
+  | "compares_with"
+  ;
+
+type LessonRelationshipType =
+  | "teaches"
+  | "introduces"
+  | "reinforces"
+  | "requires"
+  ;
+
+type BuildRelationshipType =
+  | "uses"
+  | "combines"
+  | "challenges"
+  | "applies"
+  ;
+
+export type BaseRelationship = {
+  from: string;
+  to: string;
+  
+  // type = meaning
+  type: string; // semantic meaning (depends_on, teaches, applies)
+  // scope = interpretation layer
+  scope: "concept" | "explore" | "lesson" | "build" | "crosses";
+  
+  // metadata = tuning parameters
+  metadata?: {
+    weight?: number;
+    intent?: string;
+    difficultyDelta?: number;
+    visualHint?: number;
+    role?: string;
+  };
+
+  // Build a “Graph query engine for STEMngine”
+  // so you can answer:
+  // what should a student see next?
+  // which explores explain this concept best?
+  // which lesson prepares for this build?
+
+  // That’s the point where your system becomes intelligent rather than just structured.
+};
+
+
+type ConceptRelationship = BaseRelationship & { type: ConceptRelationshipType; };
+type ExploreRelationship = BaseRelationship & { type: ExploreRelationshipType; };
+type LessonRelationship = BaseRelationship & { type: LessonRelationshipType; };
+type BuildRelationship = BaseRelationship & { type: BuildRelationshipType; };
+
+export type Relationship =
+  | ConceptRelationship
+  | ExploreRelationship
+  | LessonRelationship
+  | BuildRelationship
+  ;
+
+  export type Edge = Relationship;
 
 export type Variable = {
   id: string;
@@ -315,7 +371,7 @@ export type ScriptEffect =
   | { type: "modifySolver"; solverId: string; patch: Record<string, any> }
   | { type: "emitEvent"; eventId: string }
   | { type: "runExpression"; expression: string }
-;
+  ;
 
 /**
  * layer 3: scene (engine layer)
@@ -438,10 +494,7 @@ type Binding = {
   targetPath: string;
 }
 
-export type Explore = {
-  type: string; // explore
-  id: string;
-  name: string;
+export type Explore = BaseArtifact & {
   title: string;  // either name or title is removed
   description?: string;
   conceptId: string;
@@ -460,10 +513,8 @@ export type Explore = {
 
 
 
-export type Registry = Map<string, Artifact>;
-
 export type Artifact =
-  | ConceptNode
+  | Concept
   | ConceptRuntime
   | Lesson
   | Build
@@ -549,7 +600,7 @@ export type DeformationRule =
     stiffnessField: string;
     pressureField: string;
   }
-;
+  ;
 
 /**
  * how everything connects

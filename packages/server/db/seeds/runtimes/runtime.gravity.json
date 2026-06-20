@@ -1,0 +1,42 @@
+{
+    "type": "concept_runtime",
+    "name": "Gravity",
+    "id": "runtime:gravity",
+    "worldId": "world:gravity:basic",
+    "bindings": [
+        {
+            "variableId": "g",
+            "targetPath": "solvers.gravity.value[1]"
+        }
+    ],
+    "observations": [
+        {
+            "id": "o_position",
+            "source": "p1.position",
+            "projection": "raw",
+            "visualization": {
+                "type": "point",
+                "shape": "sphere",
+                "binding": {
+                    "position": "p1.position"
+                }
+            }
+        },
+        {
+            "id": "o_velocity",
+            "source": "p1.velocity",
+            "projection": "raw",
+            "visualization": {
+                "type": "vector"
+            }
+        },
+        {
+            "id": "o_height_graph",
+            "source": "p1.positin[1]",
+            "projection": "signal",
+            "visualization": {
+                "type": "plot"
+            }
+        }
+    ]
+}
