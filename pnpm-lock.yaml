@@ -51,18 +51,6 @@ importers:
         specifier: ^3.2.4
         version: 3.2.4(@types/node@25.9.1)(@vitest/ui@3.2.4)(jsdom@27.2.0(canvas@3.2.0))(terser@5.44.0)(tsx@4.22.4)
 
-  packages/curriculum:
-    devDependencies:
-      '@types/node':
-        specifier: ^25.9.1
-        version: 25.9.1
-      tsx:
-        specifier: ^4.22.4
-        version: 4.22.4
-      typescript:
-        specifier: ^5.9.3
-        version: 5.9.3
-
   packages/editor:
     dependencies:
       '@stemngine/engine':
@@ -113,9 +101,6 @@ importers:
 
   sandbox:
     dependencies:
-      '@stemngine/curriculum':
-        specifier: workspace:*
-        version: link:../packages/curriculum
       '@stemngine/engine':
         specifier: workspace:*
         version: link:../packages/engine
