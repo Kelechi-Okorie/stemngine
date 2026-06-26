@@ -1,0 +1,11 @@
+{
+  "type": "domain",
+  "id": "domain:mechanics",
+  "name": "Mechanics",
+  "description": "",
+  "slug": "domain-mechanics",
+
+  "relationships": [],
+
+  "tags": ["physics", "mechanics"]
+}

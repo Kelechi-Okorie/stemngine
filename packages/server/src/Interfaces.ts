@@ -13,17 +13,24 @@
 // Unique ID strategy: subject.domain.concept
 // e.g. physics.mechanics.velocity
 
+type ArtifactType = "subject" | "domain" | "concept" | "lesson" | "build" | "scene";
 
 export type BaseArtifact = {
   id: string;
-  type: "concept" | "lesson" | "build" | "scene";
+  type: ArtifactType
   version?: string;
+  name: string;
+  description: string;
+  slug?: string;
 
   relationships?: Relationship[]
 
   aliases?: string[];
-  displayName?: string;
 };
+
+export type Subject = BaseArtifact;
+
+export type Domain = BaseArtifact;
 
 /**
  * layer 1: Knowledge graph

@@ -2,11 +2,13 @@
   "type": "concept",
   "id": "concept:acceleration",
   "name": "Acceleration",
+  "description": "",
+  "slug": "concept-acceleration",
 
   "relationships": [
-    {"type": "prerequisite", "to": "velocity"},
-    {"type": "belongsTo", "to": "mechanics"},
-    {"type": "belongsTo", "to": "physics"}
+    {"type": "prerequisite", "to": "concept:velocity"},
+    {"type": "belongsTo", "to": "domain:mechanics"},
+    {"type": "belongsTo", "to": "subject:physics"}
   ],
 
   "variables": [

@@ -1,5 +1,33 @@
 import { loadBundle } from "../services/api";
 
+// ----------------------------------
+// [ Top Bar: Title / Mode ]
+
+// ----------------------------------
+// |                                |
+// |        VIEWPORT (engine)       |
+// |                                |
+// ----------------------------------
+// | Controls | Instructions | Goals |
+// ----------------------------------
+
+// if (mode === "lesson") {
+//   showInstructions();
+//   showGoals();
+//   lockControls();
+// }
+
+// if (mode === "explore") {
+//   hideInstructions();
+//   hideGoals();
+//   unlockAllControls();
+// }
+
+// if (mode === "build") {
+//   showConstraints();
+//   showGoals();
+// }
+
 export async function renderRunner(id: string) {
 
     const root = document.getElementById("root")!;
@@ -144,3 +172,21 @@ export async function renderRunner(id: string) {
 // heat
 // neural signals
 // into one consistent engine.
+
+
+
+
+// One more subtle issue (important)
+
+// This:
+
+// "target": "p1.velocity"
+
+// is too raw.
+
+// Better:
+// "target": {
+//   "type": "entity",
+//   "id": "p1",
+//   "property": "velocity"
+// }

@@ -2,18 +2,19 @@
     "type": "explore",
     "id": "explore:velocity:graph",
     "name": "Velocity vs Position Graph",
-
+    "description": "",
+    "slug": "explore-velocity-time-graph",
     "conceptId": "concept:velocity",
     "runtimeId": "runtime:velocity",
-
     "controls": [
         {
             "type": "slider",
             "variableId": "v"
         }
     ],
-
     "observations": {
-        "include": ["o_height_graph"]
+        "include": [
+            "o_height_graph"
+        ]
     }
 }

@@ -1,6 +1,9 @@
 {
     "version": "1.0.0",
     "id": "lesson:projectile:intro",
+    "name": "Introduction to projectile",
+    "description": "",
+    "slug": "lesson-projectile-motion-intro",
     "type": "lesson",
     "steps": [
         {

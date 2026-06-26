@@ -1,6 +1,8 @@
 {
-    "id": "world:heart:basic",
     "type": "world",
+    "id": "world:heart:basic",
+    "name": "Basic world",
+    "description": "",
     "systems": [
         {
             "type": "fluid",

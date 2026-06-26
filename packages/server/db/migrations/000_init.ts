@@ -56,10 +56,13 @@ export async function up() {
 
 export async function runDatabaseSetup() {
 
+    // TODO: To be changed
     const DB_NAME = "stemngine";
 
     await ensureDtabaseExists(DB_NAME);
     await up();
+
+    process.exit(0);
     
 }
 

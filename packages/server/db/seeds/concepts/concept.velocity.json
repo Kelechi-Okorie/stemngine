@@ -2,9 +2,17 @@
   "type": "concept",
   "id": "concept:velocity",
   "name": "Velocity",
+  "description": "",
+  "slug": "concept-velocity",
   "relationships": [
-    {"type": "prerequisite", "to": "concept:position"},
-    {"type": "prerequisite", "to": "concept:displacement"}
+    {
+      "type": "prerequisite",
+      "to": "concept:position"
+    },
+    {
+      "type": "prerequisite",
+      "to": "concept:displacement"
+    }
   ],
   "variables": [
     {
@@ -37,5 +45,8 @@
       ]
     }
   ],
-  "tags": ["physics", "kinematics"]
+  "tags": [
+    "physics",
+    "kinematics"
+  ]
 }

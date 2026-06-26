@@ -2,22 +2,48 @@
   "type": "concept",
   "id": "concept:gravity",
   "name": "Gravity",
+  "description": "",
+  "slug": "concept-gravity",
   "relationships": [
-    {"type": "prerequisite", "to": "concept.velocity"}
+    {
+      "type": "prerequisite",
+      "to": "concept:velocity"
+    }
   ],
-
   "variables": [
-    { "id": "g", "name": "Acceleration", "symbol": "g", "unit": "m/s^2" },
-    { "id": "v", "name": "Velocity", "symbol": "v", "unit": "m/s" },
-    { "id": "t", "name": "Time", "symbol": "t", "unit": "s" }
+    {
+      "id": "g",
+      "name": "Acceleration",
+      "symbol": "g",
+      "unit": "m/s^2"
+    },
+    {
+      "id": "v",
+      "name": "Velocity",
+      "symbol": "v",
+      "unit": "m/s"
+    },
+    {
+      "id": "t",
+      "name": "Time",
+      "symbol": "t",
+      "unit": "s"
+    }
   ],
-
   "equations": [
     {
       "id": "newton_gravity",
       "latex": "g = \\frac{v - u}{t}",
-      "variables": ["g", "u", "v", "t"]
+      "variables": [
+        "g",
+        "u",
+        "v",
+        "t"
+      ]
     }
   ],
-  "tags": ["physics", "kinematics"]
+  "tags": [
+    "physics",
+    "kinematics"
+  ]
 }

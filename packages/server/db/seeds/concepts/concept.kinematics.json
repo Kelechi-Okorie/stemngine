@@ -1,10 +1,13 @@
 {
-    "type": "concept",
-    "id": "concept:kinematics",
+    "type": "domain",
+    "id": "domain:kinematics",
     "name": "Kinematics",
-    "relationhips": [
-        
-    ],
-
-    "tags": ["physics", "velocity", "displacement"]
+    "description": "",
+    "slug": "domain-kinematics",
+    "relationhips": [],
+    "tags": [
+        "physics",
+        "velocity",
+        "displacement"
+    ]
 }

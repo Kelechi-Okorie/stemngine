@@ -1,7 +1,8 @@
 {
-    "type": "concept_runtime",
+    "type": "runtime",
     "id": "runtime:cardiac_cycle",
     "name": "Cardiac cycle",
+    "description": "",
     "worldId": "world:heart:basic",
     "observations": [
         {

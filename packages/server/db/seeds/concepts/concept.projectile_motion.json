@@ -2,10 +2,21 @@
     "type": "concept",
     "id": "concept:projectile_motion",
     "name": "Projectile Motion",
+    "description": "",
+    "slug": "concept-projectile-motion",
     "relationships": [
-        {"type": "prerequisite", "to": "concept:kinematics"},
-        {"type": "prerequisite", "to": "concept:velocity"},
-        {"type": "prerequisite", "to": "concept:acceleration"}
+        {
+            "type": "prerequisite",
+            "to": "domain:kinematics"
+        },
+        {
+            "type": "prerequisite",
+            "to": "concept:velocity"
+        },
+        {
+            "type": "prerequisite",
+            "to": "concept:acceleration"
+        }
     ],
     "variables": [
         {
@@ -68,5 +79,8 @@
             ]
         }
     ],
-    "tags": ["physics", "kinematics"]
+    "tags": [
+        "physics",
+        "kinematics"
+    ]
 }

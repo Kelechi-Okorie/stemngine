@@ -1,0 +1,11 @@
+{
+  "type": "subject",
+  "id": "subject:physics",
+  "name": "Physics",
+  "description": "",
+  "slug": "subject-physics",
+
+  "relationships": [],
+
+  "tags": []
+}

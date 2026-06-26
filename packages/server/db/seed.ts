@@ -54,23 +54,21 @@ async function insertArtifacts(artifacts: Artifact[]) {
 
     for (const a of artifacts) {
         await pool.query(`
-            INSERT INTO artifacts (id, type, data)
-            VALUES ($1, $2, $3)
+            INSERT INTO artifacts (id, type, name, description, slug, data)
+            VALUES ($1, $2, $3, $4, $5, $6)
             ON CONFLICT (id)
             DO UPDATE SET
                 type = EXCLUDED.type,
                 data = EXCLUDED.data,
                 updated_at = NOW()
             `,
-            [a.id, a.type, a]
+            [a.id, a.type, a.name, a.description, a.slug, a]
         );
     }
 
 }
 
 async function insertEdges(artifacts: Artifact[]) {
-
-    console.log('the artifacts', artifacts)
 
     // TODO: use batch insert instead
     for (const artifact of artifacts) {
@@ -95,35 +93,6 @@ async function insertEdges(artifacts: Artifact[]) {
             );
         }
 
-        // TODO: to be removed
-        // if (a.dependsOn) {
-        //     for (const dep of a.dependsOn) {
-        //         relations.push({
-        //             from: a.id,
-        //             to: dep,
-        //             type: "depends_on"
-        //         });
-        //     }
-        // }
-
-        // if (a.parent) {
-        //     relations.push({
-        //         from: a.id,
-        //         to: a.parent,
-        //         type: "child_of"
-        //     });
-        // }
-
-        // for (const r of relations) {
-        //     await pool.query(
-        //         `
-        //         INSERT INTO edges (from_id, to_id, type)
-        //         VALUES ($1, $2, $3)
-        //         ON CONFLICT DO NOTHING
-        //         `,
-        //         [r.from, r.to, r.type]
-        //     );
-        // }
     }
 
 }

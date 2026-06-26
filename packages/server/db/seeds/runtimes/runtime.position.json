@@ -1,7 +1,8 @@
 {
-    "type": "concept_runtime",
+    "type": "runtime",
     "id": "runtime:position",
     "name": "Position",
+    "description": "",
     "conceptId": "concept:displacement",
     "simulationId": "simulationId",
     "bindings": [

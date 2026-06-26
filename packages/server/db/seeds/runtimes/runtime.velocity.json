@@ -1,13 +1,13 @@
 {
     "type": "runtime",
-    "id": "runtime:gravity",
-    "name": "Gravity",
+    "id": "runtime:velocity",
+    "name": "Velocity",
     "description": "",
-    "worldId": "world:gravity:basic",
+    "worldId": "world:velocity:basic",
     "bindings": [
         {
-            "variableId": "g",
-            "targetPath": "solvers.gravity.value[1]"
+            "variableId": "v",
+            "targetPath": "solvers.velocity.value[1]"
         }
     ],
     "observations": [

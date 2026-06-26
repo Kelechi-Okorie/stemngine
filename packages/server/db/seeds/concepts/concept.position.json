@@ -1,14 +1,14 @@
 {
   "type": "concept",
-  "id": "concept:displacement",
-  "name": "Displacement",
+  "id": "concept:position",
+  "name": "Position",
   "description": "",
-  "slug": "concept-displacement",
+  "slug": "concept-position",
   "relationship": [],
   "variables": [
     {
       "id": "s",
-      "name": "Displacement",
+      "name": "Position",
       "symbol": "s",
       "unit": "m"
     }

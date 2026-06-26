@@ -2,10 +2,10 @@
     "type": "explore",
     "id": "explore:velocity:direction",
     "name": "Velocity direction",
-
+    "description": "",
+    "slug": "explore-velocity-direction",
     "conceptId": "concept:velocity",
     "runtimeId": "runtime:velocity",
-
     "controls": [
         {
             "type": "vector",
@@ -13,9 +13,13 @@
             "lockMagnitude": true
         }
     ],
-
     "observations": {
-        "include": ["o_position", "o_velocity"],
-        "exclude": ["o_height_graph"]
+        "include": [
+            "o_position",
+            "o_velocity"
+        ],
+        "exclude": [
+            "o_height_graph"
+        ]
     }
 }

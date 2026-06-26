@@ -1,6 +1,8 @@
 {
-  "id": "world:particle",
   "type": "world",
+  "id": "world:particle",
+  "name": "Particle world",
+  "description": "",
   "meta": {
     "name": "particle",
     "version": "1.0.0"

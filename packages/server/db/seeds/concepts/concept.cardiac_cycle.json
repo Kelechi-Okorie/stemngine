@@ -2,6 +2,8 @@
     "type": "concept",
     "id": "concept:cardiac_cycle",
     "name": "Cardiac cycle",
+    "description": "",
+    "slug": "concept-cardiac-cycle",
     "relationships": [],
     "variables": [
         {
@@ -23,5 +25,7 @@
             "latex": "Q = \\Delta P / R"
         }
     ],
-    "tags": ["biology"]
+    "tags": [
+        "biology"
+    ]
 }

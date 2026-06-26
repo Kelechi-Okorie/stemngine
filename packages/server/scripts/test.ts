@@ -7,9 +7,6 @@ import { seed } from "../db/seed.js";
 
 import { queryEngine } from '../src/graph/queryEngineInstance.js';
 
-
-// console.log(pool);
-
 async function run() {
 
     // await runMigrations();
@@ -19,9 +16,11 @@ async function run() {
 
     // const query = new QueryEngine();
 
-    const concept = await queryEngine.getArtifact('concept:acceleration');
+    // const concept = await queryEngine.getArtifact('concept:acceleration');
 
-    console.log(concept);
+    // console.log(concept);
+
+    console.log('testing');
 
 
 

@@ -1,9 +1,10 @@
 import { runMigrations } from "./migrate.js";
 import { seed } from './seed.js';
 
+// migrate and seed
 async function main() {
 
-    await runMigrations();
+    // await runMigrations();
     await seed();
 
     process.exit(0);
