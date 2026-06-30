@@ -18,7 +18,7 @@ type ArtifactType = "subject" | "domain" | "concept" | "lesson" | "build" | "sce
 export type BaseArtifact = {
   id: string;
   type: ArtifactType
-  version?: string;
+  version: string;
   name: string;
   description: string;
   slug?: string;

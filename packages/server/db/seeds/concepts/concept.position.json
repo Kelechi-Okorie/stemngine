@@ -1,6 +1,7 @@
 {
   "type": "concept",
-  "id": "concept:position",
+  "id": "concept.position",
+  "version": "0.0.0",
   "name": "Position",
   "description": "",
   "slug": "concept-position",

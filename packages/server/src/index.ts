@@ -42,17 +42,39 @@ app.get("/concepts", async () => {
 
 });
 
+app.get('/artifact/:d', async (req, res) => {
+
+    const { id } = req.params as { id: string};
+
+    const artifact = await queryEngine.getArtifact(id);
+
+    if (!artifact) {
+
+        return res.status(404).send({
+            ok: false,
+            error: `Artifact ${id} was not found`
+        });
+    }
+
+    return {
+        ok: true,
+        artifact
+    }
+
+});
+
+// runtime package endpoint
 app.get('/bundle/:id', async (req, res) => {
 
     const { id } = req.params as { id: string };
 
-    const concept = await queryEngine.getArtifact(id);
+    const artifact = await queryEngine.getArtifact(id);
 
-    if (!concept/* bundle */) {
+    if (!artifact/* bundle */) {
 
         return res.status(404).send({
             ok: false,
-            error: `concept not found ${id}`
+            error: `artifact not found ${id}`
         });
     }
 

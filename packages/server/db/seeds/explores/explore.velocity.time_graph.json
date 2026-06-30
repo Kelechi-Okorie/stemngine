@@ -1,11 +1,12 @@
 {
     "type": "explore",
-    "id": "explore:velocity:graph",
+    "id": "explore.velocity.graph",
+    "version": "0.0.0",
     "name": "Velocity vs Position Graph",
     "description": "",
     "slug": "explore-velocity-time-graph",
-    "conceptId": "concept:velocity",
-    "runtimeId": "runtime:velocity",
+    "conceptId": "concept.velocity",
+    "runtimeId": "runtime.velocity",
     "controls": [
         {
             "type": "slider",

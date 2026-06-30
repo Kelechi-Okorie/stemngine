@@ -1,9 +1,10 @@
 {
     "type": "runtime",
-    "id": "runtime:cardiac_cycle",
+    "id": "runtime.cardiac_cycle",
+    "version": "0.0.0",
     "name": "Cardiac cycle",
     "description": "",
-    "worldId": "world:heart:basic",
+    "worldId": "world.heart_basic",
     "observations": [
         {
             "id": "o_anatomy",

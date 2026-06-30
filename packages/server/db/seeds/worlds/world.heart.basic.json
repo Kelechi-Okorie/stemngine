@@ -1,6 +1,7 @@
 {
     "type": "world",
-    "id": "world:heart:basic",
+    "id": "world.heart_basic",
+    "version": "0.0.0",
     "name": "Basic world",
     "description": "",
     "systems": [

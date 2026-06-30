@@ -1,13 +1,14 @@
 {
   "type": "concept",
-  "id": "concept:gravity",
+  "id": "concept.gravity",
+  "version": "0.0.0",
   "name": "Gravity",
   "description": "",
   "slug": "concept-gravity",
   "relationships": [
     {
       "type": "prerequisite",
-      "to": "concept:velocity"
+      "to": "concept.velocity"
     }
   ],
   "variables": [

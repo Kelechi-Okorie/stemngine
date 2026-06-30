@@ -1,11 +1,10 @@
 {
   "type": "subject",
-  "id": "subject:physics",
+  "id": "subject.physics",
+  "version": "0.0.0",
   "name": "Physics",
   "description": "",
   "slug": "subject-physics",
-
   "relationships": [],
-
   "tags": []
 }

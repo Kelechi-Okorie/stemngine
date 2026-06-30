@@ -1,17 +1,18 @@
 {
   "type": "concept",
-  "id": "concept:velocity",
+  "id": "concept.velocity",
+  "version": "0.0.0",
   "name": "Velocity",
   "description": "",
   "slug": "concept-velocity",
   "relationships": [
     {
       "type": "prerequisite",
-      "to": "concept:position"
+      "to": "concept.position"
     },
     {
       "type": "prerequisite",
-      "to": "concept:displacement"
+      "to": "concept.displacement"
     }
   ],
   "variables": [

@@ -1,6 +1,7 @@
 {
     "type": "concept",
-    "id": "concept:cardiac_cycle",
+    "id": "concept.cardiac_cycle",
+    "version": "0.0.0",
     "name": "Cardiac cycle",
     "description": "",
     "slug": "concept-cardiac-cycle",

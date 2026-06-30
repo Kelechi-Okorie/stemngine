@@ -1,6 +1,7 @@
 {
     "type": "domain",
-    "id": "domain:kinematics",
+    "id": "domain.kinematics",
+    "version": "0.0.0",
     "name": "Kinematics",
     "description": "",
     "slug": "domain-kinematics",

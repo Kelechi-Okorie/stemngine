@@ -54,15 +54,15 @@ async function insertArtifacts(artifacts: Artifact[]) {
 
     for (const a of artifacts) {
         await pool.query(`
-            INSERT INTO artifacts (id, type, name, description, slug, data)
-            VALUES ($1, $2, $3, $4, $5, $6)
+            INSERT INTO artifacts (id, type, version, name, description, slug, data)
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
             ON CONFLICT (id)
             DO UPDATE SET
                 type = EXCLUDED.type,
                 data = EXCLUDED.data,
                 updated_at = NOW()
             `,
-            [a.id, a.type, a.name, a.description, a.slug, a]
+            [a.id, a.type, a.version, a.name, a.description, a.slug, a]
         );
     }
 

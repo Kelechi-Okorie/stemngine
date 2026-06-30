@@ -1,21 +1,22 @@
 {
     "type": "concept",
-    "id": "concept:projectile_motion",
+    "id": "concept.projectile_motion",
+    "version": "0.0.0",
     "name": "Projectile Motion",
     "description": "",
     "slug": "concept-projectile-motion",
     "relationships": [
         {
             "type": "prerequisite",
-            "to": "domain:kinematics"
+            "to": "domain.kinematics"
         },
         {
             "type": "prerequisite",
-            "to": "concept:velocity"
+            "to": "concept.velocity"
         },
         {
             "type": "prerequisite",
-            "to": "concept:acceleration"
+            "to": "concept.acceleration"
         }
     ],
     "variables": [

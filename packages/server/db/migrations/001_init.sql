@@ -2,6 +2,7 @@
 CREATE TABLE IF NOT EXISTS artifacts (
     id TEXT PRIMARY KEY,
     type TEXT NOT NULL,
+    version TEXT NOT NULL,
     name TEXT NOT NULL,
     description TEXT NOT NULL,
     slug TEXT,

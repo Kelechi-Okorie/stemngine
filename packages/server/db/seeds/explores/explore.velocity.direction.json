@@ -1,11 +1,12 @@
 {
     "type": "explore",
-    "id": "explore:velocity:direction",
+    "id": "explore.velocity.direction",
+    "version": "0.0.0",
     "name": "Velocity direction",
     "description": "",
     "slug": "explore-velocity-direction",
-    "conceptId": "concept:velocity",
-    "runtimeId": "runtime:velocity",
+    "conceptId": "concept.velocity",
+    "runtimeId": "runtime.velocity",
     "controls": [
         {
             "type": "vector",

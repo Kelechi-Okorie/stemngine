@@ -98,7 +98,7 @@ export function renderHome() {
             title: "Explore concepts",
             children: [
                 el("span", { text: "➡️ Interact with " }),
-                Link({ text: "velocity, ", href: "#" }),
+                Link({ text: "velocity, ", href: "#/run/explore.velocity.direction" }),
                 Link({ text: "acceleration, ", href: "#" }),
                 Link({ text: "forces", href: "#" })
             ]

@@ -1,9 +1,10 @@
 {
     "type": "runtime",
-    "id": "runtime:velocity",
+    "id": "runtime.velocity",
+    "version": "0.0.0",
     "name": "Velocity",
     "description": "",
-    "worldId": "world:velocity:basic",
+    "worldId": "world.velocity_basic",
     "bindings": [
         {
             "variableId": "v",

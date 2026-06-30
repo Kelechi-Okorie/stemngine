@@ -1,6 +1,7 @@
 {
     "type": "runtime",
-    "id": "runtime:gravity",
+    "id": "runtime.gravity",
+    "version": "0.0.0",
     "name": "Gravity",
     "description": "",
     "worldId": "world:gravity:basic",

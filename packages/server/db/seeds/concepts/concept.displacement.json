@@ -1,6 +1,7 @@
 {
   "type": "concept",
-  "id": "concept:displacement",
+  "id": "concept.displacement",
+  "version": "0.0.0",
   "name": "Displacement",
   "description": "",
   "slug": "concept-displacement",

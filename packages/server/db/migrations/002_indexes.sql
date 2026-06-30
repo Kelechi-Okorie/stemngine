@@ -2,6 +2,9 @@
 CREATE INDEX IF NOT EXISTS idx_artifacts_type ON artifacts(type);
 CREATE INDEX IF NOT EXISTS idx_artifacts_data ON artifacts USING GIN (data);
 
+CREATE UNIQUE INDEX IF NOT EXISTS idx_artifacts_id_version
+ON artifacts(id, version);
+
 CREATE UNIQUE INDEX IF NOT EXISTS idx_artifacts_type_slug
 ON artifacts(type,slug)
 WHERE slug IS NOT NULL;

@@ -1,5 +1,7 @@
 import { loadBundle } from "../services/api";
 
+// Your service worker can manage an IndexedDB artifact store while still providing the same Docker-like behavior
+
 // ----------------------------------
 // [ Top Bar: Title / Mode ]
 
@@ -28,7 +30,31 @@ import { loadBundle } from "../services/api";
 //   showGoals();
 // }
 
+
+
+// Then your service worker becomes a package manager
+
+// It is no longer "just a cache."
+
+// It becomes responsible for:
+
+// checking cache
+// downloading artifacts
+// verifying versions or hashes
+// storing artifacts
+// deleting old versions if desired
+
+// That's much closer to how serious software distribution works.
+
+// One suggestion
+
+// I would avoid localStorage for storing artifacts.
+
+// localStorage is synchronous, relatively small, and not well suited for storing many JSON documents or binary assets. Since you're talking about concepts, worlds, lessons, meshes, textures, audio, and eventually many hundreds or thousands of artifacts, IndexedDB is a much better fit. Your service worker can manage an IndexedDB artifact store while still providing the same Docker-like behavior.
+
 export async function renderRunner(id: string) {
+
+    console.log(id)
 
     const root = document.getElementById("root")!;
     root.innerHTML = "Loading...";
